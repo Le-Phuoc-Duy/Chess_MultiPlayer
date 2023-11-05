@@ -1,0 +1,35 @@
+npm init -y
+npm i --save-dev typescript
+    npx tsc --init
+
+package.json: test -> "scripts": {
+ 				   "start": "tsc --watch"
+ 			 },
+tsconfig.json: outDir: "./dest" || "module": "es6",   
+
+<script src="dest/script.js" defer></script>
+
+npm i uuid
+
+----------------------------
+npx create-snowpack-app . --template @snowpack/app-template-blank-typescript --force
+
+package.json:
+  "scripts": {
+    "start": "snowpack dev",
+    "build": "snowpack build"
+  },
+
+tsconfig.json:
+"importsNotUsedAsValues": "error" -> "verbatimModuleSyntax": true
+npm start
+
+npm i uuid
+
+-------------------------
+That last point is key: Every file is built individually and cached indefinitely. Your dev environment will never build a file more than once and your browser will never download a file twice (until it changes). This is the real power of unbundled development.
+
+
+
+
+

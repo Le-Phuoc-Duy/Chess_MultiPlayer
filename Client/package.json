@@ -1,0 +1,28 @@
+{
+  "scripts": {
+    "start": "snowpack dev",
+    "build": "snowpack build"
+  },
+  "dependencies": {
+    "@npmcli/arborist": "^7.2.0",
+    "@stomp/stompjs": "^7.0.0",
+    "canvas-confetti": "^1.2.0",
+    "request": "^2.88.2",
+    "sockjs-client": "^1.6.1",
+    "stomp": "^0.1.1",
+    "stompjs": "^2.3.3",
+    "tough-cookie": "^4.1.3",
+    "uuid": "^9.0.1",
+    "vm2": "^3.9.19"
+  },
+  "devDependencies": {
+    "@snowpack/plugin-typescript": "^1.2.1",
+    "@types/canvas-confetti": "^1.0.0",
+    "@types/snowpack-env": "^2.3.3",
+    "@types/sockjs-client": "^1.5.3",
+    "@types/ws": "^8.5.8",
+    "prettier": "^2.2.1",
+    "snowpack": "^3.3.7",
+    "typescript": "^4.2.4"
+  }
+}
