@@ -22,7 +22,20 @@ public class AccountService {
         account.setPassword(passwordEncoder.encode(account.getPassword()));
         return accountRepository.save(account);
     }
-    public boolean authenticate(String inputPassword, String encodedPassword) {
-        return passwordEncoder.matches(inputPassword, encodedPassword);
+//    public boolean authenticate(String inputPassword, String encodedPassword) {
+//        return passwordEncoder.matches(inputPassword, encodedPassword);
+//    }
+    public boolean authenticate(String username, String password) {
+        Account account = accountRepository.findByUsername(username);
+
+        if (account == null) {
+            return false;
+        }
+
+        if (passwordEncoder.matches(password, account.getPassword())) {
+            return true;
+        }
+
+        return false;
     }
 }
