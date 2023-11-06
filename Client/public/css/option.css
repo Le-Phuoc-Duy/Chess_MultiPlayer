@@ -48,5 +48,15 @@ body{
       color: white;
       background-color: #accf6e
     }
+  } 
+  
+  .ava {
+    border: 2px solid transparent;
+    display: inline-block;
+    margin: 10px;
+    padding: 10px; 
+  }
+  input[type="radio"]:checked + label {
+    border: 2px solid red; 
   }
   

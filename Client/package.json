@@ -11,6 +11,7 @@
     "sockjs-client": "^1.6.1",
     "stomp": "^0.1.1",
     "stompjs": "^2.3.3",
+    "sweetalert2": "^11.9.0",
     "tough-cookie": "^4.1.3",
     "uuid": "^9.0.1",
     "vm2": "^3.9.19"
