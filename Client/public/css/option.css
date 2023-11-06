@@ -1,0 +1,52 @@
+body{
+    background-color: #302e2b ;
+  }
+  .demo1{
+    outline-color: red; /* Màu đỏ */
+    outline-width: 3px; /* Độ dày 3px */
+    outline-style: dashed; /* Đường viền đứt */}
+  @media (min-width: 576px) {
+    .select-button{
+        /* display: block;  */
+        margin: 2vh 0;
+        width: 24vw;
+        height: 3vw; 
+        background-color: #dad8d6; 
+    }  
+    .select-button:hover{
+      background-color: #e7e6e5;
+    }
+    .play-button{
+        /* display: block;  */
+        margin: 2vh 0;
+        width: 24vw;
+        height: 3vw;
+        font-weight: bolder;
+        color: white;
+        /* font-size: large; */
+        background-color: #8cb55a;  
+    }  
+    .play-button:hover{
+      font-weight: bolder;
+      color: white;
+      /* font-size: larger; */
+      background-color: #accf6e;
+    }
+    .dropdown-menu{
+      border: none;
+    } 
+    .account-button{
+      margin: 2vh 1vw;
+      width: 11vw;
+      height: 3vw;
+      font-weight: bold;
+      color: white;
+      background-color: #8cb55a
+    }
+    .account-button:hover{
+      font-weight: bold;
+      color: white;
+      background-color: #accf6e
+    }
+  }
+  
