@@ -2,7 +2,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: 100% !important;
+    margin: 0;
+    overflow: hidden; 
     }
   .chessBoard {
     width:80vw;
@@ -61,12 +63,25 @@ body {
   
   @media (min-width:600px) {
     .chessBoard {
-        width:600px;
-        height: 600px;
+        width:100% ;
+        height: inherit;
     }
   }
   @media (max-width:600px) {
     .coordinate {
       font-size: 8px;
     }
+  }
+  
+  .fullScreen {
+    height: 100vh !important; /* Chiều cao toàn màn hình */
+    width: 100% !important;   /* Chiều rộng 100% */
+    overflow: hidden !important; /* Ẩn thanh cuộn nếu nó xuất hiện */
+  }
+  #divChessBoard {
+    height: 100vh; /* Chiều cao bằng chiều cao của màn hình (100 viewport height) */
+  }
+  #row{
+     /* Chiều cao toàn màn hình */
+    width: 100% !important;  
   }

@@ -69,7 +69,7 @@ function ClickPiece(coordinates: string){
 
 import { Client, StompSubscription } from '@stomp/stompjs';
 // import SockJS from 'sockjs-client';
-const socket = new SockJS('http://localhost:8080/ws');
+const socket = new SockJS('http://localhost:8888/ws');
 // const socket = new SockJS('http://localhost:888/ws');
 const stompClient = new Client({
     webSocketFactory: () => socket,
@@ -133,3 +133,15 @@ stompClient.onStompError = (frame) => {
 
 // Khi không cần kết nối nữa, bạn có thể ngắt kết nối
 // stompClient.deactivate();
+
+// main.ts
+
+// Lấy tham chiếu đến nút đăng nhập
+// const LoginButton = document.getElementById("loginButton");
+// const Overlay = document.getElementById("overlay");
+// const OverlayLogin = document.getElementById("loginButton");
+// // Thêm sự kiện khi nút đăng nhập được kích
+// LoginButton?.addEventListener("click", () => {
+//     Overlay.style.display = "block";
+//     OverlayLogin.style.display = "block";
+// });
