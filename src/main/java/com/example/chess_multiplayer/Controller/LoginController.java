@@ -25,13 +25,18 @@ public class LoginController {
         String username = loginRequest.getUsername();
         String password = loginRequest.getPassword();
 
-        // Gọi service để xác thực người dùng
-        if (accountService.authenticate(username, password)) {
-            // Gửi thông báo thành công qua WebSocket
-            messagingTemplate.convertAndSendToUser(principal.getName(), "/topic/loginStatus", "Đăng nhập thành công");
-        } else {
-            // Gửi thông báo thất bại qua WebSocket
-            messagingTemplate.convertAndSendToUser(principal.getName(), "/topic/loginStatus", "Đăng nhập thất bại");
+        try {
+            // Gọi service để xác thực người dùng
+            if (accountService.authenticate(username, password)) {
+                // Gửi thông báo thành công qua WebSocket
+                messagingTemplate.convertAndSendToUser(principal.getName(), "/queue/loginStatus", "Đăng nhập thành công");
+            } else {
+                // Gửi thông báo thất bại qua WebSocket
+                messagingTemplate.convertAndSendToUser(principal.getName(), "/queue/loginStatus", "Đăng nhập thất bại");
+            }
+        } catch (Exception ex) {
+            // Bắt lấy ngoại lệ (bao gồm cả các ngoại lệ checked) và gửi thông báo lỗi qua WebSocket
+            messagingTemplate.convertAndSendToUser(principal.getName(), "/queue/loginStatus", "Đăng nhập thất bại: " + ex.getMessage());
         }
     }
 

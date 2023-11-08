@@ -23,36 +23,41 @@ window.onload = function(){
 const socket = new SockJS('http://localhost:8888/ws'); 
 const stompClient = new Client({
     webSocketFactory: () => socket,
-    // connectHeaders: {
-    //     login: 'user',
-    //     passcode: 'password',
-    // },
-
+    connectHeaders: {
+    login: 'your_username',
+    passcode: 'your_password',
+    },
     debug: (msg) => console.log(msg),
-    reconnectDelay: 5000,
-    heartbeatIncoming: 4000,
-    heartbeatOutgoing: 4000,
+    // reconnectDelay: 5000,
+    // heartbeatIncoming: 4000,
+    // heartbeatOutgoing: 4000,
 });
 
 socket.onerror = (error) => {
     console.error('WebSocket error:', error);
     // Thực hiện các xử lý khác tùy ý khi kết nối thất bại
 };
-
+stompClient.onWebSocketError = (error) => {
+    console.error('Error with websocket', error);
+};
 
 // Bắt sự kiện khi kết nối thành công
 stompClient.onConnect = (frame) => {
     console.log('Connected to WebSocket server');
 
     // Đăng ký để nhận tin nhắn từ /queue/connect
-    const subscription: StompSubscription = stompClient.subscribe('/topic/loginStatus', (message) => {
+    const subscription: StompSubscription = stompClient.subscribe('/queue/loginStatus', (message) => {
         const body = JSON.parse(message.body);
         console.log('Received message:', body);
-    }); 
+    });
+    const subscriptionConnect: StompSubscription = stompClient.subscribe("/queue/connect", (message) => {
+        const body = JSON.parse(message.body);
+        console.log('Received message Connect:', body);
+    });
     // Gửi một yêu cầu tới server, ví dụ khi muốn tạo phòng
     stompClient.publish({
-        destination: '/login', // URL của Message Mapping trên server
-        body: JSON.stringify({}), // Dữ liệu gửi đi, có thể thay đổi tùy ý
+        destination: 'app/login', // URL của Message Mapping trên server
+        body: JSON.stringify({username: "user1_username", password: "user1_password"}), // Dữ liệu gửi đi, có thể thay đổi tùy ý
     });
 };
 // Kết nối tới server
