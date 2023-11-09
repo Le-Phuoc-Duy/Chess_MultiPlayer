@@ -20,7 +20,7 @@ window.onload = function(){
     console.log("tao game thanh cong")
     init(game.board)
 }
-const socket = new SockJS('http://localhost:8888/ws'); 
+const socket = new SockJS('http://localhost:8888/ws');  
 const stompClient = new Client({
     webSocketFactory: () => socket,
     // connectHeaders: {
@@ -33,7 +33,6 @@ const stompClient = new Client({
     heartbeatIncoming: 4000,
     heartbeatOutgoing: 4000,
 });
-
 socket.onerror = (error) => {
     console.error('WebSocket error:', error);
     // Thực hiện các xử lý khác tùy ý khi kết nối thất bại
@@ -43,18 +42,33 @@ socket.onerror = (error) => {
 // Bắt sự kiện khi kết nối thành công
 stompClient.onConnect = (frame) => {
     console.log('Connected to WebSocket server');
-
+    console.log("gui thang nay: " +JSON.stringify({username: "duy le",
+    password:"djdj12"}))
     // Đăng ký để nhận tin nhắn từ /queue/connect
-    const subscription: StompSubscription = stompClient.subscribe('/topic/loginStatus', (message) => {
+    const subscription: StompSubscription = stompClient.subscribe('/user/topic/public', (message) => {
         const body = JSON.parse(message.body);
-        console.log('Received message:', body);
-    }); 
-    // Gửi một yêu cầu tới server, ví dụ khi muốn tạo phòng
+        console.log('Received message:', body.username);
+        console.log('Received message:', body.password);
+        console.log("nhan duoc: " + body.username + body.password)
+        // console.log(message)
+    });  
+    const subscription2: StompSubscription = stompClient.subscribe('/user/queue/loginStatus', (message) => {
+        // const body = JSON.parse(message.body);
+        // console.log('Tuky:', JSON.parse(message.body).content); 
+        // console.log(message)
+        const body2 = JSON.parse(message.body);
+        console.log('Received message:', body2.username);
+        console.log('Received message:', body2.password);
+        console.log("nhan duoc: " + body2.username + body2.password)
+    });  
+}; 
+function send(name: string, pass: string){
     stompClient.publish({
-        destination: '/login', // URL của Message Mapping trên server
-        body: JSON.stringify({}), // Dữ liệu gửi đi, có thể thay đổi tùy ý
+        destination: '/app/login', // URL of the Message Mapping on the server
+        headers: {}, // Any additional headers you want to send
+        body: JSON.stringify({ username: name, password: pass }), // Data to be sent, can be customized as needed
     });
-};
+}
 // Kết nối tới server
 stompClient.activate();
 // Bắt sự kiện khi mất kết nối
@@ -76,9 +90,6 @@ stompClient.onStompError = (frame) => {
     // Thông báo lỗi đến người dùng hoặc thực hiện các xử lý khác ở đây
     console.error('WebSocket connection failed. Please check your connection settings.');
 };
-
-// Khi không cần kết nối nữa, bạn có thể ngắt kết nối
-// stompClient.deactivate();
 function init(board: Board) {
     //i row, j col
     for (let i = 0; i < 8; i++) {
@@ -148,6 +159,7 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
         }
     })
     if (formValues) {
+        send(formValues[0],formValues[1])
         console.log("username" + formValues[0] +"password" + formValues[1] )
         // Swal.fire(`Tên người dùng: ${formValues[0]}<br>Mật khẩu: ${formValues[1]}`)
     }
