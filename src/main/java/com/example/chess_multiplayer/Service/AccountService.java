@@ -38,4 +38,14 @@ public class AccountService {
 
         return false;
     }
+    public String getUserID(String username, String password){
+        Account account = accountRepository.findByUsername(username);
+        if (account == null) {
+            return null;
+        }
+        if (passwordEncoder.matches(password, account.getPassword())) {
+            return account.getiDAccount();
+        }
+        return null;
+    }
 }

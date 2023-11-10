@@ -18,37 +18,37 @@ public class WebsocketController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @EventListener
-    public void handleWebSocketConnectListener(SessionConnectedEvent event) {
-        String sessionId = event.getMessage().getHeaders().get("simpSessionId").toString();
-
-        // Kiểm tra xem event.getUser() có khả dụng hay không
-        String clientAddress = event.getUser() != null ? event.getUser().getName() : "Không có thông tin người dùng";
-
-        // Truy xuất thông tin địa chỉ IP và port
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        String clientIp = accessor.getHost();
-        String clientPort = accessor.getAck();
-
-        System.out.println("Client #" + sessionId + " đã kết nối từ địa chỉ: " + clientIp + ":" + clientPort);
-
-        String successMessage = "Kết nối thành công!";
-        messagingTemplate.convertAndSendToUser(sessionId, "/queue/connect", successMessage);
-    }
-
-
-    @EventListener
-    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        String sessionId = headerAccessor.getSessionId();
-
-        // Kiểm tra xem event.getUser() có khả dụng hay không
-        String clientAddress = event.getUser() != null ? event.getUser().getName() : "Không có thông tin người dùng";
-
-        System.out.println("Client #" + sessionId + " đã ngắt kết nối từ địa chỉ: " + clientAddress);
-
-        String errorMessage = "Kết nối thất bại!";
-        System.out.println(errorMessage);
-    }
+//    @EventListener
+//    public void handleWebSocketConnectListener(SessionConnectedEvent event) {
+//        String sessionId = event.getMessage().getHeaders().get("simpSessionId").toString();
+//
+//        // Kiểm tra xem event.getUser() có khả dụng hay không
+//        String clientAddress = event.getUser() != null ? event.getUser().getName() : "Không có thông tin người dùng";
+//
+//        // Truy xuất thông tin địa chỉ IP và port
+//        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+//        String clientIp = accessor.getHost();
+//        String clientPort = accessor.getAck();
+//
+//        System.out.println("Client #" + sessionId + " đã kết nối từ địa chỉ: " + clientIp + ":" + clientPort);
+//
+//        String successMessage = "Kết nối thành công!";
+//        messagingTemplate.convertAndSendToUser(sessionId, "/queue/connect", successMessage);
+//    }
+//
+//
+//    @EventListener
+//    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
+//        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+//        String sessionId = headerAccessor.getSessionId();
+//
+//        // Kiểm tra xem event.getUser() có khả dụng hay không
+//        String clientAddress = event.getUser() != null ? event.getUser().getName() : "Không có thông tin người dùng";
+//
+//        System.out.println("Client #" + sessionId + " đã ngắt kết nối từ địa chỉ: " + clientAddress);
+//
+//        String errorMessage = "Kết nối thất bại!";
+//        System.out.println(errorMessage);
+//    }
 
 }

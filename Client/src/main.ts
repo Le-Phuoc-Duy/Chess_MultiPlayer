@@ -17,7 +17,6 @@ var game: Game = new Game()
 window.onload = function(){
 
     game.initialize(p1,p2)
-    console.log("tao game thanh cong")
     init(game.board)
 }
 const socket = new SockJS('http://localhost:8888/ws'); 
@@ -25,7 +24,7 @@ const stompClient = new Client({
     webSocketFactory: () => socket,
     connectHeaders: {
     login: 'your_username',
-    passcode: 'your_password',
+    password: 'your_password',
     },
     debug: (msg) => console.log(msg),
     // reconnectDelay: 5000,
@@ -43,28 +42,13 @@ stompClient.onWebSocketError = (error) => {
 
 // Bắt sự kiện khi kết nối thành công
 stompClient.onConnect = (frame) => {
-    console.log('Connected to WebSocket server');
 
-    // Đăng ký để nhận tin nhắn từ /queue/connect
-    const subscription: StompSubscription = stompClient.subscribe('/queue/loginStatus', (message) => {
-        const body = JSON.parse(message.body);
-        console.log('Received message:', body);
-    });
-    const subscriptionConnect: StompSubscription = stompClient.subscribe("/queue/connect", (message) => {
-        const body = JSON.parse(message.body);
-        console.log('Received message Connect:', body);
-    });
-    // Gửi một yêu cầu tới server, ví dụ khi muốn tạo phòng
-    stompClient.publish({
-        destination: 'app/login', // URL của Message Mapping trên server
-        body: JSON.stringify({username: "user1_username", password: "user1_password"}), // Dữ liệu gửi đi, có thể thay đổi tùy ý
-    });
 };
 // Kết nối tới server
 stompClient.activate();
 // Bắt sự kiện khi mất kết nối
 stompClient.onDisconnect = (frame) => {
-    console.log('Disconnected from WebSocket server');
+    // console.log('Disconnected from WebSocket server');
 };
 // Handle lỗi
 stompClient.onStompError = (frame) => {
@@ -78,12 +62,27 @@ stompClient.onStompError = (frame) => {
         console.error('An error occurred. Please check your connection settings.');
     }
 
-    // Thông báo lỗi đến người dùng hoặc thực hiện các xử lý khác ở đây
-    console.error('WebSocket connection failed. Please check your connection settings.');
 };
+function send(name: string, pass: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        stompClient.publish({
+            destination: '/app/login',
+            headers: {},
+            body: JSON.stringify({ username: name, password: pass }),
+        });
 
-// Khi không cần kết nối nữa, bạn có thể ngắt kết nối
-// stompClient.deactivate();
+        const subscription: StompSubscription = stompClient.subscribe('/user/queue/loginStatus', (message) => {
+            const body = JSON.parse(message.body);
+            console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
+            if (body.message === "Đăng nhập thành công") {
+                localStorage.setItem('userID', body.userID);
+                resolve('success');
+            } else {
+                reject('failure');
+            }
+        });
+    });
+}
 function init(board: Board) {
     //i row, j col
     for (let i = 0; i < 8; i++) {
@@ -104,17 +103,17 @@ function init(board: Board) {
 }
 //Chi ap dung cho self, khong ap dung cho opponent
 function ClickPiece(r: number, c: number){
-    console.log(r + c)
+    // console.log(r + c)
     // connect()
     if(selected){
-        console.log("secleted") 
+        // console.log("secleted")
         if(game.playerMove(p1,startX,startY,r,c)){
             init(game.board)
             // game.setFullCoordinates(startX,startY,r,c)
-            console.log("canmove"+ startX +startY +r + c)
+            // console.log("canmove"+ startX +startY +r + c)
             // send()
         }else{
-            console.log("cantmove"+ startX +startY + +r + c)
+            // console.log("cantmove"+ startX +startY + +r + c)
         }
         selected = false
         startX = -1
@@ -122,7 +121,7 @@ function ClickPiece(r: number, c: number){
         endX = -1
         endY = -1
     }else{
-        console.log("!secleted")
+        // console.log("!secleted")
         selected = true
         startX = r //parseInt(coordinates.charAt(0))
         startY = c //parseInt(coordinates.charAt(1)) 
@@ -153,8 +152,24 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
         }
     })
     if (formValues) {
-        console.log("username" + formValues[0] +"password" + formValues[1] )
-        // Swal.fire(`Tên người dùng: ${formValues[0]}<br>Mật khẩu: ${formValues[1]}`)
+        // send(formValues[0],formValues[1]);
+        send(formValues[0], formValues[1])
+          .then((result) => {
+            if (result === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Đăng nhập thành công!',
+                }).then(() => {
+                });
+            }
+            })
+          .catch((error) => {
+              Swal.fire({
+                  icon: "error",
+                  text: "Đăng nhập thất bại",
+              }).then(() => {
+              });
+          });
     }
 })
 document.getElementById("registerButton")?.addEventListener("click",async () => {
@@ -214,6 +229,6 @@ document.getElementById("registerButton")?.addEventListener("click",async () => 
         }
     })
     if (formValues) {
-        console.log("username: " + formValues[0] + ", password: " + formValues[1] + ", avatar: " + formValues[2])          // Swal.fire(`Tên người dùng: ${formValues[0]}<br>Mật khẩu: ${formValues[1]}`)
+        // console.log("username: " + formValues[0] + ", password: " + formValues[1] + ", avatar: " + formValues[2])          // Swal.fire(`Tên người dùng: ${formValues[0]}<br>Mật khẩu: ${formValues[1]}`)
     }
 })
