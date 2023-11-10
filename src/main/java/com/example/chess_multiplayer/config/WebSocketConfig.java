@@ -1,5 +1,6 @@
 package com.example.chess_multiplayer.config;
 
+import com.example.chess_multiplayer.Controller.UserHandshakeHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 //import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
@@ -16,7 +17,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/queue"); // Đăng ký một topic /queue - topic: tat ca; queue: ca nhan rieng biet
+        config.enableSimpleBroker("/topic","/queue"); // Đăng ký một topic /queue - topic: tat ca; queue: ca nhan rieng biet
         config.setApplicationDestinationPrefixes("/app"); // Xử lý các tin nhắn đến /app
     }
 
