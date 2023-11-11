@@ -83,6 +83,40 @@ function send(name: string, pass: string): Promise<string> {
         });
     });
 }
+function createRoom(mode: Int32Array): Promise<string> {
+    return new Promise((resolve, reject) => {
+        stompClient.publish({
+            destination: '/app/createRoom',
+            headers: {},
+            body: JSON.stringify({ userCreateId: localStorage.getItem('userID'), mode: mode }),
+        });
+
+        const subscription: StompSubscription = stompClient.subscribe('/user/queue/roomCreated', (message) => {
+            const body = JSON.parse(message.body);
+            // console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
+            console.log('waitingRoomId: '+ body.waitingRoomId +'\nuserCreateId: '+ body.userCreateId+ '\nsessionUserCreateId: '+body.sessionUserCreateId +'\nmode: '+body.mode );
+            resolve(body.waitingRoomId);
+        });
+        
+    });
+}
+function joinRoom(idRoom: String): Promise<string> {
+    return new Promise((resolve, reject) => {
+        stompClient.publish({
+            destination: '/app/joinRoom',
+            headers: {"iDUser": "localStorage.getItem('userID')"},
+            body: JSON.stringify({ waitingRoomId: idRoom }),
+        });
+
+        const subscription: StompSubscription = stompClient.subscribe('/user/queue/roomJoined', (message) => {
+            const body = JSON.parse(message.body);
+            // console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
+            console.log('userID: '+ body.userID +'\nmessage: '+ body.message);
+            resolve(body.message);
+        });
+    });
+}
+
 function init(board: Board) {
     //i row, j col
     for (let i = 0; i < 8; i++) {
@@ -160,6 +194,7 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
                     icon: 'success',
                     title: 'Đăng nhập thành công!',
                 }).then(() => {
+                    toggleDisplay();
                 });
             }
             })
@@ -172,6 +207,112 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
           });
     }
 })
+document.getElementById("createRoomButton")?.addEventListener("click",async () => {
+    const { value: formValues } = await Swal.fire({
+        title: 'Tạo phòng chơi',
+        html:
+            '<input id="swal-input1" class="swal2-input" placeholder="Chọn chế độ">',
+        focusConfirm: false,
+        preConfirm: () => {
+            //   let inputUsername = document.getElementById('swal-input1')! as HTMLInputElement;
+            let mode = (document.getElementById('swal-input1')! as HTMLInputElement).value
+            
+            return [mode];
+        }
+    })
+    if (formValues) {
+        // send(formValues[0],formValues[1]);
+        createRoom(formValues[0])
+          .then((result) => {
+            if (result) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Tạo phòng thành công!',
+                    text: `ID phòng của bạn là: ${result.toString()}`,
+                    timer: 3000,
+                })
+                const subscription2: StompSubscription = stompClient.subscribe('/user/queue/roomJoined', (message) => {
+                    const body = JSON.parse(message.body);
+                    // console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
+                    console.log('userID: '+ body.userID +'\nmessage: '+ body.message);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Đã có người chơi khác tham gia, Bắt đầu trận đấu',
+                        timer: 10000,
+                    })
+                });
+            }
+            })
+          .catch((error) => {
+              Swal.fire({
+                  icon: "error",
+                  text: "Tạo phòng thất bại",
+              }).then(() => {
+              });
+          });
+    }
+    
+})
+document.getElementById("joinRoomButton")?.addEventListener("click",async () => {
+    const { value: formValues } = await Swal.fire({
+        title: 'Vào phòng chơi',
+        html:
+            '<input id="swal-input1" class="swal2-input" placeholder="Nhập ID phòng">',
+        focusConfirm: false,
+        preConfirm: () => {
+            //   let inputUsername = document.getElementById('swal-input1')! as HTMLInputElement;
+            let idRoom = (document.getElementById('swal-input1')! as HTMLInputElement).value
+            
+            return [idRoom];
+        }
+    })
+    if (formValues) {
+        // send(formValues[0],formValues[1]);
+        joinRoom(formValues[0])
+          .then((result) => {
+            if (result) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Vào phòng thành công!',
+                    text: `ID phòng bạn đã vào là: ${result.toString()}`,
+                    timer: 3000,
+                }).then(() => {
+                    // toggleDisplay();
+                });
+            }
+            })
+          .catch((error) => {
+              Swal.fire({
+                  icon: "error",
+                  text: "Vào phòng thất bại",
+              }).then(() => {
+              });
+          });
+    }
+    
+})
+// Lấy các element từ DOM
+const loginButton = document.getElementById('loginButton');
+const registerButton = document.getElementById('registerButton');
+const createRoomButton = document.getElementById('createRoomButton');
+const joinRoomButton = document.getElementById('joinRoomButton');
+
+// Hàm chuyển đổi display
+function toggleDisplay() {
+    
+    if(loginButton.style.display == 'block'){
+        loginButton.style.display = 'none';
+        registerButton.style.display = 'none';
+        createRoomButton.style.display = 'block';
+        joinRoomButton.style.display = 'block';
+        
+    }else{
+        loginButton.style.display = 'block';
+        registerButton.style.display = 'block';
+        createRoomButton.style.display = 'none';
+        joinRoomButton.style.display = 'none';
+    }
+}
 document.getElementById("registerButton")?.addEventListener("click",async () => {
     const { value: formValues } = await Swal.fire({
         title: 'ĐĂNG KÝ',

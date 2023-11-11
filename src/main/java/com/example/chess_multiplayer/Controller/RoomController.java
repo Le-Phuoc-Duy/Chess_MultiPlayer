@@ -1,14 +1,12 @@
 package com.example.chess_multiplayer.Controller;
 
-import com.example.chess_multiplayer.Entity.Room;
-import com.example.chess_multiplayer.Entity.User;
-import com.example.chess_multiplayer.Repository.RoomRepository;
+import com.example.chess_multiplayer.DTO.WaitingRoom;
+import com.example.chess_multiplayer.DTO.LoginReponse;
 import com.example.chess_multiplayer.Service.RoomService;
-import com.example.chess_multiplayer.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
@@ -18,22 +16,28 @@ import java.util.*;
 
 @Controller
 public class RoomController {
-
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
     @Autowired
     private RoomService roomService;
-    private Map<String, String> waitingRooms = new HashMap<>();
+    private RoomuserController roomuserController = new RoomuserController();
+    private Set<WaitingRoom> waitingRooms = new HashSet<>();
     private Set<String> RandomWaitingRoomIds = new HashSet<>();
-    private RoomuserController roomuserController;
+
     @MessageMapping("/createRoom")
     @SendToUser("/queue/roomCreated")
-    @Async
-    public String createRoom(@Header("iDUser") String userId, String mode) {
+    public WaitingRoom createRoom(WaitingRoom message, Principal principal) {
         // Sinh ngẫu nhiên ID phòng
         String waitingRoomId = generateRandomWaitingRoomId();
-        String infor = userId + "/" + mode;
+//        String infor = userId + "/" + principal.getName() + "/" + mode;
+        WaitingRoom waitingRoom = new WaitingRoom();
+        waitingRoom.setWaitingRoomId(waitingRoomId);
+        waitingRoom.setUserCreateId(message.getUserCreateId());
+        waitingRoom.setSessionUserCreateId(principal.getName());
+        waitingRoom.setMode(message.getMode());
         // Lưu thông tin phòng vào danh sách chờ
-        waitingRooms.put(waitingRoomId, infor);
-        return waitingRoomId;
+        waitingRooms.add(waitingRoom);
+        return waitingRoom;
     }
 
     private String generateRandomWaitingRoomId() {
@@ -48,28 +52,33 @@ public class RoomController {
     }
 
     @MessageMapping("/joinRoom")
-    @SendToUser("/queue/roomJoined")
-    @Async
-    public String joinRoom(@Header("iDUser") String userId, String waitingRoomId) {
+//    @SendToUser("/queue/roomJoined")
+    public LoginReponse joinRoom(@Header("iDUser") String userId, WaitingRoom message, Principal principal) {
         // Kiểm tra xem phòng có tồn tại trong danh sách chờ hay không
-        if (waitingRooms.containsKey(waitingRoomId)) {
+        LoginReponse loginReponse = new LoginReponse();
+        if (containsWaitingRoomById(message.getWaitingRoomId())) {
             // Phòng tồn tại, xác nhận tham gia
-            String waitingRoomValue = waitingRooms.get(waitingRoomId);
-            String[] parts = waitingRoomValue.split("/");
-            String userIdCreate = parts[0];
-            String mode = parts[1];
+            WaitingRoom waitingRoom = getWaitingRoomById(message.getWaitingRoomId());
 
             //khoi tao room
-            String idRoomCreated = roomService.createRoom(convertStringToInt(mode));
+            String idRoomCreated = roomService.createRoom(waitingRoom.getMode());
             //khoi tao roomuser
-            roomuserController.creatRoomuser(userIdCreate,idRoomCreated,convertStringToInt(mode));
-            roomuserController.creatRoomuser(userId,idRoomCreated,convertStringToInt(mode));
+            roomuserController.creatRoomuser(waitingRoom.getUserCreateId(),idRoomCreated,waitingRoom.getMode());
+            roomuserController.creatRoomuser(userId,idRoomCreated,waitingRoom.getMode());
 
-            waitingRooms.remove(waitingRoomId);
-            RandomWaitingRoomIds.remove(waitingRoomId);
-            return "Success";
+            removeWaitingRoomById(waitingRoom.getWaitingRoomId());
+            RandomWaitingRoomIds.remove(waitingRoom.getWaitingRoomId());
+
+            loginReponse.setUserID(userId);
+            loginReponse.setMessage("Vào phòng " + waitingRoom.getWaitingRoomId() + " thành công");
+
+            messagingTemplate.convertAndSendToUser(principal.getName(), "/queue/roomJoined", loginReponse);
+            messagingTemplate.convertAndSendToUser(waitingRoom.getSessionUserCreateId(), "/queue/roomJoined", loginReponse);
+            return loginReponse;
         } else {
-            return "Error";
+            loginReponse.setUserID(userId);
+            loginReponse.setMessage("Fail");
+            return loginReponse;
         }
     }
     public int convertStringToInt(String input) {
@@ -79,6 +88,32 @@ public class RoomController {
         } catch (NumberFormatException e) {
             // Xử lý trường hợp không thỏa mãn
             return 1;
+        }
+    }
+    public boolean containsWaitingRoomById( String waitingRoomId) {
+        for (WaitingRoom room : waitingRooms) {
+            if (room.getWaitingRoomId().equals(waitingRoomId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public WaitingRoom getWaitingRoomById( String waitingRoomId) {
+        for (WaitingRoom room : waitingRooms) {
+            if (room.getWaitingRoomId().equals(waitingRoomId)) {
+                return room;
+            }
+        }
+        return null;
+    }
+    public void removeWaitingRoomById(String waitingRoomId) {
+        Iterator<WaitingRoom> iterator = waitingRooms.iterator();
+        while (iterator.hasNext()) {
+            WaitingRoom room = iterator.next();
+            if (room.getWaitingRoomId().equals(waitingRoomId)) {
+                iterator.remove();
+                // Có thể thêm các xử lý khác nếu cần
+            }
         }
     }
 //    @MessageMapping("/joinRoom")

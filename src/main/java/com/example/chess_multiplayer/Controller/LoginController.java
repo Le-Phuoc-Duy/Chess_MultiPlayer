@@ -9,6 +9,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class LoginController {
@@ -17,6 +19,7 @@ public class LoginController {
     @Autowired
 
     private AccountService accountService;
+    private Map<String, String> sessionId = new HashMap<>();
     @MessageMapping("/login")
 //    @SendTo("/queue/loginStatus")
     public void login(LoginRequest message, Principal principal) {
@@ -24,6 +27,7 @@ public class LoginController {
         String password = message.getPassword();
         System.out.println(username + password);
         LoginReponse loginReponse = new LoginReponse();
+        System.out.println("principal: " + principal.getName());
         try {
             // Gọi service để xác thực người dùng
             if (accountService.authenticate(username, password)) {
