@@ -23,6 +23,9 @@ public class Roomuser {
     @Column(name = "Result", length = 50)
     private String result;
 
+
+
+
     public String getIDRoomUser() {
         return iDRoomUser;
     }
