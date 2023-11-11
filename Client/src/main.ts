@@ -228,7 +228,7 @@ document.getElementById("createRoomButton")?.addEventListener("click",async () =
                 Swal.fire({
                     icon: 'success',
                     title: 'Tạo phòng thành công!',
-                    text: `${result.toString()}`,
+                    text: `ID phòng của bạn là: ${result.toString()}`,
                     timer: 3000,
                 })
                 const subscription2: StompSubscription = stompClient.subscribe('/user/queue/roomJoined', (message) => {
@@ -274,7 +274,7 @@ document.getElementById("joinRoomButton")?.addEventListener("click",async () => 
                 Swal.fire({
                     icon: 'success',
                     title: 'Vào phòng thành công!',
-                    text: `ID phòng bạn đã vào là: ${result.toString()}`,
+                    text: `${result.toString()}`,
                     timer: 3000,
                 }).then(() => {
                     // toggleDisplay();
