@@ -20,7 +20,8 @@ public class RoomController {
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
     private RoomService roomService;
-    private RoomuserController roomuserController = new RoomuserController();
+    @Autowired
+    private RoomuserController roomuserController;
     private Set<WaitingRoom> waitingRooms = new HashSet<>();
     private Set<String> RandomWaitingRoomIds = new HashSet<>();
 
@@ -37,6 +38,7 @@ public class RoomController {
         waitingRoom.setMode(message.getMode());
         // Lưu thông tin phòng vào danh sách chờ
         waitingRooms.add(waitingRoom);
+        System.out.println(waitingRoom.toString());
         return waitingRoom;
     }
 
@@ -62,16 +64,19 @@ public class RoomController {
 
             //khoi tao room
             String idRoomCreated = roomService.createRoom(waitingRoom.getMode());
+            System.out.println("iduser1" + waitingRoom.getUserCreateId());
+            System.out.println("iduser2" + userId);
             //khoi tao roomuser
-            roomuserController.creatRoomuser(waitingRoom.getUserCreateId(),idRoomCreated,waitingRoom.getMode());
-            roomuserController.creatRoomuser(userId,idRoomCreated,waitingRoom.getMode());
-
+            String createRoomUser1 = roomuserController.creatRoomuser(waitingRoom.getUserCreateId(),idRoomCreated,waitingRoom.getMode());
+            String createRoomUser2 = roomuserController.creatRoomuser(userId,idRoomCreated,waitingRoom.getMode());
+            System.out.println("createRoomUser1" + createRoomUser1);
+            System.out.println("createRoomUser2" + createRoomUser2);
             removeWaitingRoomById(waitingRoom.getWaitingRoomId());
             RandomWaitingRoomIds.remove(waitingRoom.getWaitingRoomId());
 
             loginReponse.setUserID(userId);
             loginReponse.setMessage("Vào phòng " + waitingRoom.getWaitingRoomId() + " thành công");
-
+            System.out.println(loginReponse.toString());
             messagingTemplate.convertAndSendToUser(principal.getName(), "/queue/roomJoined", loginReponse);
             messagingTemplate.convertAndSendToUser(waitingRoom.getSessionUserCreateId(), "/queue/roomJoined", loginReponse);
             return loginReponse;

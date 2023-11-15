@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class AccountService {
     @Autowired
@@ -18,6 +20,7 @@ public class AccountService {
     public void addAccountData() {
 
     }
+
     public Account createAccount(Account account){
         account.setPassword(passwordEncoder.encode(account.getPassword()));
         return accountRepository.save(account);
@@ -37,6 +40,15 @@ public class AccountService {
         }
 
         return false;
+    }
+    public String getUserIDbyAccountID(String accID){
+        Account account = accountRepository.findById(accID).orElse(null);
+        if (account != null){
+            return account.getUser().getIDUser();
+        }else{
+            return null;
+        }
+
     }
     public String getUserID(String username, String password){
         Account account = accountRepository.findByUsername(username);

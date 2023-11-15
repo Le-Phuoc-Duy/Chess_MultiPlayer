@@ -23,11 +23,13 @@ public class RoomuserService {
 
     @Autowired
     private UserService userService;
-    public String createRoomuser(String idUser, String idRoom, int mode){
+    @Autowired
+    private AccountService accountService;
+    public String createRoomuser(String idAcc, String idRoom, int mode){
         try{
             Roomuser roomUser = new Roomuser();
             roomUser.setIDRoomUser(generateUniqueRandomId());
-            roomUser.setUser(userService.getUserById(idUser));
+            roomUser.setUser(userService.getUserById(accountService.getUserIDbyAccountID(idAcc)));
             roomUser.setChat(null);
             roomUser.setResult(null);
             Room room;

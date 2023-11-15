@@ -9,11 +9,11 @@ public class Roomuser {
     @Column(name = "IDRoomUser", nullable = false, length = 5)
     private String iDRoomUser;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "IDUser", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "IDRoom", nullable = false)
     private Room room;
 

@@ -9,7 +9,7 @@ public class Account {
     @Column(name = "IDAccount", nullable = false, length = 5)
     private String iDAccount;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "IDUser", nullable = false)
     private User user;
 

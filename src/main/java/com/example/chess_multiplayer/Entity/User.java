@@ -12,7 +12,7 @@ public class User {
     @Column(name = "IDUser", nullable = false, length = 5)
     private String iDUser;
 
-    @OneToOne(mappedBy = "user",fetch = FetchType.LAZY, optional = false)
+    @OneToOne(mappedBy = "user",fetch = FetchType.EAGER, optional = false)
     private Account account;
 
     @Column(name = "Ava")

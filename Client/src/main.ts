@@ -101,10 +101,11 @@ function createRoom(mode: Int32Array): Promise<string> {
     });
 }
 function joinRoom(idRoom: String): Promise<string> {
+    var userID = localStorage.getItem('userID');
     return new Promise((resolve, reject) => {
         stompClient.publish({
             destination: '/app/joinRoom',
-            headers: {"iDUser": "localStorage.getItem('userID')"},
+            headers: {"iDUser": userID},
             body: JSON.stringify({ waitingRoomId: idRoom }),
         });
 
