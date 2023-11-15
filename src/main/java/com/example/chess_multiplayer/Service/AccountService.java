@@ -13,21 +13,15 @@ import java.util.Optional;
 public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
-    @Autowired
-    private UserService userService;
+
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-    public void addAccountData() {
 
-    }
 
     public Account createAccount(Account account){
         account.setPassword(passwordEncoder.encode(account.getPassword()));
         return accountRepository.save(account);
     }
-//    public boolean authenticate(String inputPassword, String encodedPassword) {
-//        return passwordEncoder.matches(inputPassword, encodedPassword);
-//    }
     public boolean authenticate(String username, String password) {
         Account account = accountRepository.findByUsername(username);
 

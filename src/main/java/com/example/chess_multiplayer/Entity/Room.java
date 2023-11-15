@@ -10,7 +10,7 @@ import java.util.Set;
 @Table(name = "room", schema = "db_pbl4")
 public class Room {
     @Id
-    @Column(name = "IDRoom", nullable = false, length = 5)
+    @Column(name = "ID", nullable = false, length = 5)
     private String iDRoom;
 
     @Column(name = "TimeStart")

@@ -6,11 +6,10 @@ import jakarta.persistence.*;
 @Table(name = "account", schema = "db_pbl4")
 public class Account {
     @Id
-    @Column(name = "IDAccount", nullable = false, length = 5)
+    @Column(name = "IDAcc", nullable = false, length = 5)
     private String iDAccount;
 
-    @OneToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "IDUser", nullable = false)
+    @OneToOne(mappedBy = "account",fetch = FetchType.LAZY, optional = false)
     private User user;
 
     @Column(name = "Username", length = 50)

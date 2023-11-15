@@ -54,7 +54,6 @@ public class RoomController {
     }
 
     @MessageMapping("/joinRoom")
-//    @SendToUser("/queue/roomJoined")
     public LoginReponse joinRoom(@Header("iDUser") String userId, WaitingRoom message, Principal principal) {
         // Kiểm tra xem phòng có tồn tại trong danh sách chờ hay không
         LoginReponse loginReponse = new LoginReponse();
@@ -67,8 +66,8 @@ public class RoomController {
             System.out.println("iduser1" + waitingRoom.getUserCreateId());
             System.out.println("iduser2" + userId);
             //khoi tao roomuser
-            String createRoomUser1 = roomuserController.creatRoomuser(waitingRoom.getUserCreateId(),idRoomCreated,waitingRoom.getMode());
-            String createRoomUser2 = roomuserController.creatRoomuser(userId,idRoomCreated,waitingRoom.getMode());
+            String createRoomUser1 = roomuserController.creatRoomuser(waitingRoom.getUserCreateId(),idRoomCreated,waitingRoom.getMode(), true);
+            String createRoomUser2 = roomuserController.creatRoomuser(userId,idRoomCreated,waitingRoom.getMode(),false);
             System.out.println("createRoomUser1" + createRoomUser1);
             System.out.println("createRoomUser2" + createRoomUser2);
             removeWaitingRoomById(waitingRoom.getWaitingRoomId());

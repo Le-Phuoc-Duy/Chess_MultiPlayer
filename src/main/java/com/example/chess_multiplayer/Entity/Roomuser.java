@@ -6,24 +6,25 @@ import jakarta.persistence.*;
 @Table(name = "roomuser", schema = "db_pbl4")
 public class Roomuser {
     @Id
-    @Column(name = "IDRoomUser", nullable = false, length = 5)
+    @Column(name = "ID", nullable = false, length = 5)
     private String iDRoomUser;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "IDUser", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "IDRoom", nullable = false)
     private Room room;
 
-    @Column(name = "Chat", length = 1000)
+    @Column(name = "Chat", length = 10000)
     private String chat;
 
     @Column(name = "Result", length = 50)
     private String result;
 
-
+    @Column(name = "Side")
+    private boolean side;
 
 
     public String getIDRoomUser() {
@@ -65,5 +66,13 @@ public class Roomuser {
 
     public void setRoom(Room room) {
         this.room = room;
+    }
+
+    public boolean getSide() {
+        return side;
+    }
+
+    public void setSide(boolean side) {
+        this.side = side;
     }
 }

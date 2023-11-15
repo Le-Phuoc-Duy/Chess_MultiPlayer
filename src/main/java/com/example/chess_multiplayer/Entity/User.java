@@ -12,7 +12,8 @@ public class User {
     @Column(name = "IDUser", nullable = false, length = 5)
     private String iDUser;
 
-    @OneToOne(mappedBy = "user",fetch = FetchType.EAGER, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "IDAcc", nullable = false)
     private Account account;
 
     @Column(name = "Ava")

@@ -9,11 +9,11 @@ public class Friend {
     @Column(name = "ID", nullable = false, length = 5)
     private String id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "IDUser", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "IDFriend", nullable = false)
     private User friend;
 
