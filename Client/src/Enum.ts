@@ -8,6 +8,7 @@ export enum Side{
 }
 export enum GameStatus { 
     ACTIVE, 
+    INACTIVE,
     BLACK_WIN, 
     WHITE_WIN, 
     FORFEIT, 

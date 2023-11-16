@@ -5,19 +5,16 @@ import { Game } from "./Game";
 import { Self, Opponent } from "./Player";	
 import { Client, StompSubscription } from '@stomp/stompjs';	
 import { RoomJoinedResponse } from './RoomJoinedResponse';
-var selected: Boolean= false	
-var startX: number = -1	
-var endX: number = -1	
-var startY: number = -1	
-var endY: number = -1	
-var p1: Self = new Self(Color.WHITE)            //Chua co socket => Tam thoi setting ban than la trang	
-var p2: Opponent = new Opponent(Color.BLACK)    //Chua co socket => Tam thoi setting ban than la den	
-var game: Game = new Game()	
+import { drawBoard, } from "./PlayChess";
 
-window.onload = function(){	
-    game.initialize(p1,p2)	
-    init(game.board)	
-}	
+// window.onload = function(){
+//     game.initialize(p1,p2)
+//     init(game.board)
+// }
+
+// export var p1: any
+// export var p2: any
+
 const socket = new SockJS('http://localhost:8888/ws'); 	
 const stompClient = new Client({	
     webSocketFactory: () => socket,	
@@ -112,50 +109,6 @@ function joinRoom(idRoom: String): Promise<RoomJoinedResponse> {
     });	
 }	
 
-function init(board: Board) {	
-    //i row, j col	
-    for (let i = 0; i < 8; i++) {	
-        for (let j = 0; j < 8; j++) {	
-            let coordinate: string = i.toString()+j.toString()	
-            let divPiece = document.getElementById(coordinate)	
-            if(divPiece){	
-                divPiece.addEventListener("click",() => ClickPiece(i,j))	
-                let imgPiece = document.getElementById("i" + coordinate)  as HTMLImageElement	
-                if(board.getBox(i,j).piece?.image)	
-                    imgPiece.src = board.getBox(i,j).piece!.image 	
-                else if(imgPiece){	
-                    imgPiece.src = ""	
-                }  	
-            }	
-        }	
-    }	
-}	
-//Chi ap dung cho self, khong ap dung cho opponent	
-function ClickPiece(r: number, c: number){	
-    // console.log(r + c)	
-    // connect()	
-    if(selected){	
-        // console.log("secleted")	
-        if(game.playerMove(p1,startX,startY,r,c)){	
-            init(game.board)	
-            // game.setFullCoordinates(startX,startY,r,c)	
-            // console.log("canmove"+ startX +startY +r + c)	
-            // send()	
-        }else{	
-            // console.log("cantmove"+ startX +startY + +r + c)	
-        }	
-        selected = false	
-        startX = -1	
-        startY = -1	
-        endX = -1	
-        endY = -1	
-    }else{	
-        // console.log("!secleted")	
-        selected = true	
-        startX = r //parseInt(coordinates.charAt(0))	
-        startY = c //parseInt(coordinates.charAt(1)) 	
-    }	
-}  	
 document.getElementById("loginButton")?.addEventListener("click",async () => {	
     const { value: formValues } = await Swal.fire({	
         title: 'ĐĂNG NHẬP',	
@@ -229,14 +182,25 @@ document.getElementById("createRoomButton")?.addEventListener("click",async () =
                 const subscription2: StompSubscription = stompClient.subscribe('/user/queue/roomJoined', (message) => {	
                     const body = JSON.parse(message.body);	
                     // console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);	
-                    console.log('iDUserSend: '+ body.iDUserSend +'\niDUserReceive: '+ body.iDUserReceive+ '\niDRoom: '+body.iDRoom +'\nidRoomUser: '+body.idRoomUser+ '\nchessMove: '+body.chessMove +'\nboard: '+body.board );	
+                    console.log('iDUserSend: '+ body.iDUserSend +'\niDUserReceive: '+ body.iDUserReceive+ '\niDRoom: '+body.iDRoom +'\nidRoomUser: '+body.idRoomUser+ '\nchessMove: '+body.chessMove +'\nboard: '+body.board +'\ncolor: '+body.color );	
                     Swal.fire({	
                         icon: 'success',	
                         title: 'Đã có người chơi khác tham gia, Bắt đầu trận đấu',	
                         timer: 5000,	
-                    })
-                    game.setFullCoordinates(body.board);
-                    drawBoard(game.board);
+                    })  
+                    if(body.color){
+                        console.log("self la white, opp la black")
+                        var p1ByCreate: Self = new Self(Color.WHITE) 
+                        var p2ByCreate: Opponent = new Opponent(Color.BLACK) 
+                    }else{
+                        console.log("self la black, opp la white")
+                        var p1ByCreate: Self = new Self(Color.BLACK) 
+                        var p2ByCreate: Opponent = new Opponent(Color.WHITE) 
+                    }
+                    var gameByCreate: Game = new Game()
+                    gameByCreate.initialize(p1ByCreate,p2ByCreate)
+                    gameByCreate.setFullCoordinates(body.board); 
+                    drawBoard(gameByCreate);
                 });	
             }	
             })	
@@ -268,8 +232,20 @@ document.getElementById("joinRoomButton")?.addEventListener("click",async () => 
         joinRoom(formValues[0])	
           .then((result) => {	
             if (result) {
-                game.setFullCoordinates(result.board);
-                drawBoard(game.board);	
+                console.log('iDUserSend: '+ result.iDUserSend +'\niDUserReceive: '+ result.iDUserReceive+ '\niDRoom: '+result.iDRoom +'\nidRoomUser: '+result.idRoomUser+ '\nchessMove: '+result.chessMove +'\nboard: '+result.board +'\ncolor: '+result.color );	
+                if(result.color){
+                    console.log("self la white, opp la black")
+                    var p1ByJoin: Self = new Self(Color.WHITE) 
+                    var p2ByJoin: Opponent = new Opponent(Color.BLACK) 
+                }else{
+                    console.log("self la black, opp la white")
+                    var p1ByJoin: Self = new Self(Color.BLACK) 
+                    var p2ByJoin: Opponent = new Opponent(Color.WHITE) 
+                }
+                var gameByJoin: Game = new Game()
+                gameByJoin.initialize(p1ByJoin,p2ByJoin)
+                gameByJoin.setFullCoordinates(result.board); 
+                drawBoard(gameByJoin); 
                 Swal.fire({	
                     icon: 'success',	
                     title: 'Vào phòng thành công!',	
@@ -378,21 +354,3 @@ const port = window.location.port;
 console.log("port: " + port);	
 console.log("hostname: " + hostname);
 
-function drawBoard(board: Board) {
-    //i row, j col
-    for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
-            let coordinate: string = i.toString()+j.toString()
-            let divPiece = document.getElementById(coordinate)
-            if(divPiece){
-                divPiece.addEventListener("click",() => ClickPiece(i,j))
-                let imgPiece = document.getElementById("i" + coordinate)  as HTMLImageElement
-                if(board.getBox(i,j).piece?.image)
-                    imgPiece.src = board.getBox(i,j).piece!.image 
-                else if(imgPiece){
-                    imgPiece.src = ""
-                }  
-            }
-        }
-    }
-}

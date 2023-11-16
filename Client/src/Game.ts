@@ -23,6 +23,12 @@ export class Game {
 	// 	this._status = status
 	// 	this._movesPlayed.push(movesPlay)
 	// } 
+	public setToCurrentTurn(){
+		this._currentTurn = this._players[0]
+	}
+	public get getPlayer(): Player{
+		return this._players[0]
+	}
 	public get board(): Board {
 		return this._board;
 	}
@@ -74,6 +80,7 @@ export class Game {
 		// else { 
 		// 	this._currentTurn = p2; 
 		// } 
+		// this._status = GameStatus.ACTIVE
         this._movesPlayed.splice(0,this._movesPlayed.length)
 	} 
 	isEnd(): boolean 
