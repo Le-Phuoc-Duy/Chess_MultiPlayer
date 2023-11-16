@@ -1,6 +1,6 @@
 package com.example.chess_multiplayer.config;
 
-import com.example.chess_multiplayer.Controller.UserHandshakeHandler;
+//import com.example.chess_multiplayer.Controller.UserHandshakeHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 //import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
@@ -24,7 +24,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 //        registry.addEndpoint("/ws").setAllowedOrigins("*");
-        registry.addEndpoint("/ws").setHandshakeHandler(new UserHandshakeHandler()).setAllowedOriginPatterns("*").withSockJS(); // Cấu hình endpoint /ws
+        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS(); // Cấu hình endpoint /ws
     }
 }
 
