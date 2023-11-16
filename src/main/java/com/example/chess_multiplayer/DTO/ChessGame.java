@@ -7,6 +7,17 @@ public class ChessGame {
     private String idRoomUser;
     private String chessMove;
     private String board;
+    private Boolean color;
+
+    public Boolean getColor() {
+        return color;
+    }
+
+    public void setColor(Boolean color) {
+        this.color = color;
+    }
+
+
 
     public String getiDRoom() {
         return iDRoom;
