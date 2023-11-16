@@ -2,6 +2,7 @@ package com.example.chess_multiplayer.Service;
 
 
 import com.example.chess_multiplayer.Entity.Room;
+import com.example.chess_multiplayer.Entity.Roomuser;
 import com.example.chess_multiplayer.Repository.RoomRepository;
 import com.example.chess_multiplayer.Repository.RoomuserRepository;
 import com.example.chess_multiplayer.Repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -30,8 +32,9 @@ public class RoomService {
             room.setTimeStart(Instant.now());
             room.setTimeEnd(null); // You can set the end time as needed
             room.setMode(mode); // Example mode, you can set it as needed
-            room.setRoomusers(null); // Initialize with null or an empty set
-
+             // Initialize with null or an empty set
+//            Roomuser roomuser = new Roomuser();
+            room.setRoomusers(new HashSet<>());
             roomRepository.save(room);
             return room.getIDRoom();
         } catch (Exception e) {

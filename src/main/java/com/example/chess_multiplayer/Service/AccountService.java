@@ -44,13 +44,13 @@ public class AccountService {
         }
 
     }
-    public String getUserID(String username, String password){
+    public String getAccID(String username, String password){
         Account account = accountRepository.findByUsername(username);
         if (account == null) {
             return null;
         }
         if (passwordEncoder.matches(password, account.getPassword())) {
-            return account.getiDAccount();
+            return account.getiDAcc();
         }
         return null;
     }

@@ -36,7 +36,7 @@ public class DataInitializer implements ApplicationRunner {
             user1.setDraw(2);
             // Tạo đối tượng Account
             Account account1 = new Account();
-            account1.setiDAccount("Acc01");
+            account1.setiDAcc("Acc01");
             account1.setUsername("user1_username");
             account1.setPassword("user1_password");
 
@@ -60,7 +60,7 @@ public class DataInitializer implements ApplicationRunner {
             user2.setDraw(3);
             // Tạo đối tượng Account
             Account account2 = new Account();
-            account2.setiDAccount("Acc02");
+            account2.setiDAcc("Acc02");
             account2.setUsername("user2_username");
             account2.setPassword("user2_password");
 
@@ -84,7 +84,7 @@ public class DataInitializer implements ApplicationRunner {
             user3.setDraw(6);
             // Tạo đối tượng Account
             Account account3 = new Account();
-            account3.setiDAccount("Acc03");
+            account3.setiDAcc("Acc03");
             account3.setUsername("123");
             account3.setPassword("123");
 
@@ -108,7 +108,7 @@ public class DataInitializer implements ApplicationRunner {
             user4.setDraw(6);
             // Tạo đối tượng Account
             Account account4 = new Account();
-            account4.setiDAccount("Acc04");
+            account4.setiDAcc("Acc04");
             account4.setUsername("1234");
             account4.setPassword("1234");
 

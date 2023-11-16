@@ -23,13 +23,9 @@ const socket = new SockJS('http://localhost:8888/ws');
 const stompClient = new Client({
     webSocketFactory: () => socket,
     connectHeaders: {
-    login: 'your_username',
-    password: 'your_password',
+    tempPort: window.location.port,
     },
     debug: (msg) => console.log(msg),
-    // reconnectDelay: 5000,
-    // heartbeatIncoming: 4000,
-    // heartbeatOutgoing: 4000,
 });
 
 socket.onerror = (error) => {
@@ -68,7 +64,7 @@ function send(name: string, pass: string): Promise<string> {
         stompClient.publish({
             destination: '/app/login',
             headers: {},
-            body: JSON.stringify({ username: name, password: pass }),
+            body: JSON.stringify({ username: name, password: pass , tempPort: window.location.port}),
         });
 
         const subscription: StompSubscription = stompClient.subscribe('/user/queue/loginStatus', (message) => {
@@ -88,7 +84,7 @@ function createRoom(mode: Int32Array): Promise<string> {
         stompClient.publish({
             destination: '/app/createRoom',
             headers: {},
-            body: JSON.stringify({ userCreateId: localStorage.getItem('userID'), mode: mode }),
+            body: JSON.stringify({userCreateId: localStorage.getItem('userID'), mode: mode ,tempPort: window.location.port}),
         });
 
         const subscription: StompSubscription = stompClient.subscribe('/user/queue/roomCreated', (message) => {
@@ -105,8 +101,7 @@ function joinRoom(idRoom: String): Promise<string> {
     return new Promise((resolve, reject) => {
         stompClient.publish({
             destination: '/app/joinRoom',
-            headers: {"iDUser": userID},
-            body: JSON.stringify({ waitingRoomId: idRoom }),
+            body: JSON.stringify({ waitingRoomId: idRoom , idUserJoin: userID, tempPort: window.location.port}),
         });
 
         const subscription: StompSubscription = stompClient.subscribe('/user/queue/roomJoined', (message) => {
@@ -179,8 +174,6 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
                 Swal.showValidationMessage('Vui lòng không để trống mật khẩu');
             } else if (!username){
                 Swal.showValidationMessage('Vui lòng không để trống tên người dùng');
-            } else if (password.length < 5) {
-                Swal.showValidationMessage('Mật khẩu phải có ít nhất 5 ký tự.');
             } else {
                 return [username, password];
             }
@@ -200,10 +193,12 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
             }
             })
           .catch((error) => {
+            console.log(error)
               Swal.fire({
                   icon: "error",
                   text: "Đăng nhập thất bại",
-              }).then(() => {
+              })
+              .then(() => {
               });
           });
     }
@@ -374,3 +369,8 @@ document.getElementById("registerButton")?.addEventListener("click",async () => 
         // console.log("username: " + formValues[0] + ", password: " + formValues[1] + ", avatar: " + formValues[2])          // Swal.fire(`Tên người dùng: ${formValues[0]}<br>Mật khẩu: ${formValues[1]}`)
     }
 })
+
+const hostname = window.location.hostname;
+const port = window.location.port;
+console.log("port: " + port);
+console.log("hostname: " + hostname);

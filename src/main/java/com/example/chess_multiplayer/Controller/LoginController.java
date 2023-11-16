@@ -17,34 +17,36 @@ public class LoginController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
-
-    private AccountService accountService;
-    private Map<String, String> sessionId = new HashMap<>();
+    private AccountController accountController;
+    @Autowired
+    private UserController userController;
+//    private Map<String, String> sessionId = new HashMap<>();
     @MessageMapping("/login")
 //    @SendTo("/queue/loginStatus")
-    public void login(LoginRequest message, Principal principal) {
+    public void login(LoginRequest message) {
         String username = message.getUsername();
         String password = message.getPassword();
         System.out.println(username + password);
         LoginReponse loginReponse = new LoginReponse();
-        System.out.println("principal: " + principal.getName());
         try {
-            // Gọi service để xác thực người dùng
-            if (accountService.authenticate(username, password)) {
+            if (accountController.authenticate(username, password)) {
+                String AccId = accountController.getAccId(username,password);
+                String UserId = userController.getIdUserByIDAcc(AccId);
                 // Gửi thông báo thành công qua WebSocket
-                loginReponse.setUserID(accountService.getUserID(username,password));
+                loginReponse.setUserID(UserId);
                 loginReponse.setMessage("Đăng nhập thành công");
-                messagingTemplate.convertAndSendToUser(principal.getName(), "/queue/loginStatus", loginReponse);
+                System.out.println(message.getTempPort());
+                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/loginStatus", loginReponse);
             } else {
                 // Gửi thông báo thất bại qua WebSocket
                 loginReponse.setUserID(null);
-                loginReponse.setMessage("Đăng nhập thất bại");
-                messagingTemplate.convertAndSendToUser(principal.getName(), "/queue/loginStatus", loginReponse);
+                loginReponse.setMessage("Tài khoản hoặc mật khẩu không chính xác");
+                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/loginStatus", loginReponse);
             }
         } catch (Exception ex) {
                 loginReponse.setUserID(null);
                 loginReponse.setMessage("Đăng nhập thất bại: " + ex.getMessage());
-                messagingTemplate.convertAndSendToUser(principal.getName(), "/queue/loginStatus", loginReponse);
+                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/loginStatus", loginReponse);
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.chess_multiplayer.DTO;
 public class LoginRequest {
     private String username;
     private String password;
+    private String tempPort;
 
     public String getUsername() {
         return username;
@@ -18,6 +19,14 @@ public class LoginRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getTempPort() {
+        return tempPort;
+    }
+
+    public void setTempPort(String tempPort) {
+        this.tempPort = tempPort;
     }
 }
 

@@ -1,5 +1,6 @@
 package com.example.chess_multiplayer.Controller;
 
+import com.example.chess_multiplayer.DTO.JoinRoom;
 import com.example.chess_multiplayer.DTO.WaitingRoom;
 import com.example.chess_multiplayer.DTO.LoginReponse;
 import com.example.chess_multiplayer.Service.RoomService;
@@ -27,15 +28,15 @@ public class RoomController {
 
     @MessageMapping("/createRoom")
     @SendToUser("/queue/roomCreated")
-    public WaitingRoom createRoom(WaitingRoom message, Principal principal) {
+    public WaitingRoom createRoom(WaitingRoom message) {
         // Sinh ngẫu nhiên ID phòng
         String waitingRoomId = generateRandomWaitingRoomId();
 //        String infor = userId + "/" + principal.getName() + "/" + mode;
         WaitingRoom waitingRoom = new WaitingRoom();
         waitingRoom.setWaitingRoomId(waitingRoomId);
         waitingRoom.setUserCreateId(message.getUserCreateId());
-        waitingRoom.setSessionUserCreateId(principal.getName());
         waitingRoom.setMode(message.getMode());
+        waitingRoom.setTempPort(message.getTempPort());
         // Lưu thông tin phòng vào danh sách chờ
         waitingRooms.add(waitingRoom);
         System.out.println(waitingRoom.toString());
@@ -54,7 +55,7 @@ public class RoomController {
     }
 
     @MessageMapping("/joinRoom")
-    public LoginReponse joinRoom(@Header("iDUser") String userId, WaitingRoom message, Principal principal) {
+    public LoginReponse joinRoom(JoinRoom message) {
         // Kiểm tra xem phòng có tồn tại trong danh sách chờ hay không
         LoginReponse loginReponse = new LoginReponse();
         if (containsWaitingRoomById(message.getWaitingRoomId())) {
@@ -64,23 +65,23 @@ public class RoomController {
             //khoi tao room
             String idRoomCreated = roomService.createRoom(waitingRoom.getMode());
             System.out.println("iduser1" + waitingRoom.getUserCreateId());
-            System.out.println("iduser2" + userId);
+            System.out.println("iduser2" + message.getIdUserJoin());
             //khoi tao roomuser
             String createRoomUser1 = roomuserController.creatRoomuser(waitingRoom.getUserCreateId(),idRoomCreated,waitingRoom.getMode(), true);
-            String createRoomUser2 = roomuserController.creatRoomuser(userId,idRoomCreated,waitingRoom.getMode(),false);
+            String createRoomUser2 = roomuserController.creatRoomuser(message.getIdUserJoin(),idRoomCreated,waitingRoom.getMode(),false);
             System.out.println("createRoomUser1" + createRoomUser1);
             System.out.println("createRoomUser2" + createRoomUser2);
             removeWaitingRoomById(waitingRoom.getWaitingRoomId());
             RandomWaitingRoomIds.remove(waitingRoom.getWaitingRoomId());
 
-            loginReponse.setUserID(userId);
+            loginReponse.setUserID(message.getIdUserJoin());
             loginReponse.setMessage("Vào phòng " + waitingRoom.getWaitingRoomId() + " thành công");
             System.out.println(loginReponse.toString());
-            messagingTemplate.convertAndSendToUser(principal.getName(), "/queue/roomJoined", loginReponse);
-            messagingTemplate.convertAndSendToUser(waitingRoom.getSessionUserCreateId(), "/queue/roomJoined", loginReponse);
+            messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/roomJoined", loginReponse);
+            messagingTemplate.convertAndSendToUser(waitingRoom.getTempPort(), "/queue/roomJoined", loginReponse);
             return loginReponse;
         } else {
-            loginReponse.setUserID(userId);
+            loginReponse.setUserID(message.getIdUserJoin());
             loginReponse.setMessage("Fail");
             return loginReponse;
         }

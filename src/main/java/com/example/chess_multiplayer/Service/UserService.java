@@ -20,4 +20,7 @@ public class UserService {
     public User getUserById(String idUser) {
         return userRepository.findById(idUser).orElse(null);
     }
+    public String getIdUserByIdAcc(String idAcc){
+        return userRepository.findByAccount_iDAcc(idAcc).getIDUser();
+    }
 }

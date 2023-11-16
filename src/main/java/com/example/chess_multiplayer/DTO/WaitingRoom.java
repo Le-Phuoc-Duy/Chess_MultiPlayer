@@ -3,8 +3,8 @@ package com.example.chess_multiplayer.DTO;
 public class WaitingRoom {
     private String waitingRoomId;
     private String userCreateId;
-    private String sessionUserCreateId;
     private int mode;
+    private String tempPort;
 
     public String getUserCreateId() {
         return userCreateId;
@@ -12,14 +12,6 @@ public class WaitingRoom {
 
     public void setUserCreateId(String userCreateId) {
         this.userCreateId = userCreateId;
-    }
-
-    public String getSessionUserCreateId() {
-        return sessionUserCreateId;
-    }
-
-    public void setSessionUserCreateId(String sessionUserCreateId) {
-        this.sessionUserCreateId = sessionUserCreateId;
     }
 
     public int getMode() {
@@ -39,4 +31,11 @@ public class WaitingRoom {
         this.waitingRoomId = waitingRoomId;
     }
 
+    public String getTempPort() {
+        return tempPort;
+    }
+
+    public void setTempPort(String tempPort) {
+        this.tempPort = tempPort;
+    }
 }

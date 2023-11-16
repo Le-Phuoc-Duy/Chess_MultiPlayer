@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class Account {
     @Id
     @Column(name = "IDAcc", nullable = false, length = 5)
-    private String iDAccount;
+    private String iDAcc;
 
     @OneToOne(mappedBy = "account",fetch = FetchType.LAZY, optional = false)
     private User user;
@@ -43,11 +43,12 @@ public class Account {
         this.password = password;
     }
 
-    public String getiDAccount() {
-        return iDAccount;
+
+    public String getiDAcc() {
+        return iDAcc;
     }
 
-    public void setiDAccount(String iDAccount) {
-        this.iDAccount = iDAccount;
+    public void setiDAcc(String iDAcc) {
+        this.iDAcc = iDAcc;
     }
 }

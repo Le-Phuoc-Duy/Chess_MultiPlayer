@@ -6,9 +6,6 @@ public class ChessGame {
     private String chessMove;
     private String board;
 
-
-
-
     public String getiDRoom() {
         return iDRoom;
     }
