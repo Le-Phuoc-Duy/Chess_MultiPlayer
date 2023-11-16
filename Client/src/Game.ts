@@ -38,17 +38,17 @@ export class Game {
 				if(this.board.getBox(r,c).piece?.name)
 					fullCoordinates += this.board.getBox(r,c).piece?.name
 				else 
-					fullCoordinates += "nn"
-			}
-			fullCoordinates += "/"
+					fullCoordinates += "/"
+			} 
 		}
 
 		return fullCoordinates
 	}
-	// setFullCoordinates(startX: number,startY: number,endX: number,endY: number){
-	// 	this.board.getBox(endX,endY).piece = this.board.getBox(startX,startY).piece
-	// 	this.board.getBox(startX,startY).piece = null 
-	// }
+	setFullCoordinates(fullCoordinates: String){
+		// this.board.getBox(endX,endY).piece = this.board.getBox(startX,startY).piece
+		// this.board.getBox(startX,startY).piece = null 
+		this._board.setBoard(fullCoordinates)
+	}
 	initialize(p1: Player,p2: Player) 
 	{ 
 		this._players[0] = p1 

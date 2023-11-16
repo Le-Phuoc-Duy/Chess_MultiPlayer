@@ -5,6 +5,23 @@ body{
     outline-color: red; /* Màu đỏ */
     outline-width: 3px; /* Độ dày 3px */
     outline-style: dashed; /* Đường viền đứt */}
+
+    .overlay {
+			position: fixed;
+			/* Định vị tuyệt đối trên màn hình */
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.5);
+			/* Màu nền đen trong suốt */
+			z-index: 99 !important;
+			/* Chỉ định độ ưu tiên trên các phần tử khác */ 
+			}
+		.linkOverlay{
+			cursor: pointer;
+			text-decoration: underline;
+		}
   @media (min-width: 576px) {
     .select-button{
         /* display: block;  */
