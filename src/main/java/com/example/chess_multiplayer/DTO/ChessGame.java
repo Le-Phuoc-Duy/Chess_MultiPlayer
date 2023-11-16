@@ -7,6 +7,17 @@ public class ChessGame {
     private String idRoomUser;
     private String chessMove;
     private String board;
+    private Boolean color;
+    private String userSendTempPort;
+    private String userReceiveTempPort;
+
+    public Boolean getColor() {
+        return color;
+    }
+
+    public void setColor(Boolean color) {
+        this.color = color;
+    }
 
     public String getiDRoom() {
         return iDRoom;
@@ -55,5 +66,21 @@ public class ChessGame {
 
     public void setIdRoomUser(String idRoomUser) {
         this.idRoomUser = idRoomUser;
+    }
+
+    public String getUserSendTempPort() {
+        return userSendTempPort;
+    }
+
+    public void setUserSendTempPort(String userSendTempPort) {
+        this.userSendTempPort = userSendTempPort;
+    }
+
+    public String getUserReceiveTempPort() {
+        return userReceiveTempPort;
+    }
+
+    public void setUserReceiveTempPort(String userReceiveTempPort) {
+        this.userReceiveTempPort = userReceiveTempPort;
     }
 }

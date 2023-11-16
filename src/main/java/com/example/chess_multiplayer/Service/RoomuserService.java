@@ -9,7 +9,9 @@ import com.example.chess_multiplayer.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
@@ -64,5 +66,14 @@ public class RoomuserService {
         } while (roomuserRepository.existsById(idRoomuserBuilder.toString()));
 
         return idRoomuserBuilder.toString();
+    }
+    public Optional<Roomuser> findRoomuserByRoomIdAndUserId(String idRoom, String idUser) {
+        return roomuserRepository.findByRoomIdAndUserId(idRoom, idUser);
+    }
+    public void updateChatById(String idRoomUser, String chat) {
+        roomuserRepository.findById(idRoomUser).ifPresent(roomuser -> {
+            roomuser.setChat(roomuser.getChat() + "@" + chat + "@" + Instant.now().toString());
+            roomuserRepository.save(roomuser);
+        });
     }
 }
