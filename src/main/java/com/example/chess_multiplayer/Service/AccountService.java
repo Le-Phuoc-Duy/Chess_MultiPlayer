@@ -35,15 +35,7 @@ public class AccountService {
 
         return false;
     }
-    public String getUserIDbyAccountID(String accID){
-        Account account = accountRepository.findById(accID).orElse(null);
-        if (account != null){
-            return account.getUser().getIDUser();
-        }else{
-            return null;
-        }
 
-    }
     public String getAccID(String username, String password){
         Account account = accountRepository.findByUsername(username);
         if (account == null) {

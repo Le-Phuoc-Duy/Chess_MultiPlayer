@@ -25,11 +25,11 @@ public class RoomuserService {
     private UserService userService;
     @Autowired
     private AccountService accountService;
-    public String createRoomuser(String idAcc, String idRoom, int mode,boolean side){
+    public String createRoomuser(String idUser, String idRoom, int mode,boolean side){
         try{
             Roomuser roomUser = new Roomuser();
             roomUser.setIDRoomUser(generateUniqueRandomId());
-            roomUser.setUser(userService.getUserById(accountService.getUserIDbyAccountID(idAcc)));
+            roomUser.setUser(userService.getUserById(idUser));
             roomUser.setChat(null);
             roomUser.setResult(null);
             roomUser.setSide(side);
@@ -44,7 +44,7 @@ public class RoomuserService {
             roomUser.setRoom(room);
             roomuserRepository.save(roomUser);
 //            room.getRoomusers().add(roomUser);
-            return "Create Success";
+            return roomUser.getIDRoomUser();
         }catch (Exception e){
             e.printStackTrace();
             return e.getMessage();

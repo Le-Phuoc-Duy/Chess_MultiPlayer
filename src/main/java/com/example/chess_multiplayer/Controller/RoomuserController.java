@@ -9,9 +9,9 @@ import org.springframework.stereotype.Controller;
 public class RoomuserController {
     @Autowired
     private RoomuserService roomuserService;
-    public String creatRoomuser(String idAcc, String idRoom, int mode, boolean side){
+    public String creatRoomuser(String idUser, String idRoom, int mode, boolean side){
         try{
-            return roomuserService.createRoomuser(idAcc,idRoom,mode,side);
+            return roomuserService.createRoomuser(idUser,idRoom,mode,side);
         }catch (Exception e){
             return e.getMessage();
         }

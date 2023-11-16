@@ -1,5 +1,6 @@
 package com.example.chess_multiplayer.Controller;
 
+import com.example.chess_multiplayer.DTO.ChessGame;
 import com.example.chess_multiplayer.DTO.JoinRoom;
 import com.example.chess_multiplayer.DTO.WaitingRoom;
 import com.example.chess_multiplayer.DTO.LoginReponse;
@@ -55,36 +56,71 @@ public class RoomController {
     }
 
     @MessageMapping("/joinRoom")
-    public LoginReponse joinRoom(JoinRoom message) {
+    public void joinRoom(JoinRoom message) {
         // Kiểm tra xem phòng có tồn tại trong danh sách chờ hay không
-        LoginReponse loginReponse = new LoginReponse();
         if (containsWaitingRoomById(message.getWaitingRoomId())) {
             // Phòng tồn tại, xác nhận tham gia
+            ChessGame chessGameUser1 = new ChessGame();
+            ChessGame chessGameUser2 = new ChessGame();
             WaitingRoom waitingRoom = getWaitingRoomById(message.getWaitingRoomId());
 
             //khoi tao room
             String idRoomCreated = roomService.createRoom(waitingRoom.getMode());
             System.out.println("iduser1" + waitingRoom.getUserCreateId());
             System.out.println("iduser2" + message.getIdUserJoin());
+            System.out.println("idRoomCreated: " + idRoomCreated);
+
             //khoi tao roomuser
-            String createRoomUser1 = roomuserController.creatRoomuser(waitingRoom.getUserCreateId(),idRoomCreated,waitingRoom.getMode(), true);
-            String createRoomUser2 = roomuserController.creatRoomuser(message.getIdUserJoin(),idRoomCreated,waitingRoom.getMode(),false);
-            System.out.println("createRoomUser1" + createRoomUser1);
-            System.out.println("createRoomUser2" + createRoomUser2);
+            boolean color = generateRandomBoolean();
+            String idRoomUser1Created;
+            String idRoomUser2Created;
+            if(color == true){
+                idRoomUser1Created = roomuserController.creatRoomuser(waitingRoom.getUserCreateId(),idRoomCreated,waitingRoom.getMode(), true);
+                System.out.println("createRoomUser1" + idRoomUser1Created);
+                idRoomUser2Created = roomuserController.creatRoomuser(message.getIdUserJoin(),idRoomCreated,waitingRoom.getMode(),false);
+                System.out.println("createRoomUser2" + idRoomUser2Created);
+            }else{
+                idRoomUser1Created = roomuserController.creatRoomuser(waitingRoom.getUserCreateId(),idRoomCreated,waitingRoom.getMode(), false);
+                System.out.println("createRoomUser1" + idRoomUser1Created);
+                idRoomUser2Created = roomuserController.creatRoomuser(message.getIdUserJoin(),idRoomCreated,waitingRoom.getMode(),true);
+                System.out.println("createRoomUser2" + idRoomUser2Created);
+            }
+            //remove hang doi
             removeWaitingRoomById(waitingRoom.getWaitingRoomId());
             RandomWaitingRoomIds.remove(waitingRoom.getWaitingRoomId());
-
-            loginReponse.setUserID(message.getIdUserJoin());
-            loginReponse.setMessage("Vào phòng " + waitingRoom.getWaitingRoomId() + " thành công");
-            System.out.println(loginReponse.toString());
-            messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/roomJoined", loginReponse);
-            messagingTemplate.convertAndSendToUser(waitingRoom.getTempPort(), "/queue/roomJoined", loginReponse);
-            return loginReponse;
+            //set Chess Game
+            chessGameUser1.setiDUserSend(waitingRoom.getUserCreateId());
+            chessGameUser1.setiDUserReceive(message.getIdUserJoin());
+            chessGameUser1.setiDRoom(idRoomCreated);
+            chessGameUser1.setIdRoomUser(idRoomUser1Created);
+            chessGameUser1.setChessMove(null);
+            chessGameUser2.setiDUserSend(message.getIdUserJoin());
+            chessGameUser2.setiDUserReceive(waitingRoom.getUserCreateId());
+            chessGameUser2.setiDRoom(idRoomCreated);
+            chessGameUser2.setIdRoomUser(idRoomUser2Created);
+            chessGameUser2.setChessMove(null);
+            if(color == true){
+                chessGameUser1.setBoard("rnbqkbnrpppppppp////////////////////////////////PPPPPPPPRNBQKBNR");
+                chessGameUser2.setBoard("RNBQKBNRPPPPPPPP////////////////////////////////pppppppprnbqkbnr");
+            }else{
+                chessGameUser2.setBoard("rnbqkbnrpppppppp////////////////////////////////PPPPPPPPRNBQKBNR");
+                chessGameUser1.setBoard("RNBQKBNRPPPPPPPP////////////////////////////////pppppppprnbqkbnr");
+            }
+            System.out.println(chessGameUser1.toString());
+            System.out.println(chessGameUser2.toString());
+            //send result to user2-user1
+            messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/roomJoined", chessGameUser2);
+            messagingTemplate.convertAndSendToUser(waitingRoom.getTempPort(), "/queue/roomJoined", chessGameUser1);
         } else {
+            LoginReponse loginReponse = new LoginReponse();
             loginReponse.setUserID(message.getIdUserJoin());
-            loginReponse.setMessage("Fail");
-            return loginReponse;
+            loginReponse.setMessage("Mã phòng không hợp lệ! ");
+            messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/roomJoined", loginReponse);
         }
+    }
+    public boolean generateRandomBoolean() {
+        Random random = new Random();
+        return random.nextBoolean();
     }
     public int convertStringToInt(String input) {
         try {

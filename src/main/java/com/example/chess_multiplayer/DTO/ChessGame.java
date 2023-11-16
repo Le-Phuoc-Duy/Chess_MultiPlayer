@@ -2,7 +2,9 @@ package com.example.chess_multiplayer.DTO;
 
 public class ChessGame {
     private String iDUserSend;
+    private String iDUserReceive;
     private String iDRoom;
+    private String idRoomUser;
     private String chessMove;
     private String board;
 
@@ -36,5 +38,22 @@ public class ChessGame {
 
     public void setiDUserSend(String iDUserSend) {
         this.iDUserSend = iDUserSend;
+    }
+
+
+    public String getiDUserReceive() {
+        return iDUserReceive;
+    }
+
+    public void setiDUserReceive(String iDUserReceive) {
+        this.iDUserReceive = iDUserReceive;
+    }
+
+    public String getIdRoomUser() {
+        return idRoomUser;
+    }
+
+    public void setIdRoomUser(String idRoomUser) {
+        this.idRoomUser = idRoomUser;
     }
 }

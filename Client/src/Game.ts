@@ -15,7 +15,6 @@ export class Game {
     // private _currentTurn: Player
     // private _status: GameStatus 
     // private _movesPlayed: Move[] 
-
 	// constructor(player1: Player,player2: Player, board: Board, status: GameStatus, movesPlay: Move){
 	// 	this._players.push(player1)
 	// 	this._players.push(player2)
@@ -23,7 +22,6 @@ export class Game {
 	// 	this._currentTurn = player1
 	// 	this._status = status
 	// 	this._movesPlayed.push(movesPlay)
-
 	// } 
 	public get board(): Board {
 		return this._board;
@@ -38,12 +36,17 @@ export class Game {
 				if(this.board.getBox(r,c).piece?.name)
 					fullCoordinates += this.board.getBox(r,c).piece?.name
 				else 
-					fullCoordinates += "/"
-			} 
+					fullCoordinates += "nn"
+			}
+			fullCoordinates += "/"
 		}
 
 		return fullCoordinates
 	}
+	// setFullCoordinates(startX: number,startY: number,endX: number,endY: number){
+	// 	this.board.getBox(endX,endY).piece = this.board.getBox(startX,startY).piece
+	// 	this.board.getBox(startX,startY).piece = null 
+	// }
 	setFullCoordinates(fullCoordinates: String){
 		// this.board.getBox(endX,endY).piece = this.board.getBox(startX,startY).piece
 		// this.board.getBox(startX,startY).piece = null 
@@ -53,9 +56,7 @@ export class Game {
 	{ 
 		this._players[0] = p1 
 		this._players[1] = p2 
-
 		this._board.resetBoard()
-
 		if (p1.color === Color.WHITE ){
 			console.log("white la p1")
 			this._currentTurn = p1
@@ -75,7 +76,6 @@ export class Game {
 		// } 
         this._movesPlayed.splice(0,this._movesPlayed.length)
 	} 
-
 	isEnd(): boolean 
 	{ 
 		return this._status != GameStatus.ACTIVE; 
@@ -86,7 +86,6 @@ export class Game {
     public set status(value: GameStatus) {
         this._status = value;
     } 
-
 	playerMove(player: Player,startX: number,startY: number,endX: number,endY: number) : boolean
 	{ 
         let startBox: Point 
@@ -95,10 +94,8 @@ export class Game {
         endBox = this._board.getBox(endX,endY)
         
         let move: Move = new Move(player,startBox,endBox)  
-
 		return this.makeMove(move, player); 
 	} 
-
 	makeMove(move: Move, player: Player) : boolean
 	{ 
 		
@@ -109,13 +106,11 @@ export class Game {
 			console.log("sourcePiece")
 			return false; 
 		} 
-
 		// valid player 
 		if (player !== this._currentTurn) { 
 			console.log("chua toi luot")
 			return false; 
 		} 
-
 		if (sourcePiece.color !== player.color) { 
 			console.log("khong the choi quan cua doi thu")
 			if (sourcePiece.color === Color.WHITE)
@@ -126,7 +121,6 @@ export class Game {
 			else console.log("player: den")
 			return false; 
 		} 
-
 		// valid move? 
 		if (!sourcePiece.canMove(this._board, move.startPoint, move.endPoint)) { 
 			console.log("valid move ")
@@ -139,24 +133,19 @@ export class Game {
             destPiece.killed = true 
             move.pieceKilled = destPiece
 		} 
-
 		// castling? 
 		// if (sourcePiece != null && sourcePiece instanceof King 
 		// 	&& sourcePiece.isCastlingMove()) { 
 		// 	move.setCastlingMove(true); 
 		// } 
-
 		// store the move 
 		this._movesPlayed.push(move); 
-
 		// move piece from the stat box to end box 
 		// move.getEnd().setPiece(move.getStart().getPiece()); 
 		// move.getStart.setPiece(null);   
         
         move.endPoint.piece = move.startPoint.piece 
         move.startPoint.piece = null
-
-
 		// if (destPiece != null && destPiece instanceof King) { 
 		// 	if (player.isWhiteSide()) { 
 		// 		this.setStatus(GameStatus.WHITE_WIN); 
@@ -165,7 +154,6 @@ export class Game {
 		// 		this.setStatus(GameStatus.BLACK_WIN); 
 		// 	} 
 		// } 
-
 		// set the current turn to the other player 
 		if (this._currentTurn === this._players[0]) { 
 			this._currentTurn = this._players[1]; 
@@ -173,7 +161,6 @@ export class Game {
 		else { 
 			this._currentTurn = this._players[0]; 
 		} 
-
 		return true; 
 	}  
 } 
