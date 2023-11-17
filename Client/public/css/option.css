@@ -5,6 +5,10 @@ body{
   outline-color: red; /* Màu đỏ */
   outline-width: 3px; /* Độ dày 3px */
   outline-style: dashed; /* Đường viền đứt */}
+
+#chatPrivateContent{
+  overflow-x: auto;
+} 
 @media (min-width: 576px) {
   .select-button{
       /* display: block;  */
