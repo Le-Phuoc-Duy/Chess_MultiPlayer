@@ -25,6 +25,7 @@ public class RoomuserController {
     }
     @MessageMapping("/chessMove")
     public void chessMove(ChessGame message) {
+
         ChessGame chessGameUserReceive = new ChessGame();
         chessGameUserReceive.setiDUserSend(message.getiDUserReceive());
         chessGameUserReceive.setiDUserReceive(message.getiDUserSend());
@@ -36,9 +37,9 @@ public class RoomuserController {
             chessGameUserReceive.setColor(!message.getColor());
             chessGameUserReceive.setUserSendTempPort(message.getUserReceiveTempPort());
             chessGameUserReceive.setUserReceiveTempPort(message.getUserSendTempPort());
-            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/roomJoined",chessGameUserReceive );
+            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/chessMove",chessGameUserReceive );
         }else{
-            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/roomJoined", null);
+            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/chessMove", null);
         }
     }
     @MessageMapping("/chatRoom")
@@ -53,9 +54,9 @@ public class RoomuserController {
             chatRoomUserReceive.setChat(message.getChat());
             chatRoomUserReceive.setUserSendTempPort(message.getUserReceiveTempPort());
             chatRoomUserReceive.setUserReceiveTempPort(message.getUserSendTempPort());
-            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/roomJoined",chatRoomUserReceive );
+            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/chatRoom",chatRoomUserReceive );
         }else{
-            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/roomJoined", null);
+            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/chatRoom", null);
         }
     }
     public String reverseString(String inputString) {

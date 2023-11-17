@@ -10,8 +10,8 @@ import java.util.Set;
 @Table(name = "room", schema = "db_pbl4")
 public class Room {
     @Id
-    @Column(name = "ID", nullable = false, length = 5)
-    private String iDRoom;
+    @Column(name = "IDRoom", nullable = false, length = 5)
+    private String IDRoom;
 
     @Column(name = "TimeStart")
     private Instant timeStart;
@@ -33,13 +33,6 @@ public class Room {
         this.roomusers = roomusers;
     }
 
-    public String getIDRoom() {
-        return iDRoom;
-    }
-
-    public void setIDRoom(String iDRoom) {
-        this.iDRoom = iDRoom;
-    }
 
     public Instant getTimeStart() {
         return timeStart;
@@ -65,4 +58,12 @@ public class Room {
         this.mode = mode;
     }
 
+
+    public String getIDRoom() {
+        return IDRoom;
+    }
+
+    public void setIDRoom(String IDRoom) {
+        this.IDRoom = IDRoom;
+    }
 }

@@ -30,9 +30,8 @@ public class RoomService {
             Room room = new Room();
             room.setIDRoom(generateUniqueRandomId());
             room.setTimeStart(Instant.now());
-            room.setTimeEnd(null); // You can set the end time as needed
-            room.setMode(mode); // Example mode, you can set it as needed
-             // Initialize with null or an empty set
+            room.setTimeEnd(null);
+            room.setMode(mode);
 //            Roomuser roomuser = new Roomuser();
             room.setRoomusers(new HashSet<>());
             roomRepository.save(room);
