@@ -1,16 +1,15 @@
-import { Player } from "./Player";
 import { Point } from "./Point"; 
 import { Piece } from "./Pieces/Piece";
 
 export class Move{
-    private _player: Player
+    // private _player: Player
     private _startPoint: Point 
     private _endPoint: Point
     private _pieceMoved: Piece | null
     private _pieceKilled: Piece
 
-    constructor(player: Player, startPoint: Point, endPoint: Point){
-        this._player = player
+    constructor(startPoint: Point, endPoint: Point){
+        // this._player = player
         this._startPoint = startPoint
         this._endPoint = endPoint 
         this._pieceMoved = startPoint.piece

@@ -9,7 +9,9 @@ import com.example.chess_multiplayer.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
@@ -24,7 +26,9 @@ public class RoomuserService {
     @Autowired
     private UserService userService;
     @Autowired
-    private AccountService accountService;
+    private UserRepository userRepository;
+    @Autowired
+    private RoomRepository roomRepository;
     public String createRoomuser(String idUser, String idRoom, int mode,boolean side){
         try{
             Roomuser roomUser = new Roomuser();
@@ -64,5 +68,19 @@ public class RoomuserService {
         } while (roomuserRepository.existsById(idRoomuserBuilder.toString()));
 
         return idRoomuserBuilder.toString();
+    }
+    public Optional<Roomuser> findRoomuserByRoomIdAndUserId(String idRoom, String idUser) {
+        User user = userRepository.findById(idUser).orElse(null);
+        Room room = roomRepository.findById(idRoom).orElse(null);
+        if(user != null && room != null){
+            return roomuserRepository.findByUserAndRoom(user,room);
+        }
+        return null;
+    }
+    public void updateChatById(String idRoomUser, String chat) {
+        roomuserRepository.findById(idRoomUser).ifPresent(roomuser -> {
+            roomuser.setChat(roomuser.getChat() + "@" + chat + "@" + Instant.now().toString());
+            roomuserRepository.save(roomuser);
+        });
     }
 }

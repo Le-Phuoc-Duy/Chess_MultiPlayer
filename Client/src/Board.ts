@@ -9,17 +9,19 @@ import { King } from "./Pieces/King";
 
 export class Board{
     boxes: Point[][]
+    constructor(){
+        this.boxes = []
+        this.initBoard()
+    } 
+    //Lấy thông tin Point theo tọa độ
     getBox(x: number, y: number): Point {
         if (x < 0 || x > 7 || y < 0 || y > 7) {
           throw new Error("Index out of bound");
         } 
         return this.boxes[x][y];
     }
-    constructor(){
-        this.boxes = []
-        this.resetBoard()
-    } 
-    resetBoard() {
+    //Tạo bàn cờ ban đầu
+    initBoard() {
         this.boxes = []; // Khởi tạo mảng chính
     
         for (let r = 0; r < 8; r++) {
@@ -68,6 +70,7 @@ export class Board{
             }
         }
     }
+    //Tạo Board theo chuỗi
     setBoard(coordinateString: String){
         this.boxes = []; 
         for (let r = 0; r < 8; r++) {

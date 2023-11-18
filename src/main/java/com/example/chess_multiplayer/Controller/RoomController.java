@@ -94,11 +94,16 @@ public class RoomController {
             chessGameUser1.setiDRoom(idRoomCreated);
             chessGameUser1.setIdRoomUser(idRoomUser1Created);
             chessGameUser1.setChessMove(null);
+            chessGameUser1.setUserSendTempPort(waitingRoom.getTempPort());
+            chessGameUser1.setUserReceiveTempPort(message.getTempPort());
+
             chessGameUser2.setiDUserSend(message.getIdUserJoin());
             chessGameUser2.setiDUserReceive(waitingRoom.getUserCreateId());
             chessGameUser2.setiDRoom(idRoomCreated);
             chessGameUser2.setIdRoomUser(idRoomUser2Created);
             chessGameUser2.setChessMove(null);
+            chessGameUser2.setUserSendTempPort(message.getTempPort());
+            chessGameUser2.setUserReceiveTempPort(waitingRoom.getTempPort());
             if(color == true){
                 chessGameUser1.setColor(color);
                 chessGameUser2.setColor(!color);
@@ -161,42 +166,4 @@ public class RoomController {
             }
         }
     }
-//    @MessageMapping("/joinRoom")
-//    @SendTo("/queue/roomJoined")
-//    @Async
-//    public CompletableFuture<String> joinRoom(@Header("iDUser") String userId, String waitingRoomId) {
-//        if (waitingRooms.containsKey(waitingRoomId)) {
-//            String waitingRoomValue = waitingRooms.get(waitingRoomId);
-//            String[] parts = waitingRoomValue.split("/");
-//            String userIdCreate = parts[0];
-//            String mode = parts[1];
-//
-//            CompletableFuture<String> resultFuture = new CompletableFuture<>();
-//
-//            roomService.createRoom(convertStringToInt(mode))
-//                    .thenCompose(roomIdCreated -> {
-//                        CompletableFuture<Void> user1Future = roomuserService.createRoomuser(userIdCreate, roomIdCreated, convertStringToInt(mode));
-//                        CompletableFuture<Void> user2Future = roomuserService.createRoomuser(userId, roomIdCreated, convertStringToInt(mode));
-//
-//                        // Chờ cả hai tác vụ hoàn thành
-//                        return CompletableFuture.allOf(user1Future, user2Future).thenApply(ignore -> roomIdCreated);
-//                    })
-//                    .thenAccept(roomIdCreated -> {
-//                        waitingRooms.remove(waitingRoomId);
-//                        RandomWaitingRoomIds.remove(waitingRoomId);
-//                        resultFuture.complete("Success");
-//                    })
-//                    .exceptionally(ex -> {
-//                        // Xử lý lỗi
-//                        ex.printStackTrace();
-//                        resultFuture.complete("Error");
-//                        return null;
-//                    });
-//
-//            return resultFuture;
-//        } else {
-//            return CompletableFuture.completedFuture("Error");
-//        }
-//    }
 }
-
