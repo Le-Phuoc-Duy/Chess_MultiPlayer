@@ -9,6 +9,14 @@ body{
 #chatPrivateContent{
     overflow-x: auto;
 }
+.select-option{
+    text-align: center;
+} 
+.input-game-mode{
+    height: 100%;
+    width: 50%;
+    margin-right: 5%;
+} 
 @media (min-width: 576px) {
     .select-button{
         /* display: block;  */
