@@ -5,13 +5,16 @@ import { Board } from './Board';
 import { RoomJoinedResponse } from './RoomJoinedResponse';
 import { sendChessMove } from './PlayModule/PlayWithFriend';
 
-const socket = new SockJS('http://localhost:8888/ws');
+const socket = new SockJS('http://' + window.location.hostname +':8888/ws');
 export const stompClient = new Client({
     webSocketFactory: () => socket,
     connectHeaders: {
         tempPort: window.location.port,
     },
     debug: (msg) => console.log(msg),
+    reconnectDelay: 1000,
+    heartbeatIncoming: 1000,
+    heartbeatOutgoing: 1000,
 });
 
 socket.onerror = (error) => {
