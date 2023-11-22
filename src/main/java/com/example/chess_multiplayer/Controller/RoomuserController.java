@@ -3,6 +3,7 @@ package com.example.chess_multiplayer.Controller;
 import com.example.chess_multiplayer.DTO.*;
 import com.example.chess_multiplayer.Entity.Roomuser;
 import com.example.chess_multiplayer.Service.RoomuserService;
+import com.example.chess_multiplayer.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -16,6 +17,8 @@ public class RoomuserController {
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
     private RoomuserService roomuserService;
+    @Autowired
+    private UserService userService;
     public String creatRoomuser(String idUser, String idRoom, int mode, boolean side){
         try{
             return roomuserService.createRoomuser(idUser,idRoom,mode,side);
@@ -47,6 +50,8 @@ public class RoomuserController {
         roomuserService.updateChatById(message.getIdRoomUser(),message.getChat());
         ChatRoom chatRoomUserReceive = new ChatRoom();
         chatRoomUserReceive.setIdUserSend(message.getIdUserReceive());
+        chatRoomUserReceive.setUserSendName(userService.getUsernameByUserID(message.getIdUserSend()));
+        chatRoomUserReceive.setUserSendAva(userService.getUserById(message.getIdUserSend()).getAva());
         chatRoomUserReceive.setIdUserReceive(message.getIdUserSend());
         chatRoomUserReceive.setIdRoom(message.getIdRoom());
         if(getRoomuserIdByRoomIdAndUserId(message.getIdRoom(), message.getIdUserReceive())!=null){

@@ -1,8 +1,12 @@
 package com.example.chess_multiplayer.Controller;
 
 import com.example.chess_multiplayer.DTO.*;
+import com.example.chess_multiplayer.Service.AccountService;
 import com.example.chess_multiplayer.Service.RoomService;
 import com.example.chess_multiplayer.Service.UserService;
+import com.example.chess_multiplayer.Entity.User;
+import com.example.chess_multiplayer.Entity.Account;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -20,6 +24,7 @@ public class UserController {
     private UserService userService;
     @Autowired
     private RoomService roomService;
+
     @Autowired
     private RoomuserController roomuserController;
     private Set<queueUser> queueUsers = new HashSet<>();
@@ -29,11 +34,13 @@ public class UserController {
         return userService.getIdUserByIdAcc(idAcc);
     }
     @MessageMapping("/publicChat")
-    @SendTo("topic/publicChat")
+    @SendTo("/topic/publicChat")
     public publicChat publicChat(publicChat message) {
         if(userService.getUserById(message.getIdDUserSend())!=null){
+            message.setUserSendName(userService.getUsernameByUserID(message.getIdDUserSend()));
             message.setAva(userService.getUserById(message.getIdDUserSend()).getAva());
             return message;
+
         }else{
             return null;
         }
@@ -47,7 +54,7 @@ public class UserController {
                 for (queueUser user : queueUsers) {
                     if (user.getMode() == message.getMode() && !user.getIdUserCreate().equals(message.getIdUserCreate())) {
                         queueUsers.remove(user); // Loại bỏ người chơi khớp từ danh sách chờ
-                        //createGameRoom(user, message); // Tạo phòng chơi với hai người chơi phù hợp
+                        createGameRoom(user, message); // Tạo phòng chơi với hai người chơi phù hợp
                         clientsInJoinGame.remove(message.getIdUserCreate()); // Hủy joinGame cho client hiện tại
                         return;
                     }

@@ -14,6 +14,8 @@ function sendLogin(name: string, pass: string): Promise<string> {
             console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
             if (body.message === "Đăng nhập thành công") {
                 localStorage.setItem('userID', body.userID);
+                localStorage.setItem('userName', body.userName);
+                localStorage.setItem('ava', body.ava);
                 resolve('success');
             } else {
                 reject('failure');

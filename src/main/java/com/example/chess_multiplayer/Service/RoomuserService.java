@@ -79,8 +79,13 @@ public class RoomuserService {
     }
     public void updateChatById(String idRoomUser, String chat) {
         roomuserRepository.findById(idRoomUser).ifPresent(roomuser -> {
-            roomuser.setChat(roomuser.getChat() + "@" + chat + "@" + Instant.now().toString());
-            roomuserRepository.save(roomuser);
+            if(roomuser.getChat() != null){
+                roomuser.setChat(roomuser.getChat() + "@" + chat + "@" + Instant.now().toString());
+                roomuserRepository.save(roomuser);
+            }else{
+                roomuser.setChat("@" + chat + "@" + Instant.now().toString());
+                roomuserRepository.save(roomuser);
+            }
         });
     }
 }

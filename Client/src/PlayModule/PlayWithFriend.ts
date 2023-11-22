@@ -37,6 +37,8 @@ function joinRoom(): Promise<RoomJoinedResponse> {
             localStorage.setItem('color', body.color.toString()); // Chuyển đổi boolean thành string khi lưu
             localStorage.setItem('userSendTempPort', body.userSendTempPort);
             localStorage.setItem('userReceiveTempPort', body.userReceiveTempPort);
+            localStorage.setItem('userSendName', body.userSendName);
+            localStorage.setItem('userSendAva', body.userSendAva);
             resolve(body);
         });
     });

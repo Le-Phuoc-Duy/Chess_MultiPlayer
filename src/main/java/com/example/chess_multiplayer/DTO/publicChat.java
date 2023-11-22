@@ -2,6 +2,7 @@ package com.example.chess_multiplayer.DTO;
 
 public class publicChat {
     private String idDUserSend;
+    private String userSendName;
     private String chat;
     private int ava;
 
@@ -28,5 +29,14 @@ public class publicChat {
 
     public void setAva(int ava) {
         this.ava = ava;
+    }
+
+
+    public String getUserSendName() {
+        return userSendName;
+    }
+
+    public void setUserSendName(String userSendName) {
+        this.userSendName = userSendName;
     }
 }

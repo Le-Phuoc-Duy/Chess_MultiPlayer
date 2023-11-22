@@ -71,3 +71,7 @@ body{
 input[type="radio"]:checked + label {
     border: 2px solid red;
 }
+#chatModeAll:checked + .form-check-label,
+  #chatModePrivate:checked + .form-check-label {
+    border: none !important;
+  }

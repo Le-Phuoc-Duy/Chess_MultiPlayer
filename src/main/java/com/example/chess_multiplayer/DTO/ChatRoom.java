@@ -2,6 +2,8 @@ package com.example.chess_multiplayer.DTO;
 
 public class ChatRoom {
     private String idUserSend;
+    private String userSendName;
+    private int userSendAva;
     private String idUserReceive;
     private String idRoom;
     private String idRoomUser;
@@ -63,5 +65,21 @@ public class ChatRoom {
 
     public void setUserReceiveTempPort(String userReceiveTempPort) {
         this.userReceiveTempPort = userReceiveTempPort;
+    }
+
+    public String getUserSendName() {
+        return userSendName;
+    }
+
+    public void setUserSendName(String userSendName) {
+        this.userSendName = userSendName;
+    }
+
+    public int getUserSendAva() {
+        return userSendAva;
+    }
+
+    public void setUserSendAva(int userSendAva) {
+        this.userSendAva = userSendAva;
     }
 }

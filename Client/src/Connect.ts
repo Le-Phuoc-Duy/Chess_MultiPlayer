@@ -4,6 +4,7 @@ import { Color } from './Enum';
 import { Board } from './Board';
 import { RoomJoinedResponse } from './RoomJoinedResponse';
 import { sendChessMove } from './PlayModule/PlayWithFriend';
+import { ChatContentFrom } from './PlayModule/Chat';
 
 const socket = new SockJS('http://' + window.location.hostname +':8888/ws');
 export const stompClient = new Client({
@@ -45,6 +46,14 @@ stompClient.onConnect = (frame) => {
         currentGame.setFullCoordinates(body.board)
         currentGame.currentTurn = true
         drawBoard(currentGame.board);
+    });
+    stompClient.subscribe('/topic/publicChat', (message) => {
+        const body = JSON.parse(message.body);
+        ChatContentFrom(body.idDUserSend, body.userSendName, body.ava, body.chat, true);
+    });
+    stompClient.subscribe('/user/queue/chatRoom', (message) => {
+        const body = JSON.parse(message.body);
+        ChatContentFrom(body.idDUserSend,body.userSendName, body.userSendAva, body.chat, false);
     });
 };
 // Kết nối tới server
