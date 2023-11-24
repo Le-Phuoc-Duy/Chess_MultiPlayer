@@ -24,12 +24,9 @@ public class UserController {
     private UserService userService;
     @Autowired
     private RoomService roomService;
-
     @Autowired
     private RoomuserController roomuserController;
     private Set<queueUser> queueUsers = new HashSet<>();
-//    private Queue<queueUser> queueRooms = new LinkedList<>();
-    private Set<String> clientsInJoinGame = new HashSet<>();
     public String getIdUserByIDAcc(String idAcc){
         return userService.getIdUserByIdAcc(idAcc);
     }
@@ -48,16 +45,16 @@ public class UserController {
 
     @MessageMapping("/joinGame")
     public void joinGame(queueUser message) {
-        clientsInJoinGame.add(message.getIdUserCreate());
-        while (clientsInJoinGame.contains(message.getIdUserCreate())) {
-            if (!queueUsers.isEmpty()) {
-                for (queueUser user : queueUsers) {
-                    if (user.getMode() == message.getMode() && !user.getIdUserCreate().equals(message.getIdUserCreate())) {
-                        queueUsers.remove(user); // Loại bỏ người chơi khớp từ danh sách chờ
-                        createGameRoom(user, message); // Tạo phòng chơi với hai người chơi phù hợp
-                        clientsInJoinGame.remove(message.getIdUserCreate()); // Hủy joinGame cho client hiện tại
-                        return;
-                    }
+        queueUsers.add(message);
+        Iterator<queueUser> iterator = queueUsers.iterator();
+        while (queueUsers.contains(message)) {
+            while (iterator.hasNext()) {
+                queueUser user = iterator.next();
+                if (user.getMode() == message.getMode() && !user.getIdUserCreate().equals(message.getIdUserCreate())) {
+                    queueUsers.remove(message);
+                    createGameRoom(user, message); // Tạo phòng chơi với hai người chơi phù hợp
+                    queueUsers.remove(user); // Loại bỏ người chơi khớp từ danh sách chờ
+                    return;
                 }
             }
         }
@@ -76,7 +73,7 @@ public class UserController {
         boolean color = generateRandomBoolean();
         String idRoomUser1Created;
         String idRoomUser2Created;
-        if(color == true){
+        if(color){
             idRoomUser1Created = roomuserController.creatRoomuser(user.getIdUserCreate(),idRoomCreated,user.getMode(), true);
             System.out.println("createRoomUser1" + idRoomUser1Created);
             idRoomUser2Created = roomuserController.creatRoomuser(message.getIdUserCreate(),idRoomCreated,message.getMode(),false);
@@ -103,7 +100,7 @@ public class UserController {
         chessGameUser2.setChessMove(null);
         chessGameUser2.setUserSendTempPort(message.getUserCreateTempPort());
         chessGameUser2.setUserReceiveTempPort(user.getUserCreateTempPort());
-        if(color == true){
+        if(color){
             chessGameUser1.setColor(color);
             chessGameUser2.setColor(!color);
             chessGameUser1.setBoard("rnbqkbnrpppppppp////////////////////////////////PPPPPPPPRNBQKBNR");
@@ -123,9 +120,23 @@ public class UserController {
 
     @MessageMapping("/cancelJoinGame")
     public void cancelJoinGame(queueUser message) {
-        if(clientsInJoinGame.contains(message.getIdUserCreate())){
-            clientsInJoinGame.remove(message.getIdUserCreate());
-            messagingTemplate.convertAndSendToUser(message.getUserCreateTempPort(), "/queue/cancelJoinGame", "Success!");
+        System.out.println("before Cancel: ");
+        for (queueUser user: queueUsers){
+            System.out.println(user.getIdUserCreate());
+        }
+        System.out.println("call Cancel: " + message.getIdUserCreate());
+        Iterator<queueUser> iterator = queueUsers.iterator();
+        while (iterator.hasNext()) {
+            queueUser user = iterator.next();
+            if (user.getIdUserCreate().equals(message.getIdUserCreate())) {
+                System.out.println("remove: " + user.getIdUserCreate());
+                queueUsers.remove(user); // Loại bỏ người chơi khớp từ danh sách chờ
+                break;
+            }
+        }
+        System.out.println("after Cancel: ");
+        for (queueUser user: queueUsers){
+           System.out.println(user.getIdUserCreate());
         }
     }
     public boolean generateRandomBoolean() {

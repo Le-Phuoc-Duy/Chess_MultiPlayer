@@ -9,26 +9,46 @@ export class Game {
 	private _currentTurn: boolean  			//Lượt chơi, true có thể đánh, false lượt của đối thủ
 	private _status: GameStatus  			//Trạng thái trận 
 
-	constructor(playerSide: Color){
-		this._playerSide = playerSide
-		this._board = new Board()
-		if (playerSide === Color.WHITE ){
-			console.log("white la p1")
-			this._currentTurn = true 
-		}else{
-			console.log("white la p2")
-			this._currentTurn = false 
-		} 
-		this._status = GameStatus.ACTIVE
-	}
+	// constructor(playerSide: Color){
+	// 	this._playerSide = playerSide
+	// 	this._board = new Board()
+	// 	if (playerSide === Color.WHITE ){
+	// 		console.log("white la p1")
+	// 		this._currentTurn = true 
+	// 		if(this._currentTurn){
+	// 			localStorage.setItem('currentTurn','true');
+	// 			}else{
+	// 				localStorage.setItem('currentTurn','false');
+	// 			}
+	// 	}else{
+	// 		console.log("white la p2")
+	// 		this._currentTurn = false 
+	// 		if(this._currentTurn){
+	// 			localStorage.setItem('currentTurn','true');
+	// 			}else{
+	// 				localStorage.setItem('currentTurn','false');
+	// 			}
+	// 	} 
+	// 	this._status = GameStatus.ACTIVE
+	// }
 
 	public get currentTurn(): boolean {
 		return this._currentTurn;
 	}
 	public set currentTurn(value: boolean) {
 		this._currentTurn = value;
+		if(this._currentTurn){
+			localStorage.setItem('currentTurn','true');
+			}else{
+				localStorage.setItem('currentTurn','false');
+			}
 	} 
-	
+	public get playerSide(): Color {
+		return this._playerSide;
+	}
+	public set playerSide(value: Color) {
+		this._playerSide = value;
+	} 
 	public get board(): Board {
 		return this._board;
 	}
@@ -127,6 +147,24 @@ export class Game {
 		// }
 		// set the current turn to the other player
 		this._currentTurn = false 
+		if(this._currentTurn){
+			localStorage.setItem('currentTurn','true');
+			}else{
+				localStorage.setItem('currentTurn','false');
+			}
 		return true;
 	}
+	constructor(playerSide: Color, board: Board, currentTurn: boolean, status: GameStatus) {
+        this._playerSide = playerSide;
+        this._board = board;
+        this._currentTurn = currentTurn;
+        this._status = status;
+    }
+	static fromJSON(json: any): Game {
+        const playerSide = json._playerSide;
+        const board = json._board; // Chưa biết cấu trúc của Board là gì, cần cập nhật
+        const currentTurn = json._currentTurn;
+        const status = json._status;
+        return new Game(playerSide, board, currentTurn, status);
+    }
 } 

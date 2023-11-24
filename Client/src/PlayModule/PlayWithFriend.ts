@@ -3,7 +3,7 @@ import { currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect"
 import { RoomJoinedResponse } from "../RoomJoinedResponse";
 import Swal from "sweetalert2";
 import { Game } from "../Game";
-
+import { Board } from '../Board';
 function createRoom(mode: number): Promise<string> {
     console.log("mode" + mode) 
     return new Promise((resolve, reject) => {
@@ -99,10 +99,10 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                             console.log('iDUserSend: ' + result.iDUserSend + '\niDUserReceive: ' + result.iDUserReceive + '\niDRoom: ' + result.iDRoom + '\nidRoomUser: ' + result.idRoomUser + '\nchessMove: ' + result.chessMove + '\nboard: ' + result.board + '\ncolor: ' + result.color);
                             if (result.color) {
                                 console.log("self la white, opp la black")
-                                var gameByJoin: Game = new Game(Color.WHITE)
+                                var gameByJoin: Game = new Game(Color.WHITE, new Board,true, 0);
                             } else {
                                 console.log("self la black, opp la white")
-                                var gameByJoin: Game = new Game(Color.BLACK)
+                                var gameByJoin: Game = new Game(Color.BLACK, new Board,false, 0);
                             }
                             gameByJoin.setFullCoordinates(result.board);
                             setCurrentGame(gameByJoin)
@@ -147,23 +147,24 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
             let gameMode: number
             switch (document.getElementById('gameMode')!.innerHTML) {
                 case "2 | 1 phút":
-                    gameMode = 1
+                    gameMode = -1
                     break;
                 case "3 | 2 phút":
-                    gameMode = 2
+                    gameMode = -2
                     break;
                 case "5 phút":
-                    gameMode = 3
+                    gameMode = -3
                     break;
                 case "10 phút":
-                    gameMode = 4
+                    gameMode = -4
                     break;
                 default:
-                    let hour = (document.getElementById('hour') as HTMLInputElement).value.padStart(2, '0');
-                    let minute = (document.getElementById('minute') as HTMLInputElement).value.padStart(2, '0');
-                    let inc = (document.getElementById('inc') as HTMLInputElement).value;
-                    let x: string = hour + minute + inc 
-                    gameMode = parseInt(x)
+                    let minute = (document.getElementById('minute') as HTMLInputElement).value;
+                    let second = (document.getElementById('second') as HTMLInputElement).value;
+                    let m: number = parseInt(minute);
+                    let s: number = parseInt(second);
+                    let x: number = m*60 + s 
+                    gameMode = x;
                     break;
             }
             createRoom(gameMode)
@@ -193,10 +194,10 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                                     });
                                     if (result.color) {
                                         console.log("self la white, opp la black")
-                                        var gameByCreate: Game = new Game(Color.WHITE)
+                                        var gameByCreate: Game = new Game(Color.WHITE, new Board,true, 0);
                                     } else {
                                         console.log("self la black, opp la white")
-                                        var gameByCreate: Game = new Game(Color.BLACK)
+                                        var gameByCreate: Game = new Game(Color.BLACK, new Board,false, 0);
                                     }
                                     gameByCreate.setFullCoordinates(result.board);
                                     setCurrentGame(gameByCreate)

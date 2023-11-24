@@ -1,4 +1,4 @@
-import { stompClient } from "../Connect";
+import { checkIsloggedIn, stompClient } from "../Connect";
 import Swal from "sweetalert2";
 
 function sendLogin(name: string, pass: string): Promise<string> {
@@ -13,6 +13,7 @@ function sendLogin(name: string, pass: string): Promise<string> {
             const body = JSON.parse(message.body);
             console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
             if (body.message === "Đăng nhập thành công") {
+                localStorage.clear();
                 localStorage.setItem('userID', body.userID);
                 localStorage.setItem('userName', body.userName);
                 localStorage.setItem('ava', body.ava);
@@ -44,23 +45,24 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
             } else { 
                 sendLogin(username, password)
                     .then((result) => {
-                        if (result === 'success') {
-                            const Toast = Swal.mixin({
-                                toast: true,
-                                position: "top-end",
-                                showConfirmButton: false,
-                                timer: 5000,
-                                timerProgressBar: true,
-                                didOpen: (toast) => {
-                                toast.onmouseenter = Swal.stopTimer;
-                                toast.onmouseleave = Swal.resumeTimer;
-                                }
-                            });
-                            Toast.fire({
-                                icon: "success",
-                                title: "Đăng nhập thành công"
-                            });
-                        } 
+                        checkIsloggedIn();
+                    }).then(()=>{
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 5000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                            }
+                        });
+                        Toast.fire({
+                            icon: "success",
+                            title: "Đăng nhập thành công"
+                        });
+                        
                     })
                     .catch((error) => { 
                         const Toast = Swal.mixin({
@@ -83,4 +85,6 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
         }
     })  
 })
+
+
  

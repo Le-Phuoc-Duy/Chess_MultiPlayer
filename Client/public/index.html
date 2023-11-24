@@ -11,9 +11,11 @@
   <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
   <script type="module" src="/dist/Connect.js"></script>
   <script type="module" src="/dist/AccountModule/Login.js"></script>
+  <script type="module" src="/dist/AccountModule/Logout.js"></script>
   <script type="module" src="/dist/AccountModule/Register.js"></script>
   <script type="module" src="/dist/PlayModule/PlayWithFriend.js"></script>
   <script type="module" src="/dist/PlayModule/Chat.js"></script>
+  <script type="module" src="/dist/PlayModule/PlayWorld.js"></script>
   <!-- <script type="module" src="/dist/PlayChess.js"></script> -->
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
   <!-- <script src="./template/bundle.min.js"></script> -->
@@ -107,48 +109,21 @@
             <li><button class="btn select-button btnMode" id="mode4">10 phút</button></li>
             <li>
               <button class="btn select-button btnMode d-flex align-items-center" id="mode5">
-                <input class="form-control input-game-mode" id="hour" type="text" placeholder="giờ">
-                <input class="form-control input-game-mode" id="minute" type="text" placeholder="phút">
-                <input class="form-control input-game-mode" id="inc" type="text" placeholder="inc">
+                <input class="form-control input-game-mode" id="minute" type="number" placeholder="phút">
+                <input class="form-control input-game-mode" id="second" type="number" placeholder="giây">
                 <i class="fa-solid fa-arrow-right"></i>
               </button>
             </li>
           </ul>
         </div>
         <div class="d-flex justify-content-center">
-          <button class="btn play-button">Chơi</button>
+          <button id="buttonPlay" class="btn play-button">Chơi</button>
         </div>
         <div class="d-flex justify-content-center">
           <button class="btn select-button" id="playWithFriend" style="font-weight: bold; color: #4a4847;">Chơi với
             bạn</button>
         </div>
-        <!-- <section >
-        <div class="container ">
-          <div class="row d-flex justify-content-center">
-            <div class="col-md-8 col-lg-6 col-xl-10">
-
-              <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center px-3 pt-2 pb-2"
-                     style="border-top: 4px solid #ffa900;">
-                  <h5 class="mb-0">Chat</h5>
-                </div>
-                <div id="chatPrivateContent" class="card-body" style="position: relative; height: 200px">
-
-                </div>
-                <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
-                  <div class="input-group mb-0">
-                    <input id ="messageInput" type="text" class="form-control" placeholder="Nhập tin nhắn"
-                           aria-label="Recipient's username" aria-describedby="button-addon2" />
-                    <button class="btn btn-warning" type="button" id="btnSendMessage" style="padding-top: .55rem;">
-                      Gửi
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section> -->
+        
         <section>
           <div class="container ">
             <div class="row d-flex justify-content-center">
@@ -200,9 +175,14 @@
           }
         </style>
 
-        <div class="d-flex justify-content-center" id="noneLogin">
-          <button id="loginButton" style="display: block" class="btn account-button">Đăng nhập</button>
-          <button id="registerButton" style="display: block" class="btn account-button">Đăng ký</button>
+        <div class="d-flex justify-content-center" id="noneLogin" >
+          <button id="loginButton"class="btn account-button">Đăng nhập</button>
+          <button id="registerButton" class="btn account-button">Đăng ký</button>
+          <img src="" alt="">
+        </div>
+        <div class="d-flex justify-content-center" id="Logon">
+          <button id="profileButton"class="btn account-button">Trang cá nhân</button>
+          <button id="logoutButton" class="btn account-button">Đăng xuất</button>
           <img src="" alt="">
         </div>
       </div>

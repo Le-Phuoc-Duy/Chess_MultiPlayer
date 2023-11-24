@@ -37,8 +37,8 @@ public class DataInitializer implements ApplicationRunner {
             // Tạo đối tượng Account
             Account account1 = new Account();
             account1.setiDAcc("Acc01");
-            account1.setUsername("user1_username");
-            account1.setPassword("user1_password");
+            account1.setUsername("1");
+            account1.setPassword("1");
 
             // Thiết lập liên kết 1-1
             accountService.createAccount(account1);
@@ -61,8 +61,8 @@ public class DataInitializer implements ApplicationRunner {
             // Tạo đối tượng Account
             Account account2 = new Account();
             account2.setiDAcc("Acc02");
-            account2.setUsername("user2_username");
-            account2.setPassword("user2_password");
+            account2.setUsername("12");
+            account2.setPassword("12");
 
             // Thiết lập liên kết 1-1
             accountService.createAccount(account2);
@@ -77,7 +77,7 @@ public class DataInitializer implements ApplicationRunner {
             // Tạo đối tượng User
             User user3 = new User();
             user3.setIDUser("use03");
-            user3.setAva(4);
+            user3.setAva(3);
             user3.setElo(1000);
             user3.setWin(4);
             user3.setLose(6);
@@ -121,6 +121,54 @@ public class DataInitializer implements ApplicationRunner {
 
             // Lưu vào cơ sở dữ liệu
             userService.createUser(user4);
+
+            // Tạo đối tượng User
+            User user5 = new User();
+            user5.setIDUser("use05");
+            user5.setAva(5);
+            user5.setElo(1350);
+            user5.setWin(4);
+            user5.setLose(6);
+            user5.setDraw(6);
+            // Tạo đối tượng Account
+            Account account5 = new Account();
+            account5.setiDAcc("Acc05");
+            account5.setUsername("12345");
+            account5.setPassword("12345");
+
+            // Thiết lập liên kết 1-1
+            accountService.createAccount(account5);
+            user5.setAccount(account5);
+            // Thiet lap lien ket 1-nhieu
+            user5.setRoomusers(new HashSet<>());
+            user5.setFriends(new HashSet<>());
+
+            // Lưu vào cơ sở dữ liệu
+            userService.createUser(user5);
+
+            // Tạo đối tượng User
+            User user6 = new User();
+            user6.setIDUser("use06");
+            user6.setAva(6);
+            user6.setElo(870);
+            user6.setWin(5);
+            user6.setLose(2);
+            user6.setDraw(4);
+            // Tạo đối tượng Account
+            Account account6 = new Account();
+            account6.setiDAcc("Acc06");
+            account6.setUsername("123456");
+            account6.setPassword("123456");
+
+            // Thiết lập liên kết 1-1
+            accountService.createAccount(account6);
+            user6.setAccount(account6);
+            // Thiet lap lien ket 1-nhieu
+            user6.setRoomusers(new HashSet<>());
+            user6.setFriends(new HashSet<>());
+
+            // Lưu vào cơ sở dữ liệu
+            userService.createUser(user6);
 
             // Tạo đối tượng friend
             Friend friend12 = new Friend();
