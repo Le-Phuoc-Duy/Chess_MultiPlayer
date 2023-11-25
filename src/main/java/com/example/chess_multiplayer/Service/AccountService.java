@@ -46,4 +46,8 @@ public class AccountService {
         }
         return null;
     }
+
+    public boolean isUsernameExists(String username) {
+        return accountRepository.existsByUsername(username);
+    }
 }

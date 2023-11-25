@@ -14,4 +14,8 @@ public class AccountController {
     public boolean authenticate(String username, String password){
         return accountService.authenticate(username,password);
     }
+
+    public boolean isUsernameExists(String username) {
+        return accountService.isUsernameExists(username);
+    }
 }

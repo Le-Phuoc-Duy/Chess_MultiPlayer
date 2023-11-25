@@ -25,6 +25,8 @@ public class UserController {
     @Autowired
     private RoomService roomService;
     @Autowired
+    private AccountService accountService;
+    @Autowired
     private RoomuserController roomuserController;
     private Set<queueUser> queueUsers = new HashSet<>();
     public String getIdUserByIDAcc(String idAcc){
@@ -142,5 +144,11 @@ public class UserController {
     public boolean generateRandomBoolean() {
         Random random = new Random();
         return random.nextBoolean();
+    }
+
+
+    public String registerUser(String username, String password, int ava) {
+        return userService.registerUser(username, password, ava);
+
     }
 }
