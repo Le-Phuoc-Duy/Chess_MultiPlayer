@@ -16,7 +16,12 @@ body{
     height: 100%;
     width: 50%;
     margin-right: 5%;
-} 
+}
+.imgPromotion{
+    width: 20%;
+    margin: 2%;
+    
+}
 @media (min-width: 576px) {
     .select-button{
         /* display: block;  */
@@ -71,3 +76,6 @@ body{
 input[type="radio"]:checked + label {
     border: 2px solid red;
 }
+.selected-promotion {
+    border: 3px solid rgb(17, 209, 55);
+  }

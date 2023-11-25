@@ -108,12 +108,12 @@ public class RoomController {
                 chessGameUser1.setColor(color);
                 chessGameUser2.setColor(!color);
                 chessGameUser1.setBoard("rnbqkbnrpppppppp////////////////////////////////PPPPPPPPRNBQKBNR");
-                chessGameUser2.setBoard("RNBQKBNRPPPPPPPP////////////////////////////////pppppppprnbqkbnr");
+                chessGameUser2.setBoard("RNBKQBNRPPPPPPPP////////////////////////////////pppppppprnbkqbnr");
             }else{
                 chessGameUser1.setColor(color);
                 chessGameUser2.setColor(!color);
                 chessGameUser2.setBoard("rnbqkbnrpppppppp////////////////////////////////PPPPPPPPRNBQKBNR");
-                chessGameUser1.setBoard("RNBQKBNRPPPPPPPP////////////////////////////////pppppppprnbqkbnr");
+                chessGameUser1.setBoard("RNBKQBNRPPPPPPPP////////////////////////////////pppppppprnbkqbnr");
             }
             System.out.println(chessGameUser1.toString());
             System.out.println(chessGameUser2.toString());

@@ -1,5 +1,5 @@
 import { Point } from "./Point"; 
-import { Color } from "./Enum"; 
+import { Catsling, Color } from "./Enum"; 
 import { Knight } from "./Pieces/Knight";
 import { Pawn } from "./Pieces/Pawn";
 import { Rook } from "./Pieces/Rook";
@@ -9,14 +9,46 @@ import { King } from "./Pieces/King";
 
 export class Board{
     boxes: Point[][]
+    private _rookNearKing: boolean;
+    private _rookFarKing: boolean;
+    private _kingMoved: boolean;
+    private _catsling: Catsling;
+    public get catsling(): Catsling {
+        return this._catsling;
+    }
+    public set catsling(value: Catsling) {
+        this._catsling = value;
+    }
+    public get rookNearKing(): boolean {
+        return this._rookNearKing;
+    }
+    public set rookNearKing(value: boolean) {
+        this._rookNearKing = value;
+    } 
+    public get rookFarKing(): boolean {
+        return this._rookFarKing;
+    }
+    public set rookFarKing(value: boolean) {
+        this._rookFarKing = value;
+    } 
+    public get kingMoved(): boolean {
+        return this._kingMoved;
+    }
+    public set kingMoved(value: boolean) {
+        this._kingMoved = value;
+    }
     constructor(){
         this.boxes = []
+        this._rookNearKing = true
+        this._rookFarKing = true
+        this._kingMoved = true
+        this._catsling = Catsling.NOT
         this.initBoard()
-    } 
+    }  
     //Lấy thông tin Point theo tọa độ
     getBox(x: number, y: number): Point {
         if (x < 0 || x > 7 || y < 0 || y > 7) {
-          throw new Error("Index out of bound");
+          throw new Error("Index out of bound"); 
         } 
         return this.boxes[x][y];
     }
@@ -36,9 +68,9 @@ export class Board{
                     else if(c === 2 || c === 5)
                         this.boxes[r][c] = new Point(r, c, new Bishop(Color.BLACK, "./assets/Black-Bishop.png","b"));
                     else if(c === 3)
-                        this.boxes[r][c] = new Point(r, c, new Queen(Color.BLACK, "./assets/Black-Queen.png","q"));
-                    else if(c === 4)
                         this.boxes[r][c] = new Point(r, c, new King(Color.BLACK, "./assets/Black-King.png","k"));
+                    else if(c === 4)
+                        this.boxes[r][c] = new Point(r, c, new Queen(Color.BLACK, "./assets/Black-Queen.png","q"));
                     // else{
 
                     // }
@@ -54,10 +86,10 @@ export class Board{
                         this.boxes[r][c] = new Point(r, c, new Bishop(Color.WHITE, "./assets/White-Bishop.png","B"));
                     else if(c === 3)
                     // this.boxes[r][c] = new Point(r, c);
-                        this.boxes[r][c] = new Point(r, c, new Queen(Color.WHITE, "./assets/White-Queen.png","Q"));
-                    else if(c === 4)
-                    // this.boxes[r][c] = new Point(r, c);
                         this.boxes[r][c] = new Point(r, c, new King(Color.WHITE, "./assets/White-King.png","K"));
+                    else if(c === 4)
+                        // this.boxes[r][c] = new Point(r, c);
+                        this.boxes[r][c] = new Point(r, c, new Queen(Color.WHITE, "./assets/White-Queen.png","Q"));
                 } 
                 else if (r === 1)
                     this.boxes[r][c] = new Point(r, c, new Pawn(Color.WHITE, "./assets/White-Pawn.png","P"));
@@ -123,6 +155,17 @@ export class Board{
                 }
             }
         }
+    }
+    getKingCoordinates(color: Color): Point {  
+        for(let x = 0; x < 8;x++){
+            for(let y = 0; y < 8;y++){
+                if(color === Color.WHITE)
+                    if(this.getBox(x,y).piece?.name === 'K') return this.boxes[x][y];
+                if(color === Color.BLACK)
+                    if(this.getBox(x,y).piece?.name === 'k') return this.boxes[x][y]; 
+            }
+        }
+        return this.boxes[7][4];
     }
     
 }

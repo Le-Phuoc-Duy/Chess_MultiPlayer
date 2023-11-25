@@ -45,6 +45,7 @@ stompClient.onConnect = (frame) => {
         currentGame.setFullCoordinates(body.board)
         currentGame.currentTurn = true
         drawBoard(currentGame.board);
+        currentGame.checkGameStatus()
     });
 };
 // Kết nối tới server
@@ -74,6 +75,9 @@ var endY: number = -1
 export var currentGame: Game = new Game(Color.WHITE)
 export function setCurrentGame(game: Game) {
     currentGame = game
+}
+window.onload = function(){ 
+    drawBoard(currentGame.board)
 }
 export function drawBoard(board: Board) {
     //i row, j col
@@ -157,4 +161,4 @@ buttons.forEach((button) => {
         }
     });
 });
-
+  

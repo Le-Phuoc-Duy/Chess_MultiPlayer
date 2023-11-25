@@ -18,5 +18,6 @@ export class Knight extends Piece{
         return row*col === 2
         throw new Error("Method not implemented.");
     }
+    isPathClear(board: Board, startPoint: Point, endPoint: Point): boolean { return true}
 
 }

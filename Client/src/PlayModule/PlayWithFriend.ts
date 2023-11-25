@@ -1,5 +1,5 @@
 import { Color } from "../Enum";
-import { currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect";
+import {  currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect";
 import { RoomJoinedResponse } from "../RoomJoinedResponse";
 import Swal from "sweetalert2";
 import { Game } from "../Game";
@@ -98,9 +98,12 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                             if (result.color) {
                                 console.log("self la white, opp la black")
                                 var gameByJoin: Game = new Game(Color.WHITE)
+                                PromotionOverlay(Color.WHITE)   //Hiển thị phong cấp màu trắng
+                                
                             } else {
                                 console.log("self la black, opp la white")
                                 var gameByJoin: Game = new Game(Color.BLACK)
+                                PromotionOverlay(Color.BLACK) //Hiển thị phong cấp màu đen
                             }
                             gameByJoin.setFullCoordinates(result.board);
                             setCurrentGame(gameByJoin)
@@ -192,9 +195,11 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                                     if (result.color) {
                                         console.log("self la white, opp la black")
                                         var gameByCreate: Game = new Game(Color.WHITE)
+                                        PromotionOverlay(Color.WHITE)
                                     } else {
                                         console.log("self la black, opp la white")
                                         var gameByCreate: Game = new Game(Color.BLACK)
+                                        PromotionOverlay(Color.BLACK)
                                     }
                                     gameByCreate.setFullCoordinates(result.board);
                                     setCurrentGame(gameByCreate)
@@ -214,3 +219,36 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
     }
 })
 
+//Hiển thị bảng phong hậu
+export function PromotionOverlay(color: Color){
+    let pieceValue: string = "Queen";
+
+    document.getElementById('promotion-pawn')!.style.display = 'block'; 
+
+    if (color === Color.BLACK) {
+        document.getElementById('promotionBlack')!.style.display = 'block';
+        document.getElementById('promotionWhite')!.style.display = 'none';
+    }
+
+    if (color === Color.WHITE) {
+        document.getElementById('promotionWhite')!.style.display = 'block';
+        document.getElementById('promotionBlack')!.style.display = 'none';
+    } 
+    return pieceValue;
+}  
+export let piecePromoted: string = "Queen";  
+// Gán sự kiện click cho mỗi phần tử imgPromotion
+document.querySelectorAll('.imgPromotion').forEach((element) => {
+    element.addEventListener('click', function () { 
+        const value = element.getAttribute('value'); 
+        if (value) {
+            piecePromoted = value;
+            console.log("piece value: " + piecePromoted); 
+            // Xóa bỏ viền màu đỏ ở tất cả các phần tử
+            document.querySelectorAll('.imgPromotion').forEach((img) => {
+                img.classList.remove("selected-promotion") 
+            });
+            element.classList.add("selected-promotion") 
+        }
+    });
+});

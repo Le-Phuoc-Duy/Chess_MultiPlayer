@@ -11,3 +11,10 @@ export enum GameStatus {
     STALEMATE,
     RESIGNATION
 } 
+export enum Catsling{
+    NOT,
+    NEAR,
+    FAR,
+    DONE,
+    EXCUTE
+}

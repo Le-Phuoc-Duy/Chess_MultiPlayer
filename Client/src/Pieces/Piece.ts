@@ -4,7 +4,7 @@ import { Color } from "../Enum";
 export abstract class Piece { 
     private _killed : boolean = false
     private _color: Color 
-    private _name: string = "n";
+    private _name: string = "/";
     private _image: string = ""
 
 	constructor (color: Color, image: string, name: string) 
@@ -39,4 +39,5 @@ export abstract class Piece {
         this._image = value
     }
     abstract canMove(board: Board, startPoint: Point, endPoint: Point): boolean 
+    abstract isPathClear(board: Board, startPoint: Point, endPoint: Point): boolean 
 } 
