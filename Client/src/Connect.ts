@@ -174,7 +174,9 @@ buttons.forEach((button) => {
 });
 // Lưu trạng thái của currentGame vào localStorage trước khi reload
 window.addEventListener('beforeunload', () => {
-    localStorage.setItem('savedGame', JSON.stringify(currentGame));
+    if(localStorage.getItem('userID') != null){
+        localStorage.setItem('savedGame', JSON.stringify(currentGame));
+    }
 });
 export function checkIsloggedIn(){
     const isLoggedIn = localStorage.getItem('userID');
@@ -200,20 +202,25 @@ export function checkIsloggedIn(){
         profileButton!.style.display = 'none';
         logoutButton!.style.display = 'none';
     }
+
 }
 window.addEventListener('load', () => {
     checkIsloggedIn();
-    setCurrentGameAferLoad()
+    if(localStorage.getItem('userID') == null){
+        PromotionOverlay(currentGame.playerSide);
+    }else{
+        setCurrentGameAferLoad()
         .then((result) => {
-            console.log("currentGame.playerSide" + currentGame.playerSide)
+            console.log("currentGame.playerSide: " + currentGame.playerSide);
             var reDrawGame: Game = new Game(currentGame.playerSide, new Board, currentGame.currentTurn, currentGame.status);
             reDrawGame.setFullCoordinates(localStorage.getItem('board')!);
             setCurrentGame(reDrawGame)
             drawBoard(reDrawGame.board);
+            PromotionOverlay(currentGame.playerSide);
         })
         .catch((error) => {
         });
-
+    }
 });
 function setCurrentGameAferLoad(): Promise<string> {
     return new Promise((resolve) => {
@@ -221,9 +228,7 @@ function setCurrentGameAferLoad(): Promise<string> {
         if (storedGame) {
             const parsedGame = JSON.parse(storedGame);
             currentGame = Game.fromJSON(parsedGame);
-        } else {
-            currentGame = new Game(Color.NOT, new Board, true, 0); // Nếu không có dữ liệu, tạo một đối tượng Game mới
-        }
+        } 
         resolve("success");
     });
 }
@@ -232,13 +237,11 @@ function setCurrentGameAferLoad(): Promise<string> {
 export function PromotionOverlay(color: Color){
     let pieceValue: string = "Queen";
     if(color === Color.NOT){ 
-        console.log("color not")
         document.getElementById('beforeGame')!.style.display = 'block'; 
         document.getElementById('afterGame')!.style.display = 'none'; 
         document.getElementById('promotionBlack')!.style.display = 'none';
         document.getElementById('promotionWhite')!.style.display = 'none';
     }else{
-        console.log("!color not")
         document.getElementById('afterGame')!.style.display = 'block';
         document.getElementById('beforeGame')!.style.display = 'none';
 

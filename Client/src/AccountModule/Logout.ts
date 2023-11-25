@@ -1,4 +1,4 @@
-import { checkIsloggedIn, stompClient } from "../Connect";
+import { PromotionOverlay, checkIsloggedIn, currentGame, stompClient } from "../Connect";
 import Swal from "sweetalert2";
 
 document.getElementById("logoutButton")?.addEventListener("click",async () => {
@@ -18,5 +18,5 @@ document.getElementById("logoutButton")?.addEventListener("click",async () => {
         title: "Đăng xuất thành công"
     });
     localStorage.clear();
-    checkIsloggedIn();
+    window.location.reload();
 })

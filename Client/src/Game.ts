@@ -445,7 +445,6 @@ export class Game {
         this._board = board;
         this._currentTurn = currentTurn;
         this._status = status;
-		PromotionOverlay(playerSide)
     }
 	static fromJSON(json: any): Game {
         const playerSide = json._playerSide;

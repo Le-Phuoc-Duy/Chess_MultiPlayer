@@ -1,5 +1,5 @@
 import { Color } from "../Enum";
-import { currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect";
+import { PromotionOverlay, currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect";
 import { RoomJoinedResponse } from "../RoomJoinedResponse";
 import Swal from "sweetalert2";
 import { Game } from "../Game";
@@ -107,6 +107,7 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                             gameByJoin.setFullCoordinates(result.board);
                             setCurrentGame(gameByJoin)
                             drawBoard(gameByJoin.board);
+                            PromotionOverlay(currentGame.playerSide);
                             const Toast = Swal.mixin({
                                 toast: true,
                                 position: "top-end",
@@ -202,6 +203,7 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                                     gameByCreate.setFullCoordinates(result.board);
                                     setCurrentGame(gameByCreate)
                                     drawBoard(gameByCreate.board);
+                                    PromotionOverlay(currentGame.playerSide);
                                 }
                             })
                         }

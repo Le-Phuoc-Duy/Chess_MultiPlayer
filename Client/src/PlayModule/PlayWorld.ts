@@ -1,6 +1,6 @@
 // Import Swal library (assuming you have it installed)
 import { Color } from "../Enum";
-import { currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect";
+import { PromotionOverlay, currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect";
 import { RoomJoinedResponse } from "../RoomJoinedResponse";
 import { Game } from "../Game";
 import Swal from 'sweetalert2';
@@ -72,6 +72,7 @@ document.getElementById("buttonPlay")?.addEventListener("click", async () => {
         gameByCreate.setFullCoordinates(result.board);
         setCurrentGame(gameByCreate)
         drawBoard(gameByCreate.board);
+        PromotionOverlay(currentGame.playerSide);
       }
     })
       .catch((error) => {
