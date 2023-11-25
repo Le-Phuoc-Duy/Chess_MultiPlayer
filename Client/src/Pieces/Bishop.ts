@@ -22,9 +22,17 @@ export class Bishop extends Piece{
         if(row === col) return true
         return false 
     }
-    isPathClear(board: Board, startPoint: Point, endPoint: Point): boolean {
-        const rowDirection = startPoint.row < endPoint.row ? 1 : -1;
-        const colDirection = startPoint.col < endPoint.col ? 1 : -1;
+    isPathClear(board: Board, startPoint: Point, endPoint: Point): boolean { 
+        let rowDirection
+        let colDirection
+        if(startPoint.row < endPoint.row) rowDirection = 1
+        else if(startPoint.row > endPoint.row) rowDirection = -1
+        else rowDirection = 0
+
+        if(startPoint.col < endPoint.col) colDirection = 1
+        else if(startPoint.col > endPoint.col) colDirection = -1
+        else colDirection = 0
+        
 
         let row = startPoint.row + rowDirection;
         let col = startPoint.col + colDirection;

@@ -64,7 +64,13 @@ export class Pawn extends Piece{
     }
     isPathClear(board: Board, startPoint: Point, endPoint: Point): boolean {
         if(board.getBox(endPoint.row,endPoint.col).piece) return false
-        const direction = startPoint.row < endPoint.row ? 1 : -1; 
+        // const direction = startPoint.row < endPoint.row ? 1 : -1; 
+
+        let direction
+        if(startPoint.row < endPoint.row) direction = 1
+        else if(startPoint.row > endPoint.row) direction = -1
+        else direction = 0
+
         let row = startPoint.row + direction
         while(row !== endPoint.row){
             if (board.getBox(row,startPoint.col).piece !== null) {

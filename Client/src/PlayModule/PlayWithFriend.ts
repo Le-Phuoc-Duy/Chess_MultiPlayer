@@ -99,12 +99,11 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                             console.log('iDUserSend: ' + result.iDUserSend + '\niDUserReceive: ' + result.iDUserReceive + '\niDRoom: ' + result.iDRoom + '\nidRoomUser: ' + result.idRoomUser + '\nchessMove: ' + result.chessMove + '\nboard: ' + result.board + '\ncolor: ' + result.color);
                             if (result.color) {
                                 console.log("self la white, opp la black")
-                                var gameByJoin: Game = new Game(Color.WHITE, new Board,true, 0);
-                                PromotionOverlay(Color.WHITE)   //Hiển thị phong cấp màu trắng
+                                var gameByJoin: Game = new Game(Color.WHITE, new Board,true, 0); 
                             } else {
                                 console.log("self la black, opp la white")
-                                var gameByJoin: Game = new Game(Color.BLACK, new Board,false, 0);
-                                PromotionOverlay(Color.BLACK) //Hiển thị phong cấp màu đen                            }
+                                var gameByJoin: Game = new Game(Color.BLACK, new Board,false, 0); 
+                            }
                             gameByJoin.setFullCoordinates(result.board);
                             setCurrentGame(gameByJoin)
                             drawBoard(gameByJoin.board);
@@ -195,12 +194,10 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                                     });
                                     if (result.color) {
                                         console.log("self la white, opp la black")
-                                        var gameByCreate: Game = new Game(Color.WHITE, new Board,true, 0);
-                                        PromotionOverlay(Color.WHITE)
+                                        var gameByCreate: Game = new Game(Color.WHITE, new Board,true, 0); 
                                     } else {
                                         console.log("self la black, opp la white")
-                                        var gameByCreate: Game = new Game(Color.BLACK, new Board,false, 0);
-                                        PromotionOverlay(Color.BLACK)
+                                        var gameByCreate: Game = new Game(Color.BLACK, new Board,false, 0); 
                                     }
                                     gameByCreate.setFullCoordinates(result.board);
                                     setCurrentGame(gameByCreate)
@@ -219,37 +216,3 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
         }
     }
 })
-
-//Hiển thị bảng phong hậu
-export function PromotionOverlay(color: Color){
-    let pieceValue: string = "Queen";
-
-    document.getElementById('promotion-pawn')!.style.display = 'block';
-
-    if (color === Color.BLACK) {
-        document.getElementById('promotionBlack')!.style.display = 'block';
-        document.getElementById('promotionWhite')!.style.display = 'none';
-    }
-
-    if (color === Color.WHITE) {
-        document.getElementById('promotionWhite')!.style.display = 'block';
-        document.getElementById('promotionBlack')!.style.display = 'none';
-    }
-    return pieceValue;
-}
-export let piecePromoted: string = "Queen";
-// Gán sự kiện click cho mỗi phần tử imgPromotion
-document.querySelectorAll('.imgPromotion').forEach((element) => {
-    element.addEventListener('click', function () {
-        const value = element.getAttribute('value');
-        if (value) {
-            piecePromoted = value;
-            console.log("piece value: " + piecePromoted);
-            // Xóa bỏ viền màu đỏ ở tất cả các phần tử
-            document.querySelectorAll('.imgPromotion').forEach((img) => {
-                img.classList.remove("selected-promotion")
-            });
-            element.classList.add("selected-promotion")
-        }
-    });
-});

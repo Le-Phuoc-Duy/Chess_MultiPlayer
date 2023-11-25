@@ -1,6 +1,7 @@
 export enum Color{
     WHITE,
-    BLACK
+    BLACK,
+    NOT
 } 
 export enum GameStatus {
     ACTIVE,

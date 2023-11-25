@@ -49,8 +49,17 @@ export class Queen extends Piece{
             }
             return true; // Đường đi không bị cản trở
         }else{                                              // Đi chéo
-            let rowDirection = startPoint.row < endPoint.row ? 1 : -1;
-            let colDirection = startPoint.col < endPoint.col ? 1 : -1;
+            // let rowDirection = startPoint.row < endPoint.row ? 1 : -1;
+            // let colDirection = startPoint.col < endPoint.col ? 1 : -1;
+            let rowDirection
+            let colDirection
+            if(startPoint.row < endPoint.row) rowDirection = 1
+            else if(startPoint.row > endPoint.row) rowDirection = -1
+            else rowDirection = 0
+    
+            if(startPoint.col < endPoint.col) colDirection = 1
+            else if(startPoint.col > endPoint.col) colDirection = -1
+            else colDirection = 0
 
             let row = startPoint.row + rowDirection;
             let col = startPoint.col + colDirection;

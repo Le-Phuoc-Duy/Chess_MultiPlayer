@@ -19,5 +19,4 @@ document.getElementById("logoutButton")?.addEventListener("click",async () => {
     });
     localStorage.clear();
     checkIsloggedIn();
-
 })

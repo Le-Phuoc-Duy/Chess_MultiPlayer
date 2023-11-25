@@ -86,7 +86,7 @@ var startX: number = -1
 var endX: number = -1
 var startY: number = -1
 var endY: number = -1
-export var currentGame: Game = new Game(Color.WHITE, new Board, true, 0);
+export var currentGame: Game = new Game(Color.NOT, new Board, true, 0);
 export function setCurrentGame(game: Game) {
     currentGame = game
 }
@@ -205,6 +205,7 @@ window.addEventListener('load', () => {
     checkIsloggedIn();
     setCurrentGameAferLoad()
         .then((result) => {
+            console.log("currentGame.playerSide" + currentGame.playerSide)
             var reDrawGame: Game = new Game(currentGame.playerSide, new Board, currentGame.currentTurn, currentGame.status);
             reDrawGame.setFullCoordinates(localStorage.getItem('board')!);
             setCurrentGame(reDrawGame)
@@ -221,8 +222,52 @@ function setCurrentGameAferLoad(): Promise<string> {
             const parsedGame = JSON.parse(storedGame);
             currentGame = Game.fromJSON(parsedGame);
         } else {
-            currentGame = new Game(Color.WHITE, new Board, true, 0); // Nếu không có dữ liệu, tạo một đối tượng Game mới
+            currentGame = new Game(Color.NOT, new Board, true, 0); // Nếu không có dữ liệu, tạo một đối tượng Game mới
         }
         resolve("success");
     });
 }
+
+//Hiển thị bảng phong hậu
+export function PromotionOverlay(color: Color){
+    let pieceValue: string = "Queen";
+    if(color === Color.NOT){ 
+        console.log("color not")
+        document.getElementById('beforeGame')!.style.display = 'block'; 
+        document.getElementById('afterGame')!.style.display = 'none'; 
+        document.getElementById('promotionBlack')!.style.display = 'none';
+        document.getElementById('promotionWhite')!.style.display = 'none';
+    }else{
+        console.log("!color not")
+        document.getElementById('afterGame')!.style.display = 'block';
+        document.getElementById('beforeGame')!.style.display = 'none';
+
+        if (color === Color.BLACK) {
+            document.getElementById('promotionBlack')!.style.display = 'block';
+            document.getElementById('promotionWhite')!.style.display = 'none';
+        }
+    
+        if (color === Color.WHITE) {
+            document.getElementById('promotionWhite')!.style.display = 'block';
+            document.getElementById('promotionBlack')!.style.display = 'none';
+        }
+    }
+    
+    return pieceValue;
+}
+export let piecePromoted: string = "Queen";
+// Gán sự kiện click cho mỗi phần tử imgPromotion
+document.querySelectorAll('.imgPromotion').forEach((element) => {
+    element.addEventListener('click', function () {
+        const value = element.getAttribute('value');
+        if (value) {
+            piecePromoted = value;
+            console.log("piece value: " + piecePromoted);
+            // Xóa bỏ viền màu đỏ ở tất cả các phần tử
+            document.querySelectorAll('.imgPromotion').forEach((img) => {
+                img.classList.remove("selected-promotion")
+            });
+            element.classList.add("selected-promotion")
+        }
+    });
+});

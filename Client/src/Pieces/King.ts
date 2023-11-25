@@ -66,7 +66,13 @@ export class King extends Piece{
         return false
     }
     isPathClear(board: Board, startPoint: Point, endPoint: Point): boolean {
-        const direction = startPoint.col < endPoint.col ? 1 : -1; 
+        // const direction = startPoint.col < endPoint.col ? 1 : -1;  
+        //Vì King chỉ bắt nhảy cóc khi nhập thành nên chỉ lấy tọa độ col
+        let direction
+        if(startPoint.col < endPoint.col) direction = 1
+        else if(startPoint.col > endPoint.col) direction = -1
+        else direction = 0
+
         let col = startPoint.col + direction
         while (col !== endPoint.col){ 
             if (board.getBox(startPoint.row,col).piece !== null) {

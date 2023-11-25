@@ -5,38 +5,14 @@ import { Piece } from "./Pieces/Piece";
 import { Queen } from "./Pieces/Queen";
 import { Knight } from "./Pieces/Knight";
 import { Bishop } from "./Pieces/Bishop";
-import { Rook } from "./Pieces/Rook";
-import { piecePromoted } from "./PlayModule/PlayWithFriend";
+import { Rook } from "./Pieces/Rook"; 
 import { Pawn } from "./Pieces/Pawn";
+import { PromotionOverlay, piecePromoted } from "./Connect";
 export class Game {
 	private _playerSide: Color				//Người chơi, trắng hoặc đen
 	private _board: Board 
 	private _currentTurn: boolean  			//Lượt chơi, true có thể đánh, false lượt của đối thủ
-	private _status: GameStatus  			//Trạng thái trận 
-
-	// constructor(playerSide: Color){
-	// 	this._playerSide = playerSide
-	// 	this._board = new Board()
-	// 	if (playerSide === Color.WHITE ){
-	// 		console.log("white la p1")
-	// 		this._currentTurn = true
-	// 		if(this._currentTurn){
-	// 			localStorage.setItem('currentTurn','true');
-	// 			}else{
-	// 				localStorage.setItem('currentTurn','false');
-	// 			}
-	// 	}else{
-	// 		console.log("white la p2")
-	// 		this._currentTurn = false
-	// 		if(this._currentTurn){
-	// 			localStorage.setItem('currentTurn','true');
-	// 			}else{
-	// 				localStorage.setItem('currentTurn','false');
-	// 			}
-	// 	}
-	// 	this._status = GameStatus.ACTIVE
-	// }
-
+	private _status: GameStatus  			//Trạng thái trận  
 	public get currentTurn(): boolean {
 		return this._currentTurn;
 	}
@@ -469,6 +445,7 @@ export class Game {
         this._board = board;
         this._currentTurn = currentTurn;
         this._status = status;
+		PromotionOverlay(playerSide)
     }
 	static fromJSON(json: any): Game {
         const playerSide = json._playerSide;
