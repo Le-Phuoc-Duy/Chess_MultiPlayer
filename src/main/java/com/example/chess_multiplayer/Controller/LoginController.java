@@ -3,6 +3,7 @@ package com.example.chess_multiplayer.Controller;
 import com.example.chess_multiplayer.DTO.LoginRequest;
 import com.example.chess_multiplayer.DTO.LoginReponse;
 import com.example.chess_multiplayer.Service.AccountService;
+import com.example.chess_multiplayer.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -20,6 +21,8 @@ public class LoginController {
     private AccountController accountController;
     @Autowired
     private UserController userController;
+    @Autowired
+    private UserService userService;
 //    private Map<String, String> sessionId = new HashMap<>();
     @MessageMapping("/login")
 //    @SendTo("/queue/loginStatus")
@@ -34,6 +37,8 @@ public class LoginController {
                 String UserId = userController.getIdUserByIDAcc(AccId);
                 // Gửi thông báo thành công qua WebSocket
                 loginReponse.setUserID(UserId);
+                loginReponse.setUserName(message.getUsername());
+                loginReponse.setAva(userService.getUserById(UserId).getAva());
                 loginReponse.setMessage("Đăng nhập thành công");
                 System.out.println(message.getTempPort());
                 messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/loginStatus", loginReponse);

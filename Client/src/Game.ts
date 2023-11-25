@@ -1,30 +1,52 @@
 import { Board } from "./Board";
-import { Catsling, Color, GameStatus } from "./Enum"; 
+import { Catsling, Color, GameStatus } from "./Enum";
 import { Point } from "./Point";
 import { Piece } from "./Pieces/Piece"; 
 import { Queen } from "./Pieces/Queen";
 import { Knight } from "./Pieces/Knight";
 import { Bishop } from "./Pieces/Bishop";
-import { Rook } from "./Pieces/Rook"; 
+import { Rook } from "./Pieces/Rook";
 import { piecePromoted } from "./PlayModule/PlayWithFriend";
 import { Pawn } from "./Pieces/Pawn";
 export class Game {
-	private _playerSide: Color;				//Người chơi, trắng hoặc đen
-	private _board: Board
+	private _playerSide: Color				//Người chơi, trắng hoặc đen
+	private _board: Board 
 	private _currentTurn: boolean  			//Lượt chơi, true có thể đánh, false lượt của đối thủ
 	private _status: GameStatus  			//Trạng thái trận 
 
-	constructor(playerSide: Color) {
-		this._playerSide = playerSide
-		this._board = new Board()
-		if (playerSide === Color.WHITE) {
-			console.log("white la p1")
-			this._currentTurn = true
-		} else {
-			console.log("white la p2")
-			this._currentTurn = false
-		}
-		this._status = GameStatus.ACTIVE
+	// constructor(playerSide: Color){
+	// 	this._playerSide = playerSide
+	// 	this._board = new Board()
+	// 	if (playerSide === Color.WHITE ){
+	// 		console.log("white la p1")
+	// 		this._currentTurn = true
+	// 		if(this._currentTurn){
+	// 			localStorage.setItem('currentTurn','true');
+	// 			}else{
+	// 				localStorage.setItem('currentTurn','false');
+	// 			}
+	// 	}else{
+	// 		console.log("white la p2")
+	// 		this._currentTurn = false
+	// 		if(this._currentTurn){
+	// 			localStorage.setItem('currentTurn','true');
+	// 			}else{
+	// 				localStorage.setItem('currentTurn','false');
+	// 			}
+	// 	}
+	// 	this._status = GameStatus.ACTIVE
+	// }
+
+	public get currentTurn(): boolean {
+		return this._currentTurn;
+	}
+	public set currentTurn(value: boolean) {
+		this._currentTurn = value;
+		if(this._currentTurn){
+			localStorage.setItem('currentTurn','true');
+			}else{
+				localStorage.setItem('currentTurn','false');
+			}
 	}
 	public get playerSide(): Color {
 		return this._playerSide;
@@ -32,19 +54,12 @@ export class Game {
 	public set playerSide(value: Color) {
 		this._playerSide = value;
 	}
-	public get currentTurn(): boolean {
-		return this._currentTurn;
-	}
-	public set currentTurn(value: boolean) {
-		this._currentTurn = value;
-	}
-
 	public get board(): Board {
 		return this._board;
 	}
 	public set board(value: Board) {
 		this._board = value;
-	}
+	} 
 	public get status(): GameStatus {
 		return this._status;
 	}
@@ -66,21 +81,22 @@ export class Game {
 			}
 		}
 		return fullCoordinates
-	}
+	} 
 	//Set tọa độ full bàn cờ
-	setFullCoordinates(fullCoordinates: String) {
+	setFullCoordinates(fullCoordinates: String){ 
 		this._board.setBoard(fullCoordinates)
-	}
-	playerMove(startX: number, startY: number, endX: number, endY: number): boolean {
+	} 
+	playerMove(startX: number,startY: number,endX: number,endY: number) : boolean
+	{
 		let startBox: Point			//Ô bắt đầu di chuyển
 		let endBox: Point			//Ô kết thúc di chuyển
 		startBox = this._board.getBox(startX, startY)
 		endBox = this._board.getBox(endX, endY)
 		let move = this.makeMove(startBox, endBox)
-		if (move) this._currentTurn = false 
+		if (move) this._currentTurn = false
 		return move
 	}
-	private makeMove(startPoint: Point, endPoint: Point): boolean { 
+	private makeMove(startPoint: Point, endPoint: Point): boolean {
 		let sourcePiece: Piece | null			//Quân cờ di chuyển
 		let chkPromotion: boolean = false
 		sourcePiece = startPoint.piece
@@ -106,7 +122,7 @@ export class Game {
 			console.log("invalid move " + endPoint.row + endPoint.col)
 			return false
 		}
-		//Catsling? 
+		//Catsling?
 		// if (this._board.catsling === Catsling.DONE) console.log("catsle done ")
 		// if (this._board.catsling === Catsling.FAR) console.log("catsle.FAR ")
 		// if (this._board.catsling === Catsling.NEAR) console.log("catsle NEAR ")
@@ -127,7 +143,7 @@ export class Game {
 			}
 			startBoxRook = this._board.getBox(7, 7)
 			endBoxRook = this._board.getBox(7, 5)
-			//Move rook 
+			//Move rook
 			tmpRookEnd = endBoxRook.piece
 			this._board.getBox(endBoxRook.row, endBoxRook.col).piece = this._board.getBox(startBoxRook.row, startBoxRook.col).piece
 			this._board.getBox(startBoxRook.row, startBoxRook.col).piece = null
@@ -149,7 +165,7 @@ export class Game {
 			}
 			startBoxRook = this._board.getBox(7, 0)
 			endBoxRook = this._board.getBox(7, 3)
-			//Move rook 
+			//Move rook
 			tmpRookEnd = endBoxRook.piece
 			this._board.getBox(endBoxRook.row, endBoxRook.col).piece = this._board.getBox(startBoxRook.row, startBoxRook.col).piece
 			this._board.getBox(startBoxRook.row, startBoxRook.col).piece = null
@@ -173,7 +189,7 @@ export class Game {
 
 			startBoxRook = this._board.getBox(7, 0)
 			endBoxRook = this._board.getBox(7, 2)
-			//Move rook 
+			//Move rook
 			tmpRookEnd = endBoxRook.piece
 			this._board.getBox(endBoxRook.row, endBoxRook.col).piece = this._board.getBox(startBoxRook.row, startBoxRook.col).piece
 			this._board.getBox(startBoxRook.row, startBoxRook.col).piece = null
@@ -195,7 +211,7 @@ export class Game {
 			}
 			startBoxRook = this._board.getBox(7, 7)
 			endBoxRook = this._board.getBox(7, 4)
-			//Move rook 
+			//Move rook
 			tmpRookEnd = endBoxRook.piece
 			this._board.getBox(endBoxRook.row, endBoxRook.col).piece = this._board.getBox(startBoxRook.row, startBoxRook.col).piece
 			this._board.getBox(startBoxRook.row, startBoxRook.col).piece = null
@@ -204,10 +220,10 @@ export class Game {
 			this.board.catsling = Catsling.EXCUTE
 		}
 		//Promotion?
-		if (endPoint.row === 0 && (this._board.getBox(startPoint.row, startPoint.col).piece?.name === 'p' || this._board.getBox(startPoint.row, startPoint.col).piece?.name === 'P')) { 
+		if (endPoint.row === 0 && (this._board.getBox(startPoint.row, startPoint.col).piece?.name === 'p' || this._board.getBox(startPoint.row, startPoint.col).piece?.name === 'P')) {
 			console.log("piece promote" + piecePromoted)
 			if (this._playerSide === Color.WHITE) {
-				if (piecePromoted === "Queen") { 
+				if (piecePromoted === "Queen") {
 					this._board.getBox(startPoint.row, startPoint.col).piece = new Queen(Color.WHITE, "./assets/White-Queen.png", "Q")
 					chkPromotion = true
 				}
@@ -223,9 +239,9 @@ export class Game {
 					this._board.getBox(startPoint.row, startPoint.col).piece = new Rook(Color.WHITE, "./assets/White-Rook.png", "R")
 					chkPromotion = true
 				}
-			} 
+			}
 			if (this._playerSide === Color.BLACK) {
-				if (piecePromoted === "Queen") { 
+				if (piecePromoted === "Queen") {
 					this._board.getBox(startPoint.row, startPoint.col).piece = new Queen(Color.BLACK, "./assets/Black-Queen.png", "q")
 					chkPromotion = true
 				}
@@ -241,21 +257,21 @@ export class Game {
 					this._board.getBox(startPoint.row, startPoint.col).piece = new Rook(Color.BLACK, "./assets/Black-Rook.png", "r")
 					chkPromotion = true
 				}
-			}  
-		} 
-		//Hoán đổi nước đi 
+			}
+		}
+		//Hoán đổi nước đi
 		let tmpPieceEnd
 		tmpPieceEnd = endPoint.piece
 		this._board.getBox(endPoint.row, endPoint.col).piece = this._board.getBox(startPoint.row, startPoint.col).piece
-		this._board.getBox(startPoint.row, startPoint.col).piece = null  
+		this._board.getBox(startPoint.row, startPoint.col).piece = null
 		if (this.isInCheck()) {
-			//Undo 
+			//Undo
 			this._board.getBox(startPoint.row, startPoint.col).piece = this._board.getBox(endPoint.row, endPoint.col).piece
 			this._board.getBox(endPoint.row, endPoint.col).piece = tmpPieceEnd
 			//Undo nếu đang chiếu mà phong cấp
 			if(chkPromotion){
 				if(this._playerSide === Color.BLACK){
-					this._board.getBox(startPoint.row, startPoint.col).piece = new Pawn(Color.BLACK, "./assets/Black-Pawn.png", "p") 
+					this._board.getBox(startPoint.row, startPoint.col).piece = new Pawn(Color.BLACK, "./assets/Black-Pawn.png", "p")
 				}
 				if(this._playerSide === Color.WHITE){
 					this._board.getBox(startPoint.row, startPoint.col).piece = new Pawn(Color.WHITE, "./assets/White-Pawn.png", "P")
@@ -275,14 +291,14 @@ export class Game {
 				this.board.catsling = Catsling.NOT
 			}
 			console.log("dang chieu")
-			return false 
+			return false
 		} else {
 			if (this._board.catsling === Catsling.EXCUTE) this._board.catsling = Catsling.DONE
 			return true;
 		}
 
 	}
-	private isInCheck(): boolean { 
+	private isInCheck(): boolean {
 		var opponentColor: Color
 		if (this._playerSide === Color.WHITE) opponentColor = Color.BLACK
 		else opponentColor = Color.WHITE
@@ -343,7 +359,7 @@ export class Game {
 				if (this._board.getBox(r, c).piece?.color === this._playerSide) {
 					break;	//Có quân cùng màu chắn
 				}
-				else {										//Quân khác màu chắn 
+				else {										//Quân khác màu chắn
 					if (this._board.getBox(r, c).piece?.name === 'r'
 						|| this._board.getBox(r, c).piece?.name === 'R'
 						|| this._board.getBox(r, c).piece?.name === 'q'
@@ -352,7 +368,7 @@ export class Game {
 						console.log("quân chiếu" + this._board.getBox(r, c).piece?.name + r + c)
 						console.log("quân vua" + rowOfKing + colOfKing)
 						return true;
-					} else if (this._board.getBox(r, c).piece !== null) { 
+					} else if (this._board.getBox(r, c).piece !== null) {
 						break
 					}
 				}
@@ -438,7 +454,7 @@ export class Game {
 		let a = this.isInCheck()
 		let b = this.isAllValidMove()
 		if (a && !b) {
-			console.log("Ban da thua") 
+			console.log("Ban da thua")
 			//SendThua
 		}
 		else if (!a && !b) {
@@ -448,4 +464,17 @@ export class Game {
 			console.log("Binh thuong, choi tiep di")
 		}
 	}
-} 
+	constructor(playerSide: Color, board: Board, currentTurn: boolean, status: GameStatus) {
+        this._playerSide = playerSide;
+        this._board = board;
+        this._currentTurn = currentTurn;
+        this._status = status;
+    }
+	static fromJSON(json: any): Game {
+        const playerSide = json._playerSide;
+        const board = json._board; // Chưa biết cấu trúc của Board là gì, cần cập nhật
+        const currentTurn = json._currentTurn;
+        const status = json._status;
+        return new Game(playerSide, board, currentTurn, status);
+    }
+}

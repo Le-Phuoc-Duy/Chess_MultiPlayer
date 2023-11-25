@@ -4,8 +4,9 @@ import { Color } from './Enum';
 import { Board } from './Board';
 import { RoomJoinedResponse } from './RoomJoinedResponse';
 import { sendChessMove } from './PlayModule/PlayWithFriend';
+import { ChatContentFrom } from './PlayModule/Chat';
 
-const socket = new SockJS('http://' + window.location.hostname +':8888/ws');
+const socket = new SockJS('http://' + window.location.hostname + ':8888/ws');
 export const stompClient = new Client({
     webSocketFactory: () => socket,
     connectHeaders: {
@@ -44,8 +45,21 @@ stompClient.onConnect = (frame) => {
 
         currentGame.setFullCoordinates(body.board)
         currentGame.currentTurn = true
+        if (currentGame.currentTurn) {
+            localStorage.setItem('currentTurn', 'true');
+        } else {
+            localStorage.setItem('currentTurn', 'false');
+        }
         drawBoard(currentGame.board);
         currentGame.checkGameStatus()
+    });
+    stompClient.subscribe('/topic/publicChat', (message) => {
+        const body = JSON.parse(message.body);
+        ChatContentFrom(body.idDUserSend, body.userSendName, body.ava, body.chat, true);
+    });
+    stompClient.subscribe('/user/queue/chatRoom', (message) => {
+        const body = JSON.parse(message.body);
+        ChatContentFrom(body.idDUserSend, body.userSendName, body.userSendAva, body.chat, false);
     });
 };
 // Kết nối tới server
@@ -72,12 +86,9 @@ var startX: number = -1
 var endX: number = -1
 var startY: number = -1
 var endY: number = -1
-export var currentGame: Game = new Game(Color.WHITE)
+export var currentGame: Game = new Game(Color.WHITE, new Board, true, 0);
 export function setCurrentGame(game: Game) {
     currentGame = game
-}
-window.onload = function(){ 
-    drawBoard(currentGame.board)
 }
 export function drawBoard(board: Board) {
     //i row, j col
@@ -105,6 +116,7 @@ function ClickPiece(r: number, c: number, game: Game) {
         if (game.playerMove(startX, startY, r, c)) {
             console.log("canmove" + startX + startY + r + c)
             drawBoard(game.board)
+            localStorage.setItem('board', game.getFullCoordinates());
             let iDUserSend: string | null = localStorage.getItem('iDUserSend');
             let iDUserReceive: string | null = localStorage.getItem('iDUserReceive');
             let iDRoom: string | null = localStorage.getItem('iDRoom');
@@ -151,14 +163,66 @@ let buttons = document.querySelectorAll('.btnMode');
 buttons.forEach((button) => {
     button.addEventListener('click', function () {
         if (button.id === 'mode5') {
-            let hour = (document.getElementById('hour') as HTMLInputElement).value.padStart(2, '0');
-            let minute = (document.getElementById('minute') as HTMLInputElement).value.padStart(2, '0');
-            let inc = (document.getElementById('inc') as HTMLInputElement).value;
-            let x = hour + ":" + minute + " | " + inc;
+            let minute = (document.getElementById('minute') as HTMLInputElement).value;
+            let second = (document.getElementById('second') as HTMLInputElement).value;
+            let x = minute + ":" + second;
             document.getElementById('gameMode')!.innerHTML = x;
         } else {
             document.getElementById('gameMode')!.innerHTML = button.innerHTML;
         }
     });
 });
-  
+// Lưu trạng thái của currentGame vào localStorage trước khi reload
+window.addEventListener('beforeunload', () => {
+    localStorage.setItem('savedGame', JSON.stringify(currentGame));
+});
+export function checkIsloggedIn(){
+    const isLoggedIn = localStorage.getItem('userID');
+    let noneLoginOverlay = document.getElementById('noneLogin');
+    let logonOverlay = document.getElementById('Logon');
+    let loginButton = document.getElementById('loginButton');
+    let registerButton = document.getElementById('registerButton');
+    let profileButton = document.getElementById('profileButton');
+    let logoutButton = document.getElementById('logoutButton');
+    // Nếu đã đăng nhập
+    if (isLoggedIn != null) {
+        noneLoginOverlay!.style.display = 'none';
+        loginButton!.style.display = 'none';
+        registerButton!.style.display = 'none';
+        logonOverlay!.style.display = 'block';
+        profileButton!.style.display = 'block';
+        logoutButton!.style.display = 'block';
+    } else {
+        noneLoginOverlay!.style.display = 'block';
+        loginButton!.style.display = 'block';
+        registerButton!.style.display = 'block';
+        logonOverlay!.style.display = 'none';
+        profileButton!.style.display = 'none';
+        logoutButton!.style.display = 'none';
+    }
+}
+window.addEventListener('load', () => {
+    checkIsloggedIn();
+    setCurrentGameAferLoad()
+        .then((result) => {
+            var reDrawGame: Game = new Game(currentGame.playerSide, new Board, currentGame.currentTurn, currentGame.status);
+            reDrawGame.setFullCoordinates(localStorage.getItem('board')!);
+            setCurrentGame(reDrawGame)
+            drawBoard(reDrawGame.board);
+        })
+        .catch((error) => {
+        });
+
+});
+function setCurrentGameAferLoad(): Promise<string> {
+    return new Promise((resolve) => {
+        const storedGame = localStorage.getItem('savedGame');
+        if (storedGame) {
+            const parsedGame = JSON.parse(storedGame);
+            currentGame = Game.fromJSON(parsedGame);
+        } else {
+            currentGame = new Game(Color.WHITE, new Board, true, 0); // Nếu không có dữ liệu, tạo một đối tượng Game mới
+        }
+        resolve("success");
+    });
+}

@@ -20,7 +20,7 @@ body{
 .imgPromotion{
     width: 20%;
     margin: 2%;
-    
+
 }
 @media (min-width: 576px) {
     .select-button{
@@ -78,4 +78,8 @@ input[type="radio"]:checked + label {
 }
 .selected-promotion {
     border: 3px solid rgb(17, 209, 55);
+  }
+#chatModeAll:checked + .form-check-label,
+  #chatModePrivate:checked + .form-check-label {
+    border: none !important;
   }

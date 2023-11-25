@@ -4,7 +4,9 @@ import com.example.chess_multiplayer.DTO.ChessGame;
 import com.example.chess_multiplayer.DTO.JoinRoom;
 import com.example.chess_multiplayer.DTO.WaitingRoom;
 import com.example.chess_multiplayer.DTO.LoginReponse;
+import com.example.chess_multiplayer.Service.AccountService;
 import com.example.chess_multiplayer.Service.RoomService;
+import com.example.chess_multiplayer.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -22,6 +24,10 @@ public class RoomController {
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
     private RoomService roomService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private AccountService accountService;
     @Autowired
     private RoomuserController roomuserController;
     private Set<WaitingRoom> waitingRooms = new HashSet<>();
@@ -96,6 +102,8 @@ public class RoomController {
             chessGameUser1.setChessMove(null);
             chessGameUser1.setUserSendTempPort(waitingRoom.getTempPort());
             chessGameUser1.setUserReceiveTempPort(message.getTempPort());
+            chessGameUser1.setUserSendName(userService.getUsernameByUserID(waitingRoom.getUserCreateId()));
+            chessGameUser1.setUserSendAva(userService.getUserById(waitingRoom.getUserCreateId()).getAva());
 
             chessGameUser2.setiDUserSend(message.getIdUserJoin());
             chessGameUser2.setiDUserReceive(waitingRoom.getUserCreateId());
@@ -104,6 +112,8 @@ public class RoomController {
             chessGameUser2.setChessMove(null);
             chessGameUser2.setUserSendTempPort(message.getTempPort());
             chessGameUser2.setUserReceiveTempPort(waitingRoom.getTempPort());
+            chessGameUser2.setUserSendName(userService.getUsernameByUserID(message.getIdUserJoin()));
+            chessGameUser2.setUserSendAva(userService.getUserById(message.getIdUserJoin()).getAva());
             if(color == true){
                 chessGameUser1.setColor(color);
                 chessGameUser2.setColor(!color);

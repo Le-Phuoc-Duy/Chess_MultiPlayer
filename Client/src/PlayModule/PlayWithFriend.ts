@@ -1,9 +1,9 @@
 import { Color } from "../Enum";
-import {  currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect";
+import { currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect";
 import { RoomJoinedResponse } from "../RoomJoinedResponse";
 import Swal from "sweetalert2";
 import { Game } from "../Game";
-
+import { Board } from '../Board';
 function createRoom(mode: number): Promise<string> {
     console.log("mode" + mode) 
     return new Promise((resolve, reject) => {
@@ -37,6 +37,8 @@ function joinRoom(): Promise<RoomJoinedResponse> {
             localStorage.setItem('color', body.color.toString()); // Chuyển đổi boolean thành string khi lưu
             localStorage.setItem('userSendTempPort', body.userSendTempPort);
             localStorage.setItem('userReceiveTempPort', body.userReceiveTempPort);
+            localStorage.setItem('userSendName', body.userSendName);
+            localStorage.setItem('userSendAva', body.userSendAva);
             resolve(body);
         });
     });
@@ -97,14 +99,12 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                             console.log('iDUserSend: ' + result.iDUserSend + '\niDUserReceive: ' + result.iDUserReceive + '\niDRoom: ' + result.iDRoom + '\nidRoomUser: ' + result.idRoomUser + '\nchessMove: ' + result.chessMove + '\nboard: ' + result.board + '\ncolor: ' + result.color);
                             if (result.color) {
                                 console.log("self la white, opp la black")
-                                var gameByJoin: Game = new Game(Color.WHITE)
+                                var gameByJoin: Game = new Game(Color.WHITE, new Board,true, 0);
                                 PromotionOverlay(Color.WHITE)   //Hiển thị phong cấp màu trắng
-                                
                             } else {
                                 console.log("self la black, opp la white")
-                                var gameByJoin: Game = new Game(Color.BLACK)
-                                PromotionOverlay(Color.BLACK) //Hiển thị phong cấp màu đen
-                            }
+                                var gameByJoin: Game = new Game(Color.BLACK, new Board,false, 0);
+                                PromotionOverlay(Color.BLACK) //Hiển thị phong cấp màu đen                            }
                             gameByJoin.setFullCoordinates(result.board);
                             setCurrentGame(gameByJoin)
                             drawBoard(gameByJoin.board);
@@ -148,23 +148,24 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
             let gameMode: number
             switch (document.getElementById('gameMode')!.innerHTML) {
                 case "2 | 1 phút":
-                    gameMode = 1
+                    gameMode = -1
                     break;
                 case "3 | 2 phút":
-                    gameMode = 2
+                    gameMode = -2
                     break;
                 case "5 phút":
-                    gameMode = 3
+                    gameMode = -3
                     break;
                 case "10 phút":
-                    gameMode = 4
+                    gameMode = -4
                     break;
                 default:
-                    let hour = (document.getElementById('hour') as HTMLInputElement).value.padStart(2, '0');
-                    let minute = (document.getElementById('minute') as HTMLInputElement).value.padStart(2, '0');
-                    let inc = (document.getElementById('inc') as HTMLInputElement).value;
-                    let x: string = hour + minute + inc 
-                    gameMode = parseInt(x)
+                    let minute = (document.getElementById('minute') as HTMLInputElement).value;
+                    let second = (document.getElementById('second') as HTMLInputElement).value;
+                    let m: number = parseInt(minute);
+                    let s: number = parseInt(second);
+                    let x: number = m*60 + s
+                    gameMode = x;
                     break;
             }
             createRoom(gameMode)
@@ -194,11 +195,11 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                                     });
                                     if (result.color) {
                                         console.log("self la white, opp la black")
-                                        var gameByCreate: Game = new Game(Color.WHITE)
+                                        var gameByCreate: Game = new Game(Color.WHITE, new Board,true, 0);
                                         PromotionOverlay(Color.WHITE)
                                     } else {
                                         console.log("self la black, opp la white")
-                                        var gameByCreate: Game = new Game(Color.BLACK)
+                                        var gameByCreate: Game = new Game(Color.BLACK, new Board,false, 0);
                                         PromotionOverlay(Color.BLACK)
                                     }
                                     gameByCreate.setFullCoordinates(result.board);
@@ -223,7 +224,7 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
 export function PromotionOverlay(color: Color){
     let pieceValue: string = "Queen";
 
-    document.getElementById('promotion-pawn')!.style.display = 'block'; 
+    document.getElementById('promotion-pawn')!.style.display = 'block';
 
     if (color === Color.BLACK) {
         document.getElementById('promotionBlack')!.style.display = 'block';
@@ -233,22 +234,22 @@ export function PromotionOverlay(color: Color){
     if (color === Color.WHITE) {
         document.getElementById('promotionWhite')!.style.display = 'block';
         document.getElementById('promotionBlack')!.style.display = 'none';
-    } 
+    }
     return pieceValue;
-}  
-export let piecePromoted: string = "Queen";  
+}
+export let piecePromoted: string = "Queen";
 // Gán sự kiện click cho mỗi phần tử imgPromotion
 document.querySelectorAll('.imgPromotion').forEach((element) => {
-    element.addEventListener('click', function () { 
-        const value = element.getAttribute('value'); 
+    element.addEventListener('click', function () {
+        const value = element.getAttribute('value');
         if (value) {
             piecePromoted = value;
-            console.log("piece value: " + piecePromoted); 
+            console.log("piece value: " + piecePromoted);
             // Xóa bỏ viền màu đỏ ở tất cả các phần tử
             document.querySelectorAll('.imgPromotion').forEach((img) => {
-                img.classList.remove("selected-promotion") 
+                img.classList.remove("selected-promotion")
             });
-            element.classList.add("selected-promotion") 
+            element.classList.add("selected-promotion")
         }
     });
 });
