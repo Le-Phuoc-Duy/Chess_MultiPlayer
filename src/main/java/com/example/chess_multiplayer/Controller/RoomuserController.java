@@ -2,6 +2,8 @@ package com.example.chess_multiplayer.Controller;
 
 import com.example.chess_multiplayer.DTO.*;
 import com.example.chess_multiplayer.Entity.Roomuser;
+import com.example.chess_multiplayer.Enum.Result;
+import com.example.chess_multiplayer.Service.RoomService;
 import com.example.chess_multiplayer.Service.RoomuserService;
 import com.example.chess_multiplayer.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Controller
@@ -17,6 +20,8 @@ public class RoomuserController {
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
     private RoomuserService roomuserService;
+    @Autowired
+    private RoomService roomService;
     @Autowired
     private UserService userService;
     public String creatRoomuser(String idUser, String idRoom, int mode, boolean side){
@@ -28,7 +33,6 @@ public class RoomuserController {
     }
     @MessageMapping("/chessMove")
     public void chessMove(ChessGame message) {
-
         ChessGame chessGameUserReceive = new ChessGame();
         chessGameUserReceive.setiDUserSend(message.getiDUserReceive());
         chessGameUserReceive.setiDUserReceive(message.getiDUserSend());
@@ -44,6 +48,142 @@ public class RoomuserController {
         }else{
             messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/chessMove", null);
         }
+    }
+    @MessageMapping("/endGame")
+    public void endGame(GameStatus message) {
+        System.out.println("endGame");
+        GameStatus gameStatusUserReceive = new GameStatus();
+        gameStatusUserReceive.setiDUserSend(message.getiDUserReceive());
+        gameStatusUserReceive.setiDUserReceive(message.getiDUserSend());
+        gameStatusUserReceive.setiDRoom(message.getiDRoom());
+        if(getRoomuserIdByRoomIdAndUserId(message.getiDRoom(), message.getiDUserReceive())!=null){
+            gameStatusUserReceive.setIdRoomUser(getRoomuserIdByRoomIdAndUserId(message.getiDRoom(), message.getiDUserReceive()));
+            gameStatusUserReceive.setUserSendTempPort(message.getUserReceiveTempPort());
+            gameStatusUserReceive.setUserReceiveTempPort(message.getUserSendTempPort());
+            switch (message.getResult()){
+                case WIN -> {
+                    gameStatusUserReceive.setResult(Result.LOSE);
+
+                    // Update user values
+                    userService.updateUserWinAndElo(message.getiDUserSend()); // Increment win by 1, and elo by 50
+                    userService.updateUserLoseAndElo(gameStatusUserReceive.getiDUserSend()); // Increment lose by 1, and decrement elo by 50
+
+                    // Update room values
+                    roomService.updateRoomTimeEnd(message.getiDRoom());
+
+                    // Update room user values
+                    roomuserService.updateRoomUserResult(message.getIdRoomUser(), message.getResult().toString());
+                    roomuserService.updateRoomUserResult(gameStatusUserReceive.getIdRoomUser(), gameStatusUserReceive.getResult().toString());
+
+                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(message.getUserSendTempPort(), "/queue/endGame",message );
+                }
+                case DRAW -> {
+                    gameStatusUserReceive.setResult(Result.DRAW);
+                    // Update user values
+                    userService.updateUserDrawAndElo(message.getiDUserSend()); // Increment win by 1, and elo by 50
+                    userService.updateUserDrawAndElo(gameStatusUserReceive.getiDUserSend()); // Increment lose by 1, and decrement elo by 50
+
+                    // Update room values
+                    roomService.updateRoomTimeEnd(message.getiDRoom());
+
+                    // Update room user values
+                    roomuserService.updateRoomUserResult(message.getIdRoomUser(), message.getResult().toString());
+                    roomuserService.updateRoomUserResult(gameStatusUserReceive.getIdRoomUser(), gameStatusUserReceive.getResult().toString());
+
+                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(message.getUserSendTempPort(), "/queue/endGame",message );
+                }
+                case LOSE -> {
+                    gameStatusUserReceive.setResult(Result.WIN);
+
+                    // Update user values
+                    userService.updateUserLoseAndElo(message.getiDUserSend()); // Increment win by 1, and elo by 50
+                    userService.updateUserWinAndElo(gameStatusUserReceive.getiDUserSend()); // Increment lose by 1, and decrement elo by 50
+
+                    // Update room values
+                    roomService.updateRoomTimeEnd(message.getiDRoom());
+
+                    // Update room user values
+                    roomuserService.updateRoomUserResult(message.getIdRoomUser(), message.getResult().toString());
+                    roomuserService.updateRoomUserResult(gameStatusUserReceive.getIdRoomUser(), gameStatusUserReceive.getResult().toString());
+
+                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(message.getUserSendTempPort(), "/queue/endGame",message );
+
+                }
+                case DRAW_REQUEST -> {
+                    gameStatusUserReceive.setResult(Result.DRAW_REQUEST);
+                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                }
+                case DRAW_ACCEPT -> {
+                    message.setResult(Result.DRAW);
+                    gameStatusUserReceive.setResult(Result.DRAW);
+
+                    // Update user values
+                    userService.updateUserDrawAndElo(message.getiDUserSend()); // Increment win by 1, and elo by 50
+                    userService.updateUserDrawAndElo(gameStatusUserReceive.getiDUserSend()); // Increment lose by 1, and decrement elo by 50
+
+                    // Update room values
+                    roomService.updateRoomTimeEnd(message.getiDRoom());
+
+                    // Update room user values
+                    roomuserService.updateRoomUserResult(message.getIdRoomUser(), message.getResult().toString());
+                    roomuserService.updateRoomUserResult(gameStatusUserReceive.getIdRoomUser(), gameStatusUserReceive.getResult().toString());
+
+                    gameStatusUserReceive.setResult(Result.DRAW_ACCEPT);
+                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(message.getUserSendTempPort(), "/queue/endGame",message );
+                }
+                case DRAW_DENY -> {
+                    gameStatusUserReceive.setResult(Result.DRAW_DENY);
+                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                }
+                case QUIT -> {
+                    message.setResult(Result.LOSE);
+                    gameStatusUserReceive.setResult(Result.WIN);
+
+                    // Update user values
+                    userService.updateUserLoseAndElo(message.getiDUserSend()); // Increment win by 1, and elo by 50
+                    userService.updateUserWinAndElo(gameStatusUserReceive.getiDUserSend()); // Increment lose by 1, and decrement elo by 50
+
+                    // Update room values
+                    roomService.updateRoomTimeEnd(message.getiDRoom());
+
+                    // Update room user values
+                    roomuserService.updateRoomUserResult(message.getIdRoomUser(), message.getResult().toString());
+                    roomuserService.updateRoomUserResult(gameStatusUserReceive.getIdRoomUser(), gameStatusUserReceive.getResult().toString());
+
+                    gameStatusUserReceive.setResult(Result.QUIT);
+                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                }
+                case SURRENDER -> {
+                    message.setResult(Result.LOSE);
+                    gameStatusUserReceive.setResult(Result.WIN);
+
+                    // Update user values
+                    userService.updateUserLoseAndElo(message.getiDUserSend()); // Increment win by 1, and elo by 50
+                    userService.updateUserWinAndElo(gameStatusUserReceive.getiDUserSend()); // Increment lose by 1, and decrement elo by 50
+
+                    // Update room values
+                    roomService.updateRoomTimeEnd(message.getiDRoom());
+
+                    // Update room user values
+                    roomuserService.updateRoomUserResult(message.getIdRoomUser(), message.getResult().toString());
+                    roomuserService.updateRoomUserResult(gameStatusUserReceive.getIdRoomUser(), gameStatusUserReceive.getResult().toString());
+
+                    gameStatusUserReceive.setResult(Result.SURRENDER);
+                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                }
+                default -> {
+                    gameStatusUserReceive.setResult(Result.ACTIVE);
+                }
+            }
+        }else{
+            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame", null);
+        }
+
     }
     @MessageMapping("/chatRoom")
     public void chatRoom(ChatRoom message) {

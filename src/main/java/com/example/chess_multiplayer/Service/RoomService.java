@@ -65,4 +65,12 @@ public class RoomService {
     public Room getRoomById(String idRoom) {
         return roomRepository.findById(idRoom).orElse(null);
     }
+    public void updateRoomTimeEnd(String roomId) {
+        Room room = roomRepository.findById(roomId).orElse(null);
+        if (room != null) {
+            room.setTimeEnd(Instant.now());
+            roomRepository.save(room);
+        }
+    }
+
 }

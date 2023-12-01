@@ -4,14 +4,15 @@ export enum Color{
     NOT
 } 
 export enum GameStatus {
-    ACTIVE,
-    BLACK_WIN,
-    WHITE_WIN,
+    WIN,
+    LOSE,
     DRAW,
-    INACTIVE,
-    FORFEIT,
-    STALEMATE,
-    RESIGNATION
+    DRAW_REQUEST,
+    DRAW_DENY,
+    DRAW_ACCEPT,
+    QUIT,
+    SURRENDER,
+    ACTIVE
 } 
 export enum Catsling{
     NOT,

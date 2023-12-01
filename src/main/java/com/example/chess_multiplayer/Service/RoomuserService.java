@@ -88,4 +88,14 @@ public class RoomuserService {
             }
         });
     }
+    public Roomuser getRoomUserById(String idRoomUser) {
+        return roomuserRepository.findById(idRoomUser).orElse(null);
+    }
+    public void updateRoomUserResult(String roomUserId, String result) {
+        Roomuser roomUser = roomuserRepository.findById(roomUserId).orElse(null);
+        if (roomUser != null) {
+            roomUser.setResult(result);
+            roomuserRepository.save(roomUser);
+        }
+    }
 }
