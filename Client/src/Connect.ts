@@ -1,11 +1,12 @@
 import { Client } from '@stomp/stompjs';
 import { Game } from './Game';
-import { Color } from './Enum';
+import { Color, GameStatus } from './Enum';
 import { Board } from './Board';
 import { RoomJoinedResponse } from './RoomJoinedResponse';
 import { sendChessMove } from './PlayModule/PlayWithFriend';
 import { ChatContentFrom } from './PlayModule/Chat';
 import Swal from 'sweetalert2';
+import type { EndGame } from './EndGame';
 
 const socket = new SockJS('http://' + window.location.hostname + ':8888/ws');
 export const stompClient = new Client({
@@ -43,6 +44,7 @@ stompClient.onConnect = (frame) => {
         localStorage.setItem('color', body.color.toString()); // Chuyển đổi boolean thành string khi lưu
         localStorage.setItem('userSendTempPort', body.userSendTempPort);
         localStorage.setItem('userReceiveTempPort', body.userReceiveTempPort);
+
         currentGame.setFullCoordinates(body.board)
         currentGame.currentTurn = true
         if (currentGame.currentTurn) {
@@ -60,6 +62,56 @@ stompClient.onConnect = (frame) => {
     stompClient.subscribe('/user/queue/chatRoom', (message) => {
         const body = JSON.parse(message.body);
         ChatContentFrom(body.idDUserSend, body.userSendName, body.userSendAva, body.chat, false);
+    });
+    stompClient.subscribe('/user/queue/endGame', (message) => {
+        const body = JSON.parse(message.body);
+        console.log("recevie endGame" )
+        console.log("body result: "+body.result )
+        switch(body.result){
+            case "DRAW":
+                Swal.fire("Cờ hòa! Trận đấu kết thúc")
+                .then(()=>{
+                    removeGame()
+                })
+                break;
+            case "WIN":
+                Swal.fire("Bạn đã chiến thắng")
+                .then(()=>{
+                    removeGame()
+                })
+                break;
+            case "LOSE":
+                Swal.fire("Bạn đã thua")
+                .then(()=>{
+                    removeGame()
+                })
+                break;
+            case "DRAW_REQUEST":
+                Swal.fire("Đối thủ cầu hòa!")
+                break;
+            case "DRAW_ACCEPT":
+                Swal.fire("Đối thủ chấp nhận hòa! Trận đấu kết thúc")
+                .then(()=>{
+                    removeGame()
+                })
+                break;
+            case "DRAW_DENY":
+                Swal.fire("Đối thủ từ chối cầu hòa! Trận đấu tiếp tục")
+
+                break;
+            case "QUIT":
+                Swal.fire("Đối thủ thoát trận! Bạn đã chiến thắng")
+                .then(()=>{
+                    removeGame()
+                })
+                break;
+            case "SURRENDER":
+                    Swal.fire("Đối thủ đầu hàng! Bạn đã chiến thắng")
+                    .then(()=>{
+                        removeGame()
+                    })
+                    break;
+        }
     });
 };
 // Kết nối tới server
@@ -102,6 +154,17 @@ export function drawBoard(board: Board) {
             else if (imgPiece) {
                 imgPiece.src = ""
             }
+        }
+    }
+}
+export function removeBoard() {
+    // removeAllSeleted()
+    //i row, j col
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            let coordinate: string = i.toString() + j.toString()
+            let imgPiece = document.getElementById("i" + coordinate) as HTMLImageElement
+            imgPiece.src = ""
         }
     }
 }
@@ -150,7 +213,7 @@ function ClickPiece(r: number, c: number, game: Game) {
                 userReceiveTempPort ?? ''
             );
             sendChessMove(CreateChessMove);
-        } else {
+        }else{
             removeAllSeleted()
         }
         selected = false
@@ -166,7 +229,7 @@ function ClickPiece(r: number, c: number, game: Game) {
     }
 }
 //Remove màu selected
-function removeAllSeleted() {
+function removeAllSeleted(){
     document.querySelectorAll(".square").forEach((divPiece) => {
         divPiece.classList.remove("selected-square")
     });
@@ -188,7 +251,7 @@ buttons.forEach((button) => {
 });
 // Lưu trạng thái của currentGame vào localStorage trước khi reload
 window.addEventListener('beforeunload', () => {
-    if (localStorage.getItem('userID') != null) {
+    if(localStorage.getItem('userID') != null){
         localStorage.setItem('savedGame', JSON.stringify(currentGame));
     }
 });
@@ -257,9 +320,9 @@ export function PromotionOverlay(color: Color) {
         });
         document.getElementById('beforeGame')!.style.display = 'block';
         document.getElementById('afterGame')!.style.display = 'none';
-        document.getElementById('promotionBlack')!.style.display = 'none'; 
+        document.getElementById('promotionBlack')!.style.display = 'none';
         document.getElementById('promotionWhite')!.style.display = 'none';
-    } else { 
+    } else {
         clockdiv.forEach(function(element) {
             element.style.display = 'block'
         });
@@ -267,7 +330,7 @@ export function PromotionOverlay(color: Color) {
             case '1':
 
         }
-        // (document.getElementById('selfAva') as HTMLImageElement).src = 
+        // (document.getElementById('selfAva') as HTMLImageElement).src =
         document.getElementById('afterGame')!.style.display = 'block';
         document.getElementById('beforeGame')!.style.display = 'none';
 
@@ -304,6 +367,33 @@ document.querySelectorAll('.imgPromotion').forEach((element) => {
 export function gameStatusAlert(content: string) {
     Swal.fire(content);
 }
+export function sendEndGame(endGame: EndGame): Promise<string> {
+    return new Promise((resolve, reject) => {
+        stompClient.publish({
+            destination: '/app/endGame',
+            headers: {},
+            body: JSON.stringify({ iDUserSend: endGame.iDUserSend, iDUserReceive: endGame.iDUserReceive, iDRoom: endGame.iDRoom, idRoomUser: endGame.idRoomUser, userSendTempPort: endGame.userSendTempPort, userReceiveTempPort: endGame.userReceiveTempPort, result: endGame.result }),
+        });
+        resolve("Success");
+    });
+}
+
+function removeGame() {
+    localStorage.removeItem("iDUserSend")
+    localStorage.removeItem("iDUserReceive")
+    localStorage.removeItem("iDRoom")
+    localStorage.removeItem("idRoomUser")
+    localStorage.removeItem("chessMove")
+    localStorage.removeItem("board")
+    localStorage.removeItem("color")
+    localStorage.removeItem("userSendTempPort")
+    localStorage.removeItem("userReceiveTempPort")
+    removeBoard()
+    PromotionOverlay(Color.NOT);
+    throw new Error('Function not implemented.');
+
+}
+
 
 // Time
 function getTimeRemaining(endtime: Date) {

@@ -95,4 +95,28 @@ public class UserService {
 
         return idAccBuilder.toString();
     }
+    public void updateUserWinAndElo(String userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            user.setWin(user.getWin() + 1);
+            user.setElo(user.getElo() + 50);
+            userRepository.save(user);
+        }
+    }
+    public void updateUserLoseAndElo(String userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            user.setLose(user.getLose() + 1);
+            user.setElo(user.getElo() - 50);
+            userRepository.save(user);
+        }
+    }
+    public void updateUserDrawAndElo(String userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            user.setDraw(user.getDraw() + 1);
+            user.setElo(user.getElo() + 10);
+            userRepository.save(user);
+        }
+    }
 }

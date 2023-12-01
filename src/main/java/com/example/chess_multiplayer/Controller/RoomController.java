@@ -102,8 +102,8 @@ public class RoomController {
             chessGameUser1.setChessMove(null);
             chessGameUser1.setUserSendTempPort(waitingRoom.getTempPort());
             chessGameUser1.setUserReceiveTempPort(message.getTempPort());
-            chessGameUser1.setUserSendName(userService.getUsernameByUserID(waitingRoom.getUserCreateId()));
-            chessGameUser1.setUserSendAva(userService.getUserById(waitingRoom.getUserCreateId()).getAva());
+            chessGameUser1.setUserSendName(userService.getUsernameByUserID(message.getIdUserJoin()));
+            chessGameUser1.setUserSendAva(userService.getUserById(message.getIdUserJoin()).getAva());
 
             chessGameUser2.setiDUserSend(message.getIdUserJoin());
             chessGameUser2.setiDUserReceive(waitingRoom.getUserCreateId());
@@ -112,8 +112,8 @@ public class RoomController {
             chessGameUser2.setChessMove(null);
             chessGameUser2.setUserSendTempPort(message.getTempPort());
             chessGameUser2.setUserReceiveTempPort(waitingRoom.getTempPort());
-            chessGameUser2.setUserSendName(userService.getUsernameByUserID(message.getIdUserJoin()));
-            chessGameUser2.setUserSendAva(userService.getUserById(message.getIdUserJoin()).getAva());
+            chessGameUser2.setUserSendName(userService.getUsernameByUserID(waitingRoom.getUserCreateId()));
+            chessGameUser2.setUserSendAva(userService.getUserById(waitingRoom.getUserCreateId()).getAva());
             if(color == true){
                 chessGameUser1.setColor(color);
                 chessGameUser2.setColor(!color);

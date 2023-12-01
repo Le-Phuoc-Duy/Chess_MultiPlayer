@@ -7,7 +7,8 @@ import { Knight } from "./Pieces/Knight";
 import { Bishop } from "./Pieces/Bishop";
 import { Rook } from "./Pieces/Rook"; 
 import { Pawn } from "./Pieces/Pawn";
-import { PromotionOverlay, gameStatusAlert, piecePromoted } from "./Connect";
+import { PromotionOverlay, gameStatusAlert, piecePromoted, sendEndGame } from "./Connect";
+import { EndGame } from "./EndGame";
 export class Game {
 	private _playerSide: Color				//Người chơi, trắng hoặc đen
 	private _board: Board 
@@ -69,7 +70,7 @@ export class Game {
 		startBox = this._board.getBox(startX, startY)
 		endBox = this._board.getBox(endX, endY)
 		let move = this.makeMove(startBox, endBox)
-		if (move) this._currentTurn = false
+		if (move) this._currentTurn = true
 		return move
 	}
 	private makeMove(startPoint: Point, endPoint: Point): boolean {
@@ -78,10 +79,10 @@ export class Game {
 		sourcePiece = startPoint.piece
 		console.log("img " + sourcePiece?.image + startPoint.row + startPoint.col)
 		//Ván cờ đã kết thúc?
-		if(this._status !== GameStatus.ACTIVE){
-			console.log("Ván cờ đã kết thúc")
-			return false;
-		}	
+		// if(this._status !== GameStatus.ACTIVE){
+		// 	console.log("Ván cờ đã kết thúc")
+		// 	return false;
+		// }	
 		//Không chọn quân cờ, chọn ô cờ
 		if (sourcePiece === null) {
 			console.log("sourcePiece")
@@ -435,19 +436,47 @@ export class Game {
 		let a = this.isInCheck()
 		let b = this.isAllValidMove()
 		if (a && !b) {
-			if(this.playerSide === Color.BLACK){
-				gameStatusAlert("Quân Trắng thắng")
-				this._status = GameStatus.WHITE_WIN
-			}
-			if(this.playerSide === Color.WHITE){
-				gameStatusAlert("Quân Đen thắng")
-				this._status = GameStatus.BLACK_WIN
-			}
+			let iDUserSend: string | null = localStorage.getItem('iDUserSend');
+            let iDUserReceive: string | null = localStorage.getItem('iDUserReceive');
+            let iDRoom: string | null = localStorage.getItem('iDRoom');
+            let idRoomUser: string | null = localStorage.getItem('idRoomUser');
+            let userSendTempPort: string | null = localStorage.getItem('userSendTempPort');
+            let userReceiveTempPort: string | null = localStorage.getItem('userReceiveTempPort');
+            let result: GameStatus | null = GameStatus.LOSE
+            let endGame: EndGame = new EndGame(
+                iDUserSend ?? '', // Sử dụng ?? để kiểm tra null hoặc undefined và gán giá trị mặc định nếu không tồn tại
+                iDUserReceive ?? '',
+                iDRoom ?? '',
+                idRoomUser ?? '',
+                userSendTempPort ?? '',
+                userReceiveTempPort ?? '',
+				result ?? ''
+            );
+			sendEndGame(endGame);
+			console.log("bạn đã thua")
 			//SendThua
 		}
 		else if (!a && !b) {
-			gameStatusAlert("Hòa cờ")
-			this._status = GameStatus.DRAW
+			let iDUserSend: string | null = localStorage.getItem('iDUserSend');
+            let iDUserReceive: string | null = localStorage.getItem('iDUserReceive');
+            let iDRoom: string | null = localStorage.getItem('iDRoom');
+            let idRoomUser: string | null = localStorage.getItem('idRoomUser');
+            let userSendTempPort: string | null = localStorage.getItem('userSendTempPort');
+            let userReceiveTempPort: string | null = localStorage.getItem('userReceiveTempPort');
+            let result: GameStatus | null = GameStatus.DRAW
+            let endGame: EndGame = new EndGame(
+                iDUserSend ?? '', // Sử dụng ?? để kiểm tra null hoặc undefined và gán giá trị mặc định nếu không tồn tại
+                iDUserReceive ?? '',
+                iDRoom ?? '',
+                idRoomUser ?? '',
+                userSendTempPort ?? '',
+                userReceiveTempPort ?? '',
+				result ?? ''
+            );
+			sendEndGame(endGame);
+			console.log("bạn hòa")
+			// gameStatusAlert("Hòa cờ")
+			// this._status = GameStatus.DRAW
 			//SendHoa
 		}
 	}
