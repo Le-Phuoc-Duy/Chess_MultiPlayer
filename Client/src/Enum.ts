@@ -5,9 +5,10 @@ export enum Color{
 } 
 export enum GameStatus {
     ACTIVE,
-    INACTIVE,
     BLACK_WIN,
     WHITE_WIN,
+    DRAW,
+    INACTIVE,
     FORFEIT,
     STALEMATE,
     RESIGNATION

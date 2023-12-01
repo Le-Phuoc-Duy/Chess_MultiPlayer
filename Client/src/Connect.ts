@@ -5,6 +5,7 @@ import { Board } from './Board';
 import { RoomJoinedResponse } from './RoomJoinedResponse';
 import { sendChessMove } from './PlayModule/PlayWithFriend';
 import { ChatContentFrom } from './PlayModule/Chat';
+import Swal from 'sweetalert2';
 
 const socket = new SockJS('http://' + window.location.hostname + ':8888/ws');
 export const stompClient = new Client({
@@ -91,6 +92,7 @@ export function setCurrentGame(game: Game) {
     currentGame = game
 }
 export function drawBoard(board: Board) {
+    // removeAllSeleted()
     //i row, j col
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
@@ -111,8 +113,12 @@ document.querySelectorAll(".square").forEach((divPiece) => {
 });
 //Chi ap dung cho self, khong ap dung cho opponent
 function ClickPiece(r: number, c: number, game: Game) {
+    let selectedSquare = document.getElementById(`${r}${c}`);
+    removeAllSeleted()
+    selectedSquare?.classList.add("selected-square");
     if (selected) {
         console.log("secleted")
+        // document.getElementById(r.toString() + c.toString)?.classList.add("select-board-color")
         if (game.playerMove(startX, startY, r, c)) {
             console.log("canmove" + startX + startY + r + c)
             drawBoard(game.board)
@@ -145,6 +151,8 @@ function ClickPiece(r: number, c: number, game: Game) {
                 userReceiveTempPort ?? ''
             );
             sendChessMove(CreateChessMove);
+        }else{
+            removeAllSeleted()
         }
         selected = false
         startX = -1
@@ -158,6 +166,13 @@ function ClickPiece(r: number, c: number, game: Game) {
         startY = c //parseInt(coordinates.charAt(1)) 
     }
 }
+//Remove màu selected
+function removeAllSeleted(){
+    document.querySelectorAll(".square").forEach((divPiece) => {
+        divPiece.classList.remove("selected-square")
+    });
+}
+
 
 let buttons = document.querySelectorAll('.btnMode');
 buttons.forEach((button) => {
@@ -274,3 +289,7 @@ document.querySelectorAll('.imgPromotion').forEach((element) => {
         }
     });
 });
+//Hiển thị thông báo thắng thua
+export function gameStatusAlert(content: string){
+    Swal.fire(content);
+}

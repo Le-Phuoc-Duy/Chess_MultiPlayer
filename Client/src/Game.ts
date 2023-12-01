@@ -7,7 +7,7 @@ import { Knight } from "./Pieces/Knight";
 import { Bishop } from "./Pieces/Bishop";
 import { Rook } from "./Pieces/Rook"; 
 import { Pawn } from "./Pieces/Pawn";
-import { PromotionOverlay, piecePromoted } from "./Connect";
+import { PromotionOverlay, gameStatusAlert, piecePromoted } from "./Connect";
 export class Game {
 	private _playerSide: Color				//Người chơi, trắng hoặc đen
 	private _board: Board 
@@ -77,6 +77,11 @@ export class Game {
 		let chkPromotion: boolean = false
 		sourcePiece = startPoint.piece
 		console.log("img " + sourcePiece?.image + startPoint.row + startPoint.col)
+		//Ván cờ đã kết thúc?
+		if(this._status !== GameStatus.ACTIVE){
+			console.log("Ván cờ đã kết thúc")
+			return false;
+		}	
 		//Không chọn quân cờ, chọn ô cờ
 		if (sourcePiece === null) {
 			console.log("sourcePiece")
@@ -430,14 +435,20 @@ export class Game {
 		let a = this.isInCheck()
 		let b = this.isAllValidMove()
 		if (a && !b) {
-			console.log("Ban da thua")
+			if(this.playerSide === Color.BLACK){
+				gameStatusAlert("Quân Trắng thắng")
+				this._status = GameStatus.WHITE_WIN
+			}
+			if(this.playerSide === Color.WHITE){
+				gameStatusAlert("Quân Đen thắng")
+				this._status = GameStatus.BLACK_WIN
+			}
 			//SendThua
 		}
 		else if (!a && !b) {
-			console.log("Ban da hoa")
+			gameStatusAlert("Hòa cờ")
+			this._status = GameStatus.DRAW
 			//SendHoa
-		} else {
-			console.log("Binh thuong, choi tiep di")
 		}
 	}
 	constructor(playerSide: Color, board: Board, currentTurn: boolean, status: GameStatus) {

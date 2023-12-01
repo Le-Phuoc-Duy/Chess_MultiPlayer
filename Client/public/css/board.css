@@ -26,6 +26,9 @@
   .black {
     background-color: #7e985c;
   }    
+  .selected-square{
+    background-color: #f5f598 !important
+  }
 
   @media (min-width:1400px) {
     .chessBoard {
