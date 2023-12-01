@@ -8,14 +8,11 @@ import com.example.chess_multiplayer.Service.AccountService;
 import com.example.chess_multiplayer.Service.RoomService;
 import com.example.chess_multiplayer.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 
-import java.security.Principal;
 import java.util.*;
 
 @Controller
