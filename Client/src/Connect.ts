@@ -326,11 +326,13 @@ export function PromotionOverlay(color: Color) {
         clockdiv.forEach(function(element) {
             element.style.display = 'block'
         });
-        switch (localStorage.getItem('ava')){
-            case '1':
-
-        }
-        // (document.getElementById('selfAva') as HTMLImageElement).src =
+        // ava
+        (document.getElementById('selfAva') as HTMLImageElement).src = './assets/ava0' + localStorage.getItem('ava') + '.png'; 
+        (document.getElementById('opponentAva') as HTMLImageElement).src = './assets/ava0' + localStorage.getItem('userSendAva') + '.png'
+        // name
+        document.getElementById('selfName')!.innerHTML = localStorage.getItem('userName')!.toString()
+        document.getElementById('opponentName')!.innerHTML = localStorage.getItem('userSendName')!.toString()
+        
         document.getElementById('afterGame')!.style.display = 'block';
         document.getElementById('beforeGame')!.style.display = 'none';
 
