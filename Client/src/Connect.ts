@@ -43,7 +43,6 @@ stompClient.onConnect = (frame) => {
         localStorage.setItem('color', body.color.toString()); // Chuyển đổi boolean thành string khi lưu
         localStorage.setItem('userSendTempPort', body.userSendTempPort);
         localStorage.setItem('userReceiveTempPort', body.userReceiveTempPort);
-
         currentGame.setFullCoordinates(body.board)
         currentGame.currentTurn = true
         if (currentGame.currentTurn) {
@@ -151,7 +150,7 @@ function ClickPiece(r: number, c: number, game: Game) {
                 userReceiveTempPort ?? ''
             );
             sendChessMove(CreateChessMove);
-        }else{
+        } else {
             removeAllSeleted()
         }
         selected = false
@@ -167,7 +166,7 @@ function ClickPiece(r: number, c: number, game: Game) {
     }
 }
 //Remove màu selected
-function removeAllSeleted(){
+function removeAllSeleted() {
     document.querySelectorAll(".square").forEach((divPiece) => {
         divPiece.classList.remove("selected-square")
     });
@@ -189,11 +188,11 @@ buttons.forEach((button) => {
 });
 // Lưu trạng thái của currentGame vào localStorage trước khi reload
 window.addEventListener('beforeunload', () => {
-    if(localStorage.getItem('userID') != null){
+    if (localStorage.getItem('userID') != null) {
         localStorage.setItem('savedGame', JSON.stringify(currentGame));
     }
 });
-export function checkIsloggedIn(){
+export function checkIsloggedIn() {
     const isLoggedIn = localStorage.getItem('userID');
     let noneLoginOverlay = document.getElementById('noneLogin');
     let logonOverlay = document.getElementById('Logon');
@@ -221,20 +220,20 @@ export function checkIsloggedIn(){
 }
 window.addEventListener('load', () => {
     checkIsloggedIn();
-    if(localStorage.getItem('userID') == null){
+    if (localStorage.getItem('userID') == null) {
         PromotionOverlay(currentGame.playerSide);
-    }else{
+    } else {
         setCurrentGameAferLoad()
-        .then((result) => {
-            console.log("currentGame.playerSide: " + currentGame.playerSide);
-            var reDrawGame: Game = new Game(currentGame.playerSide, new Board, currentGame.currentTurn, currentGame.status);
-            reDrawGame.setFullCoordinates(localStorage.getItem('board')!);
-            setCurrentGame(reDrawGame)
-            drawBoard(reDrawGame.board);
-            PromotionOverlay(currentGame.playerSide);
-        })
-        .catch((error) => {
-        });
+            .then((result) => {
+                console.log("currentGame.playerSide: " + currentGame.playerSide);
+                var reDrawGame: Game = new Game(currentGame.playerSide, new Board, currentGame.currentTurn, currentGame.status);
+                reDrawGame.setFullCoordinates(localStorage.getItem('board')!);
+                setCurrentGame(reDrawGame)
+                drawBoard(reDrawGame.board);
+                PromotionOverlay(currentGame.playerSide);
+            })
+            .catch((error) => {
+            });
     }
 });
 function setCurrentGameAferLoad(): Promise<string> {
@@ -243,20 +242,32 @@ function setCurrentGameAferLoad(): Promise<string> {
         if (storedGame) {
             const parsedGame = JSON.parse(storedGame);
             currentGame = Game.fromJSON(parsedGame);
-        } 
+        }
         resolve("success");
     });
 }
 
 //Hiển thị bảng phong hậu
-export function PromotionOverlay(color: Color){
+export function PromotionOverlay(color: Color) {
     let pieceValue: string = "Queen";
-    if(color === Color.NOT){ 
-        document.getElementById('beforeGame')!.style.display = 'block'; 
-        document.getElementById('afterGame')!.style.display = 'none'; 
-        document.getElementById('promotionBlack')!.style.display = 'none';
+    var clockdiv = document.querySelectorAll('.clockdiv') as NodeListOf<HTMLElement>;
+    if (color === Color.NOT) {
+        clockdiv.forEach(function(element) {
+            element.style.display = 'none'
+        });
+        document.getElementById('beforeGame')!.style.display = 'block';
+        document.getElementById('afterGame')!.style.display = 'none';
+        document.getElementById('promotionBlack')!.style.display = 'none'; 
         document.getElementById('promotionWhite')!.style.display = 'none';
-    }else{
+    } else { 
+        clockdiv.forEach(function(element) {
+            element.style.display = 'block'
+        });
+        switch (localStorage.getItem('ava')){
+            case '1':
+
+        }
+        // (document.getElementById('selfAva') as HTMLImageElement).src = 
         document.getElementById('afterGame')!.style.display = 'block';
         document.getElementById('beforeGame')!.style.display = 'none';
 
@@ -264,13 +275,13 @@ export function PromotionOverlay(color: Color){
             document.getElementById('promotionBlack')!.style.display = 'block';
             document.getElementById('promotionWhite')!.style.display = 'none';
         }
-    
+
         if (color === Color.WHITE) {
             document.getElementById('promotionWhite')!.style.display = 'block';
             document.getElementById('promotionBlack')!.style.display = 'none';
         }
     }
-    
+
     return pieceValue;
 }
 export let piecePromoted: string = "Queen";
@@ -290,6 +301,44 @@ document.querySelectorAll('.imgPromotion').forEach((element) => {
     });
 });
 //Hiển thị thông báo thắng thua
-export function gameStatusAlert(content: string){
+export function gameStatusAlert(content: string) {
     Swal.fire(content);
 }
+
+// Time
+function getTimeRemaining(endtime: Date) {
+    var t = Date.parse(endtime.toString()) - Date.parse(new Date().toString());
+    var minutes = Math.floor(t / 1000 / 60);
+    var seconds = Math.floor(t / 1000 - minutes * 60);
+    return {
+        total: t,
+        minutes: minutes,
+        seconds: seconds,
+    };
+}
+
+function initializeClock(selfEndTime: Date, opponentEndTime: Date) {
+    // var clock = document.getElementById(id);
+    var selfTime = document.getElementById('selfTime');
+    var opponentTime = document.getElementById('opponentTime');
+
+    function updateClock() {
+        var t1 = getTimeRemaining(selfEndTime);
+        var t2 = getTimeRemaining(opponentEndTime);
+
+        selfTime!.innerHTML =
+            ('0' + t1.minutes).slice(-2) + ' : ' + ('0' + t1.seconds).slice(-2);
+        opponentTime!.innerHTML =
+            ('0' + t2.minutes).slice(-2) + ' : ' + ('0' + t2.seconds).slice(-2);
+
+        if (t1.total <= 0 || t2.total <= 0) {
+            clearInterval(timeinterval);
+        }
+    }
+
+    updateClock();
+    var timeinterval = setInterval(updateClock, 1000);
+}
+var time = new Date();
+var deadline = new Date(Date.parse(time.toString()) + 1 * 1 * 60 * 1000); // Thay đổi để chỉ hiển thị 15 phút
+initializeClock(deadline,deadline);
