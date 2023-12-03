@@ -14,6 +14,7 @@
     <script type="module" src="/dist/AccountModule/Logout.js"></script>
     <script type="module" src="/dist/AccountModule/Register.js"></script>
     <script type="module" src="/dist/AccountModule/Profile.js"></script>
+    <script type="module" src="/dist/PlayModule/ExtendOpt.js"></script>
     <script type="module" src="/dist/PlayModule/PlayWithFriend.js"></script>
     <script type="module" src="/dist/PlayModule/Chat.js"></script>
     <script type="module" src="/dist/PlayModule/PlayWorld.js"></script>
@@ -31,7 +32,7 @@
   </head>
 
   <body>
-    <div class="container-fluid">
+    <div class="container-fluid"> 
       <div class="row">
         <!--Clock & ava  -->
         <div class="col-sm-7 col-md-7 col-lg-7 col-xl-1 mt-3">  
@@ -118,7 +119,7 @@
           </div>
         </div>
         <div class="col-sm-5 col-md-5 col-lg-5 col-xl-4 bg-white mt-3" id="divTool">
-          <div id="mainGame">
+          <div id="mainGame" >
             <div id="afterGame" style="display: none;">
               <div id="promotionBlack" class="card-body px-5 py-5 pt-1 pb-1"
                 style="display: flex; justify-content: center; align-items: center;">
@@ -146,6 +147,10 @@
                 style="display: flex; justify-content: center; align-items: center;">
                 <p style="font-weight: bold; color: #4a4847; " class="mb-1">QUÂN
                   PHONG CẤP</p>
+              </div>
+              <div class="d-flex justify-content-center"> 
+                <button id="drawRequest" class="btn account-button">Cầu hòa</button>
+                <button id="surrender" class="btn account-button">Đầu hàng</button>
               </div>
             </div>
             <div id="beforeGame" style="display: block;">
@@ -181,13 +186,12 @@
               <div class="d-flex justify-content-center">
                 <button id="buttonPlay" class="btn play-button">Chơi</button>
               </div>
-            </div>
-
-            <div class="d-flex justify-content-center">
-              <button class="btn select-button" id="playWithFriend"
-                style="font-weight: bold; color: #4a4847;">Chơi với
-                bạn</button>
-            </div>
+              <div class="d-flex justify-content-center">
+                <button class="btn select-button" id="playWithFriend"
+                  style="font-weight: bold; color: #4a4847;display: block;">Chơi với
+                  bạn</button> 
+              </div>
+            </div> 
             <!-- Chat -->
             <div class="container ">
               <div class="row d-flex justify-content-center">
@@ -254,22 +258,28 @@
           </div> 
           <!-- Giao diện thông tin cá nhân -->
           <div id="profileSection" style="display: none;height: 600px; overflow-y: auto;overflow-x: hidden; ">
-            <span class="mt-5"><i class="fa-solid fa-backward"></i> Back</span>
-            <div class="card-body px-5 py-5 pt-3 pb-0"
-              style="display: flex; justify-content: center; align-items: center;">
-              <img src="./assets/ava01.png" class="rounded-circle img-fluid"
-                style="width: 25%;" />
-              <h4 class="mx-2">Julie L. Arsenault</h4>
-            </div>
+            <div class="mt-2 mx-2" style="cursor: pointer;" id="backProfile"><i class="fa-solid fa-backward"></i> Back</div>
+            <div class="card-body px-5 py-5 pt-3 pb-1" style="display: flex; justify-content: center; align-items: center;">
+              <img id="imgProfile" class="rounded-circle img-fluid" style="width: 25%;" />
+              <div class="mx-3 text-center">
+                <h4 id="h4ProfileName" class=""></h4>
+                <h4 id="h4ProfileElo" class=""></h4>  
+              </div>
+            </div>  
             <div class="d-flex justify-content-center align-items-center mt-0 pb-2" style="height:270px;">
               <canvas id="achieve"></canvas>
             </div>
+            <div class="card-body px-5 py-5 pt-2 pb-0" style="display: flex; justify-content: center; align-items: center;">
+              <!-- <div class="mx-3 text-center">  -->
+                <h5 id="h4ProfileRank" style="font-weight: bold; color: rgb(17, 209, 55);" ></h5>  
+              <!-- </div> -->
+            </div> 
+            
             <div class="row d-flex justify-content-center mt-2 mb-4">
               <div class="col-md-9 col-lg-7 col-xl-11">
                 <div
                   class="card-header d-flex justify-content-center align-items-center pt-2 pb-2"
-                  style="border-top: 4px solid #ffa900;">
-                  <!-- <h5 class="mb-0">Bảng xếp hạng</h5> -->
+                  style="border-top: 4px solid #ffa900;"> 
                   <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio"
                       name="profileMode" id="inpBXH" value="inpBXH" checked> 
@@ -285,32 +295,18 @@
                   <thead>
                     <tr>
                       <th scope="col">#</th>
-                      <th scope="col">Tên</th>
+                      <th scope="col" class="col-6">Tên</th>
                       <th scope="col">Thắng</th>
                       <th scope="col">Thua</th>
                       <th scope="col">Hòa</th>
-                      <th scope="col">Elo</th>
+                      <th scope="col" class="col-2">Elo</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="row">1</th>
-                      <td>Markccccccc</td>
-                      <td>Otto</td>
-                      <td>@mdo</td>
-                      <td>@mdo</td>
-                      <td>@mdo</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">1</th>
-                      <td>Mark</td>
-                      <td>Otto</td>
-                      <td>@mdo</td>
-                      <td>@mdo</td>
-                      <td>@mdo</td>
-                    </tr> 
+                  <tbody>  
                   </tbody>
-                </table>
+                </table> 
+                <ul class="pagination pagination-sm mt-3 mb-0 justify-content-end"> 
+                </ul> 
                 <table class="table" id="tableFriend" style="display: none;">
                   <thead>
                     <tr>

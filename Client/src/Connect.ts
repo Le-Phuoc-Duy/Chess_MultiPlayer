@@ -5,8 +5,9 @@ import { Board } from './Board';
 import { RoomJoinedResponse } from './RoomJoinedResponse';
 import { sendChessMove } from './PlayModule/PlayWithFriend';
 import { ChatContentFrom } from './PlayModule/Chat';
-import Swal from 'sweetalert2';
-import type { EndGame } from './EndGame';
+import Swal from 'sweetalert2'; 
+import { removeGame, setEndGame } from './PlayModule/ExtendOpt';
+import { profileRender, standingRender } from './AccountModule/Profile';
 
 const socket = new SockJS('http://' + window.location.hostname + ':8888/ws');
 export const stompClient = new Client({
@@ -86,8 +87,21 @@ stompClient.onConnect = (frame) => {
                     removeGame()
                 })
                 break;
-            case "DRAW_REQUEST":
-                Swal.fire("Đối thủ cầu hòa!")
+            case "DRAW_REQUEST": 
+                Swal.fire({
+                    title: "Đối thủ cầu hòa! Bạn có chấp nhận",
+                    showDenyButton: true,
+                    showConfirmButton: true, 
+                    confirmButtonText: "Chấp nhận",
+                    denyButtonText: "Từ chối"
+                  }).then((result) => { 
+                    if (result.isConfirmed) {
+                      setEndGame(GameStatus.DRAW_ACCEPT);
+                    } else if (result.isDenied) {
+                      setEndGame(GameStatus.DRAW_DENY);
+                    }
+                  });
+                
                 break;
             case "DRAW_ACCEPT":
                 Swal.fire("Đối thủ chấp nhận hòa! Trận đấu kết thúc")
@@ -113,6 +127,15 @@ stompClient.onConnect = (frame) => {
                     break;
         }
     });
+    stompClient.subscribe('/user/queue/profile', (message) => {
+        const body = JSON.parse(message.body); 
+        console.log("profile " + body.rank)
+        profileRender(body.rank,body.elo, body.numberOfWon,body.numberOfDrawn,body.numberOfLost, body.numberOfStanding)
+    });
+    stompClient.subscribe('/user/queue/standing', (message) => {
+        const body = JSON.parse(message.body); 
+        standingRender(body)  
+    });
 };
 // Kết nối tới server
 stompClient.activate();
@@ -132,7 +155,7 @@ stompClient.onStompError = (frame) => {
         console.error('An error occurred. Please check your connection settings.');
     }
 
-};
+}; 
 var selected: Boolean = false
 var startX: number = -1
 var endX: number = -1
@@ -157,17 +180,7 @@ export function drawBoard(board: Board) {
         }
     }
 }
-export function removeBoard() {
-    // removeAllSeleted()
-    //i row, j col
-    for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
-            let coordinate: string = i.toString() + j.toString()
-            let imgPiece = document.getElementById("i" + coordinate) as HTMLImageElement
-            imgPiece.src = ""
-        }
-    }
-}
+
 document.querySelectorAll(".square").forEach((divPiece) => {
     let r = divPiece.id.charAt(0)
     let c = divPiece.id.charAt(1)
@@ -365,36 +378,7 @@ document.querySelectorAll('.imgPromotion').forEach((element) => {
         }
     });
 });
-//Hiển thị thông báo thắng thua
-export function gameStatusAlert(content: string) {
-    Swal.fire(content);
-}
-export function sendEndGame(endGame: EndGame): Promise<string> {
-    return new Promise((resolve, reject) => {
-        stompClient.publish({
-            destination: '/app/endGame',
-            headers: {},
-            body: JSON.stringify({ iDUserSend: endGame.iDUserSend, iDUserReceive: endGame.iDUserReceive, iDRoom: endGame.iDRoom, idRoomUser: endGame.idRoomUser, userSendTempPort: endGame.userSendTempPort, userReceiveTempPort: endGame.userReceiveTempPort, result: endGame.result }),
-        });
-        resolve("Success");
-    });
-}
 
-function removeGame() {
-    localStorage.removeItem("iDUserSend")
-    localStorage.removeItem("iDUserReceive")
-    localStorage.removeItem("iDRoom")
-    localStorage.removeItem("idRoomUser")
-    localStorage.removeItem("chessMove")
-    localStorage.removeItem("board")
-    localStorage.removeItem("color")
-    localStorage.removeItem("userSendTempPort")
-    localStorage.removeItem("userReceiveTempPort")
-    removeBoard()
-    PromotionOverlay(Color.NOT);
-    throw new Error('Function not implemented.');
-
-}
 
 
 // Time

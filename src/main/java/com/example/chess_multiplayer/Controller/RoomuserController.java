@@ -174,7 +174,7 @@ public class RoomuserController {
 
                     gameStatusUserReceive.setResult(Result.SURRENDER);
                     messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
-                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(message.getUserSendTempPort(), "/queue/endGame",message );
                 }
                 default -> {
                     gameStatusUserReceive.setResult(Result.ACTIVE);

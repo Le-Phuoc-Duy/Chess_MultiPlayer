@@ -9,10 +9,15 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -119,4 +124,22 @@ public class UserService {
             userRepository.save(user);
         }
     }
+    public List<String> getTopUsers(int pageIndex, int pageSize) {
+        pageIndex--;    // pageIndex đếm từ 0 nên phải giảm
+        Page<User> userPage = userRepository.findAllByOrderByEloDesc(PageRequest.of(pageIndex, pageSize));
+
+        // Chuyển đổi Page<User> thành List<String> hoặc thực hiện xử lý khác tùy thuộc vào yêu cầu của bạn
+        List<String> userIds = userPage.getContent().stream()
+                .map(User::getIDUser)
+                .collect(Collectors.toList());
+
+        return userIds;
+    }
+    public long getNumberOfStanding() {
+        return userRepository.count();
+    }
+    public long getRank(String userId) {
+        return userRepository.getRank(userId);
+    }
+
 }
