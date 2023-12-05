@@ -36,7 +36,9 @@ document.getElementById("logoutButton")?.addEventListener("click",async () => {
         userReceiveTempPort ?? '',
         result ?? ''
     );
-    sendEndGame(endGame);
+    if(iDUserReceive != null){
+        sendEndGame(endGame);
+    }
     localStorage.clear();
     window.location.reload();
 })

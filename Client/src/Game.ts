@@ -19,11 +19,6 @@ export class Game {
 	}
 	public set currentTurn(value: boolean) {
 		this._currentTurn = value;
-		if(this._currentTurn){
-			localStorage.setItem('currentTurn','true');
-			}else{
-				localStorage.setItem('currentTurn','false');
-			}
 	}
 	public get playerSide(): Color {
 		return this._playerSide;
@@ -70,7 +65,7 @@ export class Game {
 		startBox = this._board.getBox(startX, startY)
 		endBox = this._board.getBox(endX, endY)
 		let move = this.makeMove(startBox, endBox)
-		if (move) this._currentTurn = true
+		if (move) this._currentTurn = false
 		return move
 	}
 	private makeMove(startPoint: Point, endPoint: Point): boolean {

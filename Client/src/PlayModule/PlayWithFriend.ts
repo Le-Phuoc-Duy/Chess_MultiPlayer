@@ -1,11 +1,11 @@
 import { Color } from "../Enum";
-import { PromotionOverlay, currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect";
+import { PromotionOverlay, currentGame, drawBoard, setCurrentGame, setTimer, stompClient, selfEndTime, opponentEndTime, selfTimeStop, oppTimeStop } from "../Connect";
 import { RoomJoinedResponse } from "../RoomJoinedResponse";
 import Swal from "sweetalert2";
 import { Game } from "../Game";
 import { Board } from '../Board';
 function createRoom(mode: number): Promise<string> {
-    console.log("mode" + mode) 
+    console.log("mode" + mode)
     return new Promise((resolve, reject) => {
         stompClient.publish({
             destination: '/app/createRoom',
@@ -22,7 +22,7 @@ function createRoom(mode: number): Promise<string> {
 
     });
 }
-function joinRoom(): Promise<RoomJoinedResponse> { 
+function joinRoom(): Promise<RoomJoinedResponse> {
     return new Promise((resolve, reject) => {
         stompClient.subscribe('/user/queue/roomJoined', (message) => {
             const body = JSON.parse(message.body);
@@ -39,6 +39,7 @@ function joinRoom(): Promise<RoomJoinedResponse> {
             localStorage.setItem('userReceiveTempPort', body.userReceiveTempPort);
             localStorage.setItem('userSendName', body.userSendName);
             localStorage.setItem('userSendAva', body.userSendAva);
+            localStorage.setItem('userCountdownValue', body.userCountdownValue);
             resolve(body);
         });
     });
@@ -99,15 +100,17 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                             console.log('iDUserSend: ' + result.iDUserSend + '\niDUserReceive: ' + result.iDUserReceive + '\niDRoom: ' + result.iDRoom + '\nidRoomUser: ' + result.idRoomUser + '\nchessMove: ' + result.chessMove + '\nboard: ' + result.board + '\ncolor: ' + result.color);
                             if (result.color) {
                                 console.log("self la white, opp la black")
-                                var gameByJoin: Game = new Game(Color.WHITE, new Board,true, 0); 
+                                var gameByJoin: Game = new Game(Color.WHITE, new Board, true, 0);
                             } else {
                                 console.log("self la black, opp la white")
-                                var gameByJoin: Game = new Game(Color.BLACK, new Board,false, 0); 
+                                var gameByJoin: Game = new Game(Color.BLACK, new Board, false, 0);
                             }
                             gameByJoin.setFullCoordinates(result.board);
                             setCurrentGame(gameByJoin)
                             drawBoard(gameByJoin.board);
                             PromotionOverlay(currentGame.playerSide);
+                            console.log("result.userCountdownValue: " + result.userCountdownValue);
+                            setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
                             const Toast = Swal.mixin({
                                 toast: true,
                                 position: "top-end",
@@ -145,7 +148,7 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
             }
         }
         if (option === "createRoom") {
-            let gameMode: number
+            let gameMode: number = -1
             switch (document.getElementById('gameMode')!.innerHTML) {
                 case "2 | 1 phút":
                     gameMode = -1
@@ -160,61 +163,72 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                     gameMode = -4
                     break;
                 default:
+                    let m: number;
+                    let s: number;
                     let minute = (document.getElementById('minute') as HTMLInputElement).value;
                     let second = (document.getElementById('second') as HTMLInputElement).value;
-                    let m: number = parseInt(minute);
-                    let s: number = parseInt(second);
-                    let x: number = m*60 + s
-                    gameMode = x;
+                    if (isNaN(parseInt(minute))) { 
+                        m = 0;
+                    }else{
+                        m = parseInt(minute);
+                    }
+                    if (isNaN(parseInt(second))) { 
+                        s = 0;
+                    }else{
+                        s = parseInt(second);
+                    }
+                    gameMode = m*60 + s;
                     break;
             }
             createRoom(gameMode)
-                    .then((result) => {
-                        if (result) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Tạo phòng thành công!',
-                                text: `ID phòng của bạn là: ${result.toString()}`,
-                            })
-                            joinRoom().then((result) => {
-                                if (result) {
-                                    const Toast = Swal.mixin({
-                                        toast: true,
-                                        position: "top-end",
-                                        showConfirmButton: false,
-                                        timer: 5000,
-                                        timerProgressBar: true,
-                                        didOpen: (toast) => {
-                                            toast.onmouseenter = Swal.stopTimer;
-                                            toast.onmouseleave = Swal.resumeTimer;
-                                        }
-                                    });
-                                    Toast.fire({
-                                        icon: "success",
-                                        title: "Đã có người chơi khác tham gia, Bắt đầu trận đấu"
-                                    });
-                                    if (result.color) {
-                                        console.log("self la white, opp la black")
-                                        var gameByCreate: Game = new Game(Color.WHITE, new Board,true, 0); 
-                                    } else {
-                                        console.log("self la black, opp la white")
-                                        var gameByCreate: Game = new Game(Color.BLACK, new Board,false, 0); 
-                                    }
-                                    gameByCreate.setFullCoordinates(result.board);
-                                    setCurrentGame(gameByCreate)
-                                    drawBoard(gameByCreate.board);
-                                    PromotionOverlay(currentGame.playerSide);
-                                }
-                            })
-                        }
-                    })
-                    .catch((error) => {
+                .then((result) => {
+                    if (result) {
                         Swal.fire({
-                            icon: "error",
-                            text: "Tạo phòng thất bại",
-                        }).then(() => {
-                        });
+                            icon: 'success',
+                            title: 'Tạo phòng thành công!',
+                            text: `ID phòng của bạn là: ${result.toString()}`,
+                        })
+                        joinRoom().then((result) => {
+                            if (result) {
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: "top-end",
+                                    showConfirmButton: false,
+                                    timer: 5000,
+                                    timerProgressBar: true,
+                                    didOpen: (toast) => {
+                                        toast.onmouseenter = Swal.stopTimer;
+                                        toast.onmouseleave = Swal.resumeTimer;
+                                    }
+                                });
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "Đã có người chơi khác tham gia, Bắt đầu trận đấu"
+                                });
+                                if (result.color) {
+                                    console.log("self la white, opp la black")
+                                    var gameByCreate: Game = new Game(Color.WHITE, new Board, true, 0);
+                                } else {
+                                    console.log("self la black, opp la white")
+                                    var gameByCreate: Game = new Game(Color.BLACK, new Board, false, 0);
+                                }
+                                gameByCreate.setFullCoordinates(result.board);
+                                setCurrentGame(gameByCreate)
+                                drawBoard(gameByCreate.board);
+                                PromotionOverlay(currentGame.playerSide);
+                                console.log("result.userCountdownValue: " + result.userCountdownValue);
+                                setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
+                            }
+                        })
+                    }
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        icon: "error",
+                        text: "Tạo phòng thất bại",
+                    }).then(() => {
                     });
+                });
         }
     }
 })

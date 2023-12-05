@@ -92,6 +92,28 @@ public class RoomController {
             removeWaitingRoomById(waitingRoom.getWaitingRoomId());
             RandomWaitingRoomIds.remove(waitingRoom.getWaitingRoomId());
             //set Chess Game
+            switch (waitingRoom.getMode()){
+                case -1 -> {
+                    chessGameUser1.setUserCountdownValue(120);
+                    chessGameUser2.setUserCountdownValue(120);
+                }
+                case -2 -> {
+                    chessGameUser1.setUserCountdownValue(180);
+                    chessGameUser2.setUserCountdownValue(180);
+                }
+                case -3 -> {
+                    chessGameUser1.setUserCountdownValue(360);
+                    chessGameUser2.setUserCountdownValue(360);
+                }
+                case -4 -> {
+                    chessGameUser1.setUserCountdownValue(600);
+                    chessGameUser2.setUserCountdownValue(600);
+                }
+                default ->{
+                    chessGameUser1.setUserCountdownValue(waitingRoom.getMode());
+                    chessGameUser2.setUserCountdownValue(waitingRoom.getMode());
+                }
+            }
             chessGameUser1.setiDUserSend(waitingRoom.getUserCreateId());
             chessGameUser1.setiDUserReceive(message.getIdUserJoin());
             chessGameUser1.setiDRoom(idRoomCreated);
@@ -111,6 +133,7 @@ public class RoomController {
             chessGameUser2.setUserReceiveTempPort(waitingRoom.getTempPort());
             chessGameUser2.setUserSendName(userService.getUsernameByUserID(waitingRoom.getUserCreateId()));
             chessGameUser2.setUserSendAva(userService.getUserById(waitingRoom.getUserCreateId()).getAva());
+
             if(color == true){
                 chessGameUser1.setColor(color);
                 chessGameUser2.setColor(!color);

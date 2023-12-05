@@ -12,6 +12,8 @@ public class ChessGame {
     private Boolean color;
     private String userSendTempPort;
     private String userReceiveTempPort;
+    private int userCountdownValue;
+    private int oppCountdownValue;
 
     public Boolean getColor() {
         return color;
@@ -100,5 +102,21 @@ public class ChessGame {
 
     public void setUserSendAva(int userSendAva) {
         this.userSendAva = userSendAva;
+    }
+
+    public int getUserCountdownValue() {
+        return userCountdownValue;
+    }
+
+    public void setUserCountdownValue(int userCountdownValue) {
+        this.userCountdownValue = userCountdownValue;
+    }
+
+    public int getOppCountdownValue() {
+        return oppCountdownValue;
+    }
+
+    public void setOppCountdownValue(int oppCountdownValue) {
+        this.oppCountdownValue = oppCountdownValue;
     }
 }

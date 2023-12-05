@@ -44,7 +44,8 @@ stompClient.onConnect = (frame) => {
         localStorage.setItem('color', body.color.toString()); // Chuyển đổi boolean thành string khi lưu
         localStorage.setItem('userSendTempPort', body.userSendTempPort);
         localStorage.setItem('userReceiveTempPort', body.userReceiveTempPort);
-
+        localStorage.setItem('userCountdownValue', body.userCountdownValue);
+        localStorage.setItem('oppCountdownValue', body.oppCountdownValue);
         currentGame.setFullCoordinates(body.board)
         currentGame.currentTurn = true
         if (currentGame.currentTurn) {
@@ -54,6 +55,29 @@ stompClient.onConnect = (frame) => {
         }
         drawBoard(currentGame.board);
         currentGame.checkGameStatus()
+        setTimer(body.userCountdownValue,body.oppCountdownValue,false,true)
+        
+    });
+    stompClient.subscribe('/user/queue/chessMoveSuccess', (message) => {
+        const body = JSON.parse(message.body);
+        localStorage.setItem('userCountdownValue', body.userCountdownValue);
+        localStorage.setItem('oppCountdownValue', body.oppCountdownValue);
+        setTimer(body.userCountdownValue,body.oppCountdownValue,true,false)
+    });
+    stompClient.subscribe('/user/queue/timeout', (message) => {
+        const body = JSON.parse(message.body);
+        if(body.notify == "Time out"){
+            Swal.fire("Hết thời gian! Bạn đã thua")
+            .then(()=>{
+                removeGame()
+            })
+        }else{
+            Swal.fire("Đối thủ hết giờ! Bạn đã thắng")
+            .then(()=>{
+                removeGame()
+            })
+        }
+        
     });
     stompClient.subscribe('/topic/publicChat', (message) => {
         const body = JSON.parse(message.body);
@@ -113,6 +137,7 @@ stompClient.onConnect = (frame) => {
                     break;
         }
     });
+    
 };
 // Kết nối tới server
 stompClient.activate();
@@ -195,7 +220,6 @@ function ClickPiece(r: number, c: number, game: Game) {
             let userSendTempPort: string | null = localStorage.getItem('userSendTempPort');
             let userReceiveTempPort: string | null = localStorage.getItem('userReceiveTempPort');
             let color: boolean;
-
             if (localStorage.getItem('color') == "true") {
                 color = true;
             } else {
@@ -210,7 +234,9 @@ function ClickPiece(r: number, c: number, game: Game) {
                 board ?? '',
                 color ?? false, // Gán giá trị mặc định nếu không tồn tại hoặc không hợp lệ
                 userSendTempPort ?? '',
-                userReceiveTempPort ?? ''
+                userReceiveTempPort ?? '',
+                1,
+                1
             );
             sendChessMove(CreateChessMove);
         }else{
@@ -396,41 +422,66 @@ function removeGame() {
 
 }
 
-
-// Time
-function getTimeRemaining(endtime: Date) {
-    var t = Date.parse(endtime.toString()) - Date.parse(new Date().toString());
-    var minutes = Math.floor(t / 1000 / 60);
-    var seconds = Math.floor(t / 1000 - minutes * 60);
+// // Time
+function getTimeRemaining(endtime: number) {
+    const minutes = Math.floor(endtime / 60);
+    const seconds = Math.floor(endtime % 60);
     return {
-        total: t,
+        total: endtime,
         minutes: minutes,
         seconds: seconds,
     };
 }
 
-function initializeClock(selfEndTime: Date, opponentEndTime: Date) {
-    // var clock = document.getElementById(id);
+
+export let selfEndTime: number;
+export let opponentEndTime: number;
+export let selfTimeStop = true;
+export let oppTimeStop = true;
+export function setTimer(selfEndTimeLC: number, opponentEndTimeLC: number, selfTimeStopLC: boolean, oppTimeStopLC: boolean){
+    selfEndTime = selfEndTimeLC;
+    opponentEndTime = opponentEndTimeLC;
+    selfTimeStop = selfTimeStopLC;
+    oppTimeStop = oppTimeStopLC;
+    initializeClock();
+}   
+
+function initializeClock() {
     var selfTime = document.getElementById('selfTime');
     var opponentTime = document.getElementById('opponentTime');
-
-    function updateClock() {
+    function initializeClockSelf(){
         var t1 = getTimeRemaining(selfEndTime);
-        var t2 = getTimeRemaining(opponentEndTime);
-
         selfTime!.innerHTML =
             ('0' + t1.minutes).slice(-2) + ' : ' + ('0' + t1.seconds).slice(-2);
+    }
+    function initializeClockOpp(){
+        var t2 = getTimeRemaining(opponentEndTime);
         opponentTime!.innerHTML =
             ('0' + t2.minutes).slice(-2) + ' : ' + ('0' + t2.seconds).slice(-2);
-
-        if (t1.total <= 0 || t2.total <= 0) {
-            clearInterval(timeinterval);
+    }
+    function updateClockSelf() {
+        var t1 = getTimeRemaining(selfEndTime);
+        if(t1.total <= 0 || selfTimeStop){
+            clearInterval(timeintervalSelf);
+        }else{
+            selfTime!.innerHTML =
+            ('0' + t1.minutes).slice(-2) + ' : ' + ('0' + t1.seconds).slice(-2);
+            selfEndTime--;
         }
     }
 
-    updateClock();
-    var timeinterval = setInterval(updateClock, 1000);
+    function updateClockOpp() {
+        var t2 = getTimeRemaining(opponentEndTime);
+        if(t2.total <= 0 || oppTimeStop){
+            clearInterval(timeintervalOpp);
+        }else {
+            opponentTime!.innerHTML =
+            ('0' + t2.minutes).slice(-2) + ' : ' + ('0' + t2.seconds).slice(-2);
+            opponentEndTime--;
+        }
+    }
+    initializeClockSelf();
+    initializeClockOpp();
+    var timeintervalSelf = setInterval(updateClockSelf, 1000);
+    var timeintervalOpp = setInterval(updateClockOpp, 1000);
 }
-var time = new Date();
-var deadline = new Date(Date.parse(time.toString()) + 1 * 1 * 60 * 1000); // Thay đổi để chỉ hiển thị 15 phút
-initializeClock(deadline,deadline);

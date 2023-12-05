@@ -1,12 +1,12 @@
 // Import Swal library (assuming you have it installed)
 import { Color } from "../Enum";
-import { PromotionOverlay, currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect";
+import { PromotionOverlay, currentGame, drawBoard, setCurrentGame, setTimer, stompClient, selfEndTime, opponentEndTime, selfTimeStop, oppTimeStop } from "../Connect";
 import { RoomJoinedResponse } from "../RoomJoinedResponse";
 import { Game } from "../Game";
 import Swal from 'sweetalert2';
 import { Board } from '../Board';
 document.getElementById("buttonPlay")?.addEventListener("click", async () => {
-  if(localStorage.getItem('userID') == null){
+  if (localStorage.getItem('userID') == null) {
     const Toast = Swal.mixin({
       toast: true,
       position: "top-end",
@@ -14,15 +14,15 @@ document.getElementById("buttonPlay")?.addEventListener("click", async () => {
       timer: 3000,
       timerProgressBar: true,
       didOpen: (toast) => {
-      toast.onmouseenter = Swal.stopTimer;
-      toast.onmouseleave = Swal.resumeTimer;
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
       }
-  });
-  Toast.fire({
+    });
+    Toast.fire({
       icon: "error",
       title: "Đăng nhập để có thể chơi!"
-  }); 
-  }else{
+    });
+  } else {
     const loadingSwal = Swal.fire({
       title: 'Đang tìm kiếm người chơi...',
       allowOutsideClick: false,
@@ -36,24 +36,24 @@ document.getElementById("buttonPlay")?.addEventListener("click", async () => {
         const cancelButton = Swal.getCancelButton();
         if (cancelButton) {
           cancelButton.addEventListener('click', () => {
-            cancelJoinGame().then(()=>{
+            cancelJoinGame().then(() => {
               console.log("cancel");
             });
-            
+
           });
         }
       },
     });
-  
+
     // Thiết lập thời gian tự động đóng sau 20 giây
     loadingSwal.then((result) => {
       if (result.dismiss === Swal.DismissReason.timer) {
-        cancelJoinGame().then(()=>{
+        cancelJoinGame().then(() => {
           console.log("cancel");
         });
       }
     }); // 20 giây
-  
+
     joinGame().then((result) => {
       if (result) {
         loadingSwal.close();
@@ -64,15 +64,17 @@ document.getElementById("buttonPlay")?.addEventListener("click", async () => {
         })
         if (result.color) {
           console.log("self la white, opp la black")
-          var gameByCreate: Game = new Game(Color.WHITE, new Board,true, 0);
+          var gameByCreate: Game = new Game(Color.WHITE, new Board, true, 0);
         } else {
           console.log("self la black, opp la white")
-          var gameByCreate: Game = new Game(Color.BLACK, new Board,false, 0);
+          var gameByCreate: Game = new Game(Color.BLACK, new Board, false, 0);
         }
         gameByCreate.setFullCoordinates(result.board);
         setCurrentGame(gameByCreate)
         drawBoard(gameByCreate.board);
         PromotionOverlay(currentGame.playerSide);
+        console.log("result.userCountdownValue: " + result.userCountdownValue);
+        setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
       }
     })
       .catch((error) => {
@@ -82,7 +84,7 @@ document.getElementById("buttonPlay")?.addEventListener("click", async () => {
         })
       });
   }
-  
+
 });
 
 
@@ -139,7 +141,7 @@ function joinGame(): Promise<RoomJoinedResponse> {
 
 function cancelJoinGame(): Promise<String> {
   return new Promise((resolve) => {
-    let gameMode: number
+    let gameMode: number = -1
     switch (document.getElementById('gameMode')!.innerHTML) {
       case "2 | 1 phút":
         gameMode = -1
@@ -154,12 +156,21 @@ function cancelJoinGame(): Promise<String> {
         gameMode = -4
         break;
       default:
+        let m: number;
+        let s: number;
         let minute = (document.getElementById('minute') as HTMLInputElement).value;
         let second = (document.getElementById('second') as HTMLInputElement).value;
-        let m: number = parseInt(minute);
-        let s: number = parseInt(second);
-        let x: number = m * 60 + s
-        gameMode = x;
+        if (isNaN(parseInt(minute))) {
+          m = 0;
+        } else {
+          m = parseInt(minute);
+        }
+        if (isNaN(parseInt(second))) {
+          s = 0;
+        } else {
+          s = parseInt(second);
+        }
+        gameMode = m * 60 + s;
         break;
     }
     stompClient.publish({
