@@ -16,7 +16,7 @@ function sendLogin(name: string, pass: string): Promise<string> {
                 localStorage.clear();
                 localStorage.setItem('userID', body.userID);
                 localStorage.setItem('userName', body.userName);
-                localStorage.setItem('ava', body.ava);
+                localStorage.setItem('ava', body.ava);  
                 resolve('success');
             } else {
                 reject('failure');
@@ -44,14 +44,14 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
                 Swal.showValidationMessage('Vui lòng không để trống tên người dùng');
             } else { 
                 sendLogin(username, password)
-                    .then((result) => {
-                        checkIsloggedIn();
-                    }).then(()=>{
+                    .then((result) => { 
+                        checkIsloggedIn(); 
+                    }).then(()=>{  
                         const Toast = Swal.mixin({
                             toast: true,
                             position: "top-end",
                             showConfirmButton: false,
-                            timer: 5000,
+                            timer: 1000,
                             timerProgressBar: true,
                             didOpen: (toast) => {
                             toast.onmouseenter = Swal.stopTimer;
@@ -61,6 +61,8 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
                         Toast.fire({
                             icon: "success",
                             title: "Đăng nhập thành công"
+                        }).then(()=>{
+                            location.reload()
                         });
                         
                     })

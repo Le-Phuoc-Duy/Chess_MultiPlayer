@@ -1,5 +1,5 @@
 import { Color } from "../Enum";
-import { PromotionOverlay, currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect";
+import { PromotionOverlay, currentGame, drawBoard, gameMode, setCurrentGame, stompClient } from "../Connect";
 import { RoomJoinedResponse } from "../RoomJoinedResponse";
 import Swal from "sweetalert2";
 import { Game } from "../Game";
@@ -145,29 +145,30 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
             }
         }
         if (option === "createRoom") {
-            let gameMode: number
-            switch (document.getElementById('gameMode')!.innerHTML) {
-                case "2 | 1 phút":
-                    gameMode = -1
-                    break;
-                case "3 | 2 phút":
-                    gameMode = -2
-                    break;
-                case "5 phút":
-                    gameMode = -3
-                    break;
-                case "10 phút":
-                    gameMode = -4
-                    break;
-                default:
-                    let minute = (document.getElementById('minute') as HTMLInputElement).value;
-                    let second = (document.getElementById('second') as HTMLInputElement).value;
-                    let m: number = parseInt(minute);
-                    let s: number = parseInt(second);
-                    let x: number = m*60 + s
-                    gameMode = x;
-                    break;
-            }
+            // let gameMode: number
+            // switch (document.getElementById('gameMode')!.textContent!.trim()) {
+            //     case "2 | 1 phút":
+            //         gameMode = -1
+            //         break;
+            //     case "3 | 2 phút":
+            //         gameMode = -2
+            //         break;
+            //     case "5 phút":
+            //         gameMode = -3
+            //         break;
+            //     case "10 phút":
+            //         gameMode = -4
+            //         break;
+            //     default:
+            //         let minute = (document.getElementById('minute') as HTMLInputElement).value;
+            //         let second = (document.getElementById('second') as HTMLInputElement).value;
+            //         let m: number = parseInt(minute);
+            //         let s: number = parseInt(second);
+            //         let x: number = m*60 + s
+            //         gameMode = x;
+            //         break;
+            // }
+            console.log("gameMode: " + gameMode) 
             createRoom(gameMode)
                     .then((result) => {
                         if (result) {

@@ -125,13 +125,13 @@ public class RoomController {
             System.out.println(chessGameUser1.toString());
             System.out.println(chessGameUser2.toString());
             //send result to user2-user1
-            messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/roomJoined", chessGameUser2);
-            messagingTemplate.convertAndSendToUser(waitingRoom.getTempPort(), "/queue/roomJoined", chessGameUser1);
+            messagingTemplate.convertAndSendToUser(message.getIdUserJoin(), "/queue/roomJoined", chessGameUser2);
+            messagingTemplate.convertAndSendToUser(waitingRoom.getUserCreateId(), "/queue/roomJoined", chessGameUser1);
         } else {
             LoginReponse loginReponse = new LoginReponse();
             loginReponse.setUserID(message.getIdUserJoin());
             loginReponse.setMessage("Mã phòng không hợp lệ! ");
-            messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/roomJoined", loginReponse);
+            messagingTemplate.convertAndSendToUser(message.getIdUserJoin(), "/queue/roomJoined", loginReponse);
         }
     }
     public boolean generateRandomBoolean() {

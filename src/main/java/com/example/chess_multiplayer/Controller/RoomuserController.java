@@ -44,9 +44,9 @@ public class RoomuserController {
             chessGameUserReceive.setColor(!message.getColor());
             chessGameUserReceive.setUserSendTempPort(message.getUserReceiveTempPort());
             chessGameUserReceive.setUserReceiveTempPort(message.getUserSendTempPort());
-            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/chessMove",chessGameUserReceive );
+            messagingTemplate.convertAndSendToUser(message.getiDUserReceive(), "/queue/chessMove",chessGameUserReceive );
         }else{
-            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/chessMove", null);
+            messagingTemplate.convertAndSendToUser(message.getiDUserReceive(), "/queue/chessMove", null);
         }
     }
     @MessageMapping("/endGame")

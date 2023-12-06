@@ -4,9 +4,12 @@ import com.example.chess_multiplayer.DTO.LoginRequest;
 import com.example.chess_multiplayer.DTO.LoginReponse;
 import com.example.chess_multiplayer.Service.AccountService;
 import com.example.chess_multiplayer.Service.UserService;
+import com.example.chess_multiplayer.config.PricipalCustome;
+import com.example.chess_multiplayer.config.UserInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
@@ -23,10 +26,9 @@ public class LoginController {
     private UserController userController;
     @Autowired
     private UserService userService;
-//    private Map<String, String> sessionId = new HashMap<>();
     @MessageMapping("/login")
-//    @SendTo("/queue/loginStatus")
-    public void login(LoginRequest message) {
+    @SendToUser("/queue/loginStatus")
+    public LoginReponse login(LoginRequest message, Principal principal) {
         String username = message.getUsername();
         String password = message.getPassword();
         System.out.println(username + password);
@@ -41,17 +43,22 @@ public class LoginController {
                 loginReponse.setAva(userService.getUserById(UserId).getAva());
                 loginReponse.setMessage("Đăng nhập thành công");
                 System.out.println(message.getTempPort());
-                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/loginStatus", loginReponse);
+                UserInterceptor.updatePrincipal(principal.getName(),new PricipalCustome(UserId));
+                UserInterceptor.printUserMap();
+                return loginReponse;
+//                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/loginStatus", loginReponse);
             } else {
                 // Gửi thông báo thất bại qua WebSocket
                 loginReponse.setUserID(null);
                 loginReponse.setMessage("Tài khoản hoặc mật khẩu không chính xác");
-                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/loginStatus", loginReponse);
+                return loginReponse;
+//                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/loginStatus", loginReponse);
             }
         } catch (Exception ex) {
                 loginReponse.setUserID(null);
                 loginReponse.setMessage("Đăng nhập thất bại: " + ex.getMessage());
-                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/loginStatus", loginReponse);
+            return loginReponse;
+//                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/loginStatus", loginReponse);
         }
     }
 

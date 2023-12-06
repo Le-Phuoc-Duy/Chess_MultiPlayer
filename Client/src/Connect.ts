@@ -8,19 +8,25 @@ import { ChatContentFrom } from './PlayModule/Chat';
 import Swal from 'sweetalert2'; 
 import { removeGame, setEndGame } from './PlayModule/ExtendOpt';
 import { profileRender, standingRender } from './AccountModule/Profile';
-
+// let session = localStorage.getItem('userID');
+// if (!session) {
+//     session = 'guest-' + Date.now(); // Generate a unique ID for guest users
+//     localStorage.setItem('session', session);
+// }
+// localStorage.setItem('userID', '');
+export var currentGame: Game = new Game(Color.NOT, new Board, true, 0);
 const socket = new SockJS('http://' + window.location.hostname + ':8888/ws');
-export const stompClient = new Client({
+export var stompClient = new Client({ 
     webSocketFactory: () => socket,
     connectHeaders: {
-        tempPort: window.location.port,
+        // tempPort: window.location.port,
+        tempPort: localStorage.getItem('userID')!
     },
     debug: (msg) => console.log(msg),
     reconnectDelay: 1000,
     heartbeatIncoming: 1000,
     heartbeatOutgoing: 1000,
-});
-
+});  
 socket.onerror = (error) => {
     console.error('WebSocket error:', error);
     // Thực hiện các xử lý khác tùy ý khi kết nối thất bại
@@ -34,7 +40,6 @@ stompClient.onConnect = (frame) => {
     console.log("onconnect")
     stompClient.subscribe('/user/queue/chessMove', (message) => {
         const body = JSON.parse(message.body);
-        console.log('iDUserSend: ' + body.iDUserSend + '\niDUserReceive: ' + body.iDUserReceive + '\niDRoom: ' + body.iDRoom + '\nidRoomUser: ' + body.idRoomUser + '\nchessMove: ' + body.chessMove + '\nboard: ' + body.board + '\ncolor: ' + body.color)
 
         localStorage.setItem('iDUserSend', body.iDUserSend);
         localStorage.setItem('iDUserReceive', body.iDUserReceive);
@@ -45,7 +50,18 @@ stompClient.onConnect = (frame) => {
         localStorage.setItem('color', body.color.toString()); // Chuyển đổi boolean thành string khi lưu
         localStorage.setItem('userSendTempPort', body.userSendTempPort);
         localStorage.setItem('userReceiveTempPort', body.userReceiveTempPort);
-
+        localStorage.setItem('userSendName', body.userSendName);
+        localStorage.setItem('userSendAva', body.userSendAva);
+        //Trường hợp đăng nhập 1 acc trên 2 máy
+        if(currentGame.playerSide === Color.NOT){
+            var tmpColor: Color 
+            tmpColor = localStorage.getItem('color') === "true" ? Color.WHITE : Color.BLACK;
+            var tmpGame: Game = new Game(tmpColor,new Board,true,GameStatus.WIN)
+            console.log(1)
+            setCurrentGame(tmpGame)
+            console.log("provl: "+ currentGame.playerSide )
+            PromotionOverlay(currentGame.playerSide)
+        }
         currentGame.setFullCoordinates(body.board)
         currentGame.currentTurn = true
         if (currentGame.currentTurn) {
@@ -155,13 +171,13 @@ stompClient.onStompError = (frame) => {
         console.error('An error occurred. Please check your connection settings.');
     }
 
-}; 
+};
 var selected: Boolean = false
 var startX: number = -1
 var endX: number = -1
 var startY: number = -1
 var endY: number = -1
-export var currentGame: Game = new Game(Color.NOT, new Board, true, 0);
+
 export function setCurrentGame(game: Game) {
     currentGame = game
 }
@@ -187,13 +203,11 @@ document.querySelectorAll(".square").forEach((divPiece) => {
     divPiece.addEventListener("click", () => ClickPiece(Number(r), Number(c), currentGame));
 });
 //Chi ap dung cho self, khong ap dung cho opponent
-function ClickPiece(r: number, c: number, game: Game) {
-    let selectedSquare = document.getElementById(`${r}${c}`);
+function ClickPiece(r: number, c: number, game: Game) { 
     removeAllSeleted()
-    selectedSquare?.classList.add("selected-square");
+    document.getElementById(`${r}${c}`)?.classList.add("selected-square");
     if (selected) {
         console.log("secleted")
-        // document.getElementById(r.toString() + c.toString)?.classList.add("select-board-color")
         if (game.playerMove(startX, startY, r, c)) {
             console.log("canmove" + startX + startY + r + c)
             drawBoard(game.board)
@@ -204,7 +218,6 @@ function ClickPiece(r: number, c: number, game: Game) {
             let idRoomUser: string | null = localStorage.getItem('idRoomUser');
             let chessMove: string | null = localStorage.getItem('chessMove');
             let board: string | null = game.getFullCoordinates();
-            //let color: string | null = localStorage.getItem('color'); // Lấy dưới dạng chuỗi
             let userSendTempPort: string | null = localStorage.getItem('userSendTempPort');
             let userReceiveTempPort: string | null = localStorage.getItem('userReceiveTempPort');
             let color: boolean;
@@ -250,21 +263,29 @@ function removeAllSeleted(){
 
 
 let buttons = document.querySelectorAll('.btnMode');
+export var gameMode: number = -1
 buttons.forEach((button) => {
     button.addEventListener('click', function () {
+        // console.log("cc" + document.getElementById('gameMode')!.textContent!.trim()) 
         if (button.id === 'mode5') {
             let minute = (document.getElementById('minute') as HTMLInputElement).value;
-            let second = (document.getElementById('second') as HTMLInputElement).value;
-            let x = minute + ":" + second;
-            document.getElementById('gameMode')!.innerHTML = x;
+            let second = (document.getElementById('second') as HTMLInputElement).value; 
+            let m: number = parseInt(minute);
+            let s: number = parseInt(second);
+            let x: number = m*60 + s
+            gameMode = x;
+
+            document.getElementById('gameMode')!.innerHTML = minute + ":" + second;
         } else {
+            gameMode = parseInt("-" +(button.id.toString()).charAt(4))
             document.getElementById('gameMode')!.innerHTML = button.innerHTML;
         }
     });
-});
+}); 
 // Lưu trạng thái của currentGame vào localStorage trước khi reload
-window.addEventListener('beforeunload', () => {
-    if(localStorage.getItem('userID') != null){
+window.addEventListener('beforeunload', () => { 
+    //Thêm !== Color.NOT để trừ trường hợp login nhưng chưa đánh
+    if(localStorage.getItem('userID') != null && currentGame.playerSide !== Color.NOT){
         localStorage.setItem('savedGame', JSON.stringify(currentGame));
     }
 });
@@ -298,20 +319,21 @@ window.addEventListener('load', () => {
     checkIsloggedIn();
     if (localStorage.getItem('userID') == null) {
         PromotionOverlay(currentGame.playerSide);
-    } else {
+    } 
+    if (localStorage.getItem('userID') != null && localStorage.getItem('savedGame') ) {
         setCurrentGameAferLoad()
-            .then((result) => {
-                console.log("currentGame.playerSide: " + currentGame.playerSide);
+            .then((result) => { 
                 var reDrawGame: Game = new Game(currentGame.playerSide, new Board, currentGame.currentTurn, currentGame.status);
                 reDrawGame.setFullCoordinates(localStorage.getItem('board')!);
                 setCurrentGame(reDrawGame)
-                drawBoard(reDrawGame.board);
+                drawBoard(reDrawGame.board); 
                 PromotionOverlay(currentGame.playerSide);
             })
             .catch((error) => {
             });
     }
 });
+//Lấy dữ liệu game từ localStorage lưu vào currentgame
 function setCurrentGameAferLoad(): Promise<string> {
     return new Promise((resolve) => {
         const storedGame = localStorage.getItem('savedGame');
