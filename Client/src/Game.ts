@@ -19,11 +19,6 @@ export class Game {
 	}
 	public set currentTurn(value: boolean) {
 		this._currentTurn = value;
-		if(this._currentTurn){
-			localStorage.setItem('currentTurn','true');
-			}else{
-				localStorage.setItem('currentTurn','false');
-			}
 	}
 	public get playerSide(): Color {
 		return this._playerSide;

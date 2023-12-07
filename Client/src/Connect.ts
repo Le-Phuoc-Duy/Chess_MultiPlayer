@@ -5,23 +5,23 @@ import { Board } from './Board';
 import { RoomJoinedResponse } from './RoomJoinedResponse';
 import { sendChessMove } from './PlayModule/PlayWithFriend';
 import { ChatContentFrom } from './PlayModule/Chat';
-import Swal from 'sweetalert2'; 
+import Swal from 'sweetalert2';
 import { removeGame, setEndGame } from './PlayModule/ExtendOpt';
 import { listFriendRender, profileRender, sendInvatationFriend, standingRender } from './AccountModule/Profile';
 
 export var currentGame: Game = new Game(Color.NOT, new Board, true, 0);
 const socket = new SockJS('http://' + window.location.hostname + ':8888/ws');
-export var stompClient = new Client({ 
+export const stompClient = new Client({
     webSocketFactory: () => socket,
     connectHeaders: {
-        // tempPort: window.location.port,
-        tempPort: localStorage.getItem('userID')!
+        tempPort: window.location.port,
     },
     debug: (msg) => console.log(msg),
     reconnectDelay: 1000,
     heartbeatIncoming: 1000,
     heartbeatOutgoing: 1000,
-});  
+});
+
 socket.onerror = (error) => {
     console.error('WebSocket error:', error);
     // Thực hiện các xử lý khác tùy ý khi kết nối thất bại
@@ -35,6 +35,7 @@ stompClient.onConnect = (frame) => {
     console.log("onconnect")
     stompClient.subscribe('/user/queue/chessMove', (message) => {
         const body = JSON.parse(message.body);
+        console.log('iDUserSend: ' + body.iDUserSend + '\niDUserReceive: ' + body.iDUserReceive + '\niDRoom: ' + body.iDRoom + '\nidRoomUser: ' + body.idRoomUser + '\nchessMove: ' + body.chessMove + '\nboard: ' + body.board + '\ncolor: ' + body.color)
 
         localStorage.setItem('iDUserSend', body.iDUserSend);
         localStorage.setItem('iDUserReceive', body.iDUserReceive);
@@ -45,11 +46,13 @@ stompClient.onConnect = (frame) => {
         localStorage.setItem('color', body.color.toString()); // Chuyển đổi boolean thành string khi lưu
         localStorage.setItem('userSendTempPort', body.userSendTempPort);
         localStorage.setItem('userReceiveTempPort', body.userReceiveTempPort);
+        localStorage.setItem('userCountdownValue', body.userCountdownValue);
+        localStorage.setItem('oppCountdownValue', body.oppCountdownValue);
         localStorage.setItem('userSendName', body.userSendName);
         localStorage.setItem('userSendAva', body.userSendAva);
         //Trường hợp đăng nhập 1 acc trên 2 máy
         if(currentGame.playerSide === Color.NOT){
-            var tmpColor: Color 
+            var tmpColor: Color
             tmpColor = localStorage.getItem('color') === "true" ? Color.WHITE : Color.BLACK;
             var tmpGame: Game = new Game(tmpColor,new Board,true,GameStatus.WIN)
             console.log(1)
@@ -66,6 +69,47 @@ stompClient.onConnect = (frame) => {
         }
         drawBoard(currentGame.board);
         currentGame.checkGameStatus()
+        // setTimer(body.userCountdownValue,body.oppCountdownValue,false,true)
+        initializeClockSelf(body.userCountdownValue);
+        initializeClockOpp(body.oppCountdownValue);
+    });
+    stompClient.subscribe('/user/queue/chessMoveSuccess', (message) => {
+        const body = JSON.parse(message.body);
+        localStorage.setItem('userCountdownValue', body.userCountdownValue);
+        localStorage.setItem('oppCountdownValue', body.oppCountdownValue);
+        // setTimer(body.userCountdownValue,body.oppCountdownValue,true,false)
+        initializeClockSelf(body.userCountdownValue);
+        initializeClockOpp(body.oppCountdownValue);
+    });
+    stompClient.subscribe('/user/queue/countdown', (message) => {
+        const body = JSON.parse(message.body);
+        if(body.userSendTempPort === localStorage.getItem("userSendTempPort")){
+            localStorage.setItem('usercountdownValue', body.countdownValue);
+            initializeClockSelf(body.countdownValue);
+        }else if(body.userReceiveTempPort === localStorage.getItem("userSendTempPort")){
+            localStorage.setItem('oppcountdownValue', body.countdownValue);
+            initializeClockOpp(body.countdownValue);
+        }
+        console.log("body.countdownValue: " + body.countdownValue);
+        console.log("body.userSendTempPort: " + body.userSendTempPort);
+        console.log("body.userReceiveTempPort: " + body.userReceiveTempPort);
+        // setTimer(body.userCountdownValue,body.oppCountdownValue,true,false)
+
+    });
+    stompClient.subscribe('/user/queue/timeout', (message) => {
+        const body = JSON.parse(message.body);
+        if(body.notify == "Time out"){
+            Swal.fire("Hết thời gian! Bạn đã thua")
+              .then(()=>{
+                  removeGame()
+              })
+        }else{
+            Swal.fire("Đối thủ hết giờ! Bạn đã thắng")
+              .then(()=>{
+                  removeGame()
+              })
+        }
+
     });
     stompClient.subscribe('/topic/publicChat', (message) => {
         const body = JSON.parse(message.body);
@@ -84,10 +128,10 @@ stompClient.onConnect = (frame) => {
                 Swal.fire({
                     title: "Đối thủ gửi lời mời kết bạn",
                     showDenyButton: true,
-                    showConfirmButton: true, 
+                    showConfirmButton: true,
                     confirmButtonText: "Chấp nhận",
                     denyButtonText: "Từ chối"
-                  }).then((result) => { 
+                  }).then((result) => {
                     if (result.isConfirmed) {
                         sendInvatationFriend("FRIEND_ACCEPT")
                     } else if (result.isDenied) {
@@ -132,12 +176,12 @@ stompClient.onConnect = (frame) => {
             case "FRIEND_ALREADY":
                 Swal.fire({
                     icon: 'error',
-                    title: "Đã là bạn bè", 
-                    showCloseButton: true, 
-                    }).then((result) => {  
+                    title: "Đã là bạn bè",
+                    showCloseButton: true,
+                    }).then((result) => {
                     });
                 break
-            
+
         }
     });
     stompClient.subscribe('/user/queue/endGame', (message) => {
@@ -147,43 +191,43 @@ stompClient.onConnect = (frame) => {
         switch(body.result){
             case "DRAW":
                 Swal.fire("Cờ hòa! Trận đấu kết thúc")
-                .then(()=>{
-                    removeGame()
-                })
+                  .then(()=>{
+                      removeGame()
+                  })
                 break;
             case "WIN":
                 Swal.fire("Bạn đã chiến thắng")
-                .then(()=>{
-                    removeGame()
-                })
+                  .then(()=>{
+                      removeGame()
+                  })
                 break;
             case "LOSE":
                 Swal.fire("Bạn đã thua")
-                .then(()=>{
-                    removeGame()
-                })
+                  .then(()=>{
+                      removeGame()
+                  })
                 break;
-            case "DRAW_REQUEST": 
+            case "DRAW_REQUEST":
                 Swal.fire({
                     title: "Đối thủ cầu hòa! Bạn có chấp nhận",
                     showDenyButton: true,
-                    showConfirmButton: true, 
+                    showConfirmButton: true,
                     confirmButtonText: "Chấp nhận",
                     denyButtonText: "Từ chối"
-                  }).then((result) => { 
+                  }).then((result) => {
                     if (result.isConfirmed) {
                       setEndGame(GameStatus.DRAW_ACCEPT);
                     } else if (result.isDenied) {
                       setEndGame(GameStatus.DRAW_DENY);
                     }
                   });
-                
+
                 break;
             case "DRAW_ACCEPT":
                 Swal.fire("Đối thủ chấp nhận hòa! Trận đấu kết thúc")
-                .then(()=>{
-                    removeGame()
-                })
+                  .then(()=>{
+                      removeGame()
+                  })
                 break;
             case "DRAW_DENY":
                 Swal.fire("Đối thủ từ chối cầu hòa! Trận đấu tiếp tục")
@@ -191,30 +235,30 @@ stompClient.onConnect = (frame) => {
                 break;
             case "QUIT":
                 Swal.fire("Đối thủ thoát trận! Bạn đã chiến thắng")
-                .then(()=>{
-                    removeGame()
-                })
+                  .then(()=>{
+                      removeGame()
+                  })
                 break;
             case "SURRENDER":
-                    Swal.fire("Đối thủ đầu hàng! Bạn đã chiến thắng")
-                    .then(()=>{
-                        removeGame()
-                    })
-                    break;
+                Swal.fire("Đối thủ đầu hàng! Bạn đã chiến thắng")
+                  .then(()=>{
+                      removeGame()
+                  })
+                break;
         }
     });
     stompClient.subscribe('/user/queue/profile', (message) => {
-        const body = JSON.parse(message.body); 
+        const body = JSON.parse(message.body);
         console.log("profile " + body.rank)
         profileRender(body.rank,body.elo, body.numberOfWon,body.numberOfDrawn,body.numberOfLost, body.numberOfStanding)
     });
     stompClient.subscribe('/user/queue/standing', (message) => {
-        const body = JSON.parse(message.body); 
-        standingRender(body)  
+        const body = JSON.parse(message.body);
+        standingRender(body)
     });
     stompClient.subscribe('/user/queue/myFriend', (message) => {
         const body = JSON.parse(message.body);
-        listFriendRender(body)  
+        listFriendRender(body)
     });
 };
 // Kết nối tới server
@@ -267,7 +311,7 @@ document.querySelectorAll(".square").forEach((divPiece) => {
     divPiece.addEventListener("click", () => ClickPiece(Number(r), Number(c), currentGame));
 });
 //Chi ap dung cho self, khong ap dung cho opponent
-function ClickPiece(r: number, c: number, game: Game) { 
+function ClickPiece(r: number, c: number, game: Game) {
     removeAllSeleted()
     document.getElementById(`${r}${c}`)?.classList.add("selected-square");
     if (selected) {
@@ -292,15 +336,17 @@ function ClickPiece(r: number, c: number, game: Game) {
                 color = false;
             }
             let CreateChessMove: RoomJoinedResponse = new RoomJoinedResponse(
-                iDUserSend ?? '', // Sử dụng ?? để kiểm tra null hoặc undefined và gán giá trị mặc định nếu không tồn tại
-                iDUserReceive ?? '',
-                iDRoom ?? '',
-                idRoomUser ?? '',
-                chessMove ?? '',
-                board ?? '',
-                color ?? false, // Gán giá trị mặc định nếu không tồn tại hoặc không hợp lệ
-                userSendTempPort ?? '',
-                userReceiveTempPort ?? ''
+              iDUserSend ?? '', // Sử dụng ?? để kiểm tra null hoặc undefined và gán giá trị mặc định nếu không tồn tại
+              iDUserReceive ?? '',
+              iDRoom ?? '',
+              idRoomUser ?? '',
+              chessMove ?? '',
+              board ?? '',
+              color ?? false, // Gán giá trị mặc định nếu không tồn tại hoặc không hợp lệ
+              userSendTempPort ?? '',
+              userReceiveTempPort ?? '',
+              1,
+              1
             );
             sendChessMove(CreateChessMove);
         }else{
@@ -315,7 +361,7 @@ function ClickPiece(r: number, c: number, game: Game) {
         console.log("!secleted")
         selected = true
         startX = r //parseInt(coordinates.charAt(0))
-        startY = c //parseInt(coordinates.charAt(1)) 
+        startY = c //parseInt(coordinates.charAt(1))
     }
 }
 //Remove màu selected
@@ -327,34 +373,27 @@ function removeAllSeleted(){
 
 
 let buttons = document.querySelectorAll('.btnMode');
-export var gameMode: number = -1
 buttons.forEach((button) => {
     button.addEventListener('click', function () {
-        // console.log("cc" + document.getElementById('gameMode')!.textContent!.trim()) 
         if (button.id === 'mode5') {
             let minute = (document.getElementById('minute') as HTMLInputElement).value;
-            let second = (document.getElementById('second') as HTMLInputElement).value; 
-            let m: number = parseInt(minute);
-            let s: number = parseInt(second);
-            let x: number = m*60 + s
-            gameMode = x;
-
-            document.getElementById('gameMode')!.innerHTML = minute + ":" + second;
+            let second = (document.getElementById('second') as HTMLInputElement).value;
+            let x = minute + ":" + second;
+            document.getElementById('gameMode')!.innerHTML = x;
         } else {
-            gameMode = parseInt("-" +(button.id.toString()).charAt(4))
             document.getElementById('gameMode')!.innerHTML = button.innerHTML;
         }
     });
-}); 
+});
 // Lưu trạng thái của currentGame vào localStorage trước khi reload
-window.addEventListener('beforeunload', () => { 
+window.addEventListener('beforeunload', () => {
     //Thêm !== Color.NOT để trừ trường hợp đã login nhưng chưa đánh
     if(currentGame.playerSide !== Color.NOT){
         localStorage.setItem('savedGame', JSON.stringify(currentGame));
     }
     stompClient.publish({
-        destination: '/app/logout', 
-        headers: {},   
+        destination: '/app/logout',
+        headers: {},
     });
 });
 export function checkIsloggedIn() {
@@ -387,14 +426,14 @@ window.addEventListener('load', () => {
     checkIsloggedIn();
     if (localStorage.getItem('userID') == null) {
         PromotionOverlay(currentGame.playerSide);
-    } 
+    }
     if (localStorage.getItem('userID') != null && localStorage.getItem('savedGame') ) {
         setCurrentGameAferLoad()
-            .then((result) => { 
+            .then((result) => {
                 var reDrawGame: Game = new Game(currentGame.playerSide, new Board, currentGame.currentTurn, currentGame.status);
                 reDrawGame.setFullCoordinates(localStorage.getItem('board')!);
                 setCurrentGame(reDrawGame)
-                drawBoard(reDrawGame.board); 
+                drawBoard(reDrawGame.board);
                 PromotionOverlay(currentGame.playerSide);
             })
             .catch((error) => {
@@ -430,12 +469,12 @@ export function PromotionOverlay(color: Color) {
             element.style.display = 'block'
         });
         // ava
-        (document.getElementById('selfAva') as HTMLImageElement).src = './assets/ava0' + localStorage.getItem('ava') + '.png'; 
+        (document.getElementById('selfAva') as HTMLImageElement).src = './assets/ava0' + localStorage.getItem('ava') + '.png';
         (document.getElementById('opponentAva') as HTMLImageElement).src = './assets/ava0' + localStorage.getItem('userSendAva') + '.png'
         // name
         document.getElementById('selfName')!.innerHTML = localStorage.getItem('userName')!.toString()
         document.getElementById('opponentName')!.innerHTML = localStorage.getItem('userSendName')!.toString()
-        
+
         document.getElementById('afterGame')!.style.display = 'block';
         document.getElementById('beforeGame')!.style.display = 'none';
 
@@ -470,41 +509,26 @@ document.querySelectorAll('.imgPromotion').forEach((element) => {
 });
 
 
-
-// Time
-function getTimeRemaining(endtime: Date) {
-    var t = Date.parse(endtime.toString()) - Date.parse(new Date().toString());
-    var minutes = Math.floor(t / 1000 / 60);
-    var seconds = Math.floor(t / 1000 - minutes * 60);
+// // Time
+function getTimeRemaining(endtime: number) {
+    const minutes = Math.floor(endtime / 60);
+    const seconds = Math.floor(endtime % 60);
     return {
-        total: t,
+        total: endtime,
         minutes: minutes,
         seconds: seconds,
     };
 }
 
-function initializeClock(selfEndTime: Date, opponentEndTime: Date) {
-    // var clock = document.getElementById(id);
+export function initializeClockSelf(selfEndTime: number){
     var selfTime = document.getElementById('selfTime');
-    var opponentTime = document.getElementById('opponentTime');
-
-    function updateClock() {
-        var t1 = getTimeRemaining(selfEndTime);
-        var t2 = getTimeRemaining(opponentEndTime);
-
-        selfTime!.innerHTML =
-            ('0' + t1.minutes).slice(-2) + ' : ' + ('0' + t1.seconds).slice(-2);
-        opponentTime!.innerHTML =
-            ('0' + t2.minutes).slice(-2) + ' : ' + ('0' + t2.seconds).slice(-2);
-
-        if (t1.total <= 0 || t2.total <= 0) {
-            clearInterval(timeinterval);
-        }
-    }
-
-    updateClock();
-    var timeinterval = setInterval(updateClock, 1000);
+    var t1 = getTimeRemaining(selfEndTime);
+    selfTime!.innerHTML =
+      ('0' + t1.minutes).slice(-2) + ' : ' + ('0' + t1.seconds).slice(-2);
 }
-var time = new Date();
-var deadline = new Date(Date.parse(time.toString()) + 1 * 1 * 60 * 1000); // Thay đổi để chỉ hiển thị 15 phút
-initializeClock(deadline,deadline);
+export function initializeClockOpp(opponentEndTime: number){
+    var opponentTime = document.getElementById('opponentTime');
+    var t2 = getTimeRemaining(opponentEndTime);
+    opponentTime!.innerHTML =
+      ('0' + t2.minutes).slice(-2) + ' : ' + ('0' + t2.seconds).slice(-2);
+}

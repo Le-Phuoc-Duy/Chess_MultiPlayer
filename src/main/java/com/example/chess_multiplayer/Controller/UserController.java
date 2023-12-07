@@ -87,6 +87,29 @@ public class UserController {
             System.out.println("createRoomUser2" + idRoomUser2Created);
         }
         //set Chess Game
+        switch (user.getMode()){
+            case -1 -> {
+                chessGameUser1.setUserCountdownValue(120);
+                chessGameUser2.setUserCountdownValue(120);
+            }
+            case -2 -> {
+                chessGameUser1.setUserCountdownValue(180);
+                chessGameUser2.setUserCountdownValue(180);
+            }
+            case -3 -> {
+                chessGameUser1.setUserCountdownValue(360);
+                chessGameUser2.setUserCountdownValue(360);
+            }
+            case -4 -> {
+                chessGameUser1.setUserCountdownValue(600);
+                chessGameUser2.setUserCountdownValue(600);
+            }
+            default ->{
+                chessGameUser1.setUserCountdownValue(user.getMode());
+                chessGameUser2.setUserCountdownValue(user.getMode());
+            }
+        }
+
         chessGameUser1.setiDUserSend(user.getIdUserCreate());
         chessGameUser1.setiDUserReceive(message.getIdUserCreate());
         chessGameUser1.setiDRoom(idRoomCreated);
@@ -94,6 +117,8 @@ public class UserController {
         chessGameUser1.setChessMove(null);
         chessGameUser1.setUserSendTempPort(user.getUserCreateTempPort());
         chessGameUser1.setUserReceiveTempPort(message.getUserCreateTempPort());
+        chessGameUser1.setUserSendName(userService.getUsernameByUserID(user.getIdUserCreate()));
+        chessGameUser1.setUserSendAva(userService.getUserById(user.getIdUserCreate()).getAva());
 
         chessGameUser2.setiDUserSend(message.getIdUserCreate());
         chessGameUser2.setiDUserReceive(user.getIdUserCreate());
@@ -102,6 +127,9 @@ public class UserController {
         chessGameUser2.setChessMove(null);
         chessGameUser2.setUserSendTempPort(message.getUserCreateTempPort());
         chessGameUser2.setUserReceiveTempPort(user.getUserCreateTempPort());
+        chessGameUser2.setUserSendName(userService.getUsernameByUserID(message.getIdUserCreate()));
+        chessGameUser2.setUserSendAva(userService.getUserById(message.getIdUserCreate()).getAva());
+
         if(color){
             chessGameUser1.setColor(color);
             chessGameUser2.setColor(!color);
