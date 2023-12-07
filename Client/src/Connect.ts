@@ -35,31 +35,29 @@ stompClient.onConnect = (frame) => {
     console.log("onconnect")
     stompClient.subscribe('/user/queue/chessMove', (message) => {
         const body = JSON.parse(message.body);
-        console.log('iDUserSend: ' + body.iDUserSend + '\niDUserReceive: ' + body.iDUserReceive + '\niDRoom: ' + body.iDRoom + '\nidRoomUser: ' + body.idRoomUser + '\nchessMove: ' + body.chessMove + '\nboard: ' + body.board + '\ncolor: ' + body.color)
+        // console.log('iDUserSend: ' + body.iDUserSend + '\niDUserReceive: ' + body.iDUserReceive + '\niDRoom: ' + body.iDRoom + '\nidRoomUser: ' + body.idRoomUser + '\nchessMove: ' + body.chessMove + '\nboard: ' + body.board + '\ncolor: ' + body.color)
 
         localStorage.setItem('iDUserSend', body.iDUserSend);
-        localStorage.setItem('iDUserReceive', body.iDUserReceive);
         localStorage.setItem('iDRoom', body.iDRoom);
         localStorage.setItem('idRoomUser', body.idRoomUser);
         localStorage.setItem('chessMove', body.chessMove);
         localStorage.setItem('board', body.board);
-        localStorage.setItem('color', body.color.toString()); // Chuyển đổi boolean thành string khi lưu
-        localStorage.setItem('userSendTempPort', body.userSendTempPort);
-        localStorage.setItem('userReceiveTempPort', body.userReceiveTempPort);
+        localStorage.setItem('color', body.color.toString()); 
         localStorage.setItem('userCountdownValue', body.userCountdownValue);
         localStorage.setItem('oppCountdownValue', body.oppCountdownValue);
         localStorage.setItem('userSendName', body.userSendName);
         localStorage.setItem('userSendAva', body.userSendAva);
-        //Trường hợp đăng nhập 1 acc trên 2 máy
-        if(currentGame.playerSide === Color.NOT){
-            var tmpColor: Color
-            tmpColor = localStorage.getItem('color') === "true" ? Color.WHITE : Color.BLACK;
-            var tmpGame: Game = new Game(tmpColor,new Board,true,GameStatus.WIN)
-            console.log(1)
-            setCurrentGame(tmpGame)
-            console.log("provl: "+ currentGame.playerSide )
-            PromotionOverlay(currentGame.playerSide)
-        }
+        localStorage.setItem('userReceiveName', body.userReceiveName);
+        // //Trường hợp đăng nhập 1 acc trên 2 máy
+        // if(currentGame.playerSide === Color.NOT){
+        //     var tmpColor: Color
+        //     tmpColor = localStorage.getItem('color') === "true" ? Color.WHITE : Color.BLACK;
+        //     var tmpGame: Game = new Game(tmpColor,new Board,true,GameStatus.WIN)
+        //     console.log(1)
+        //     setCurrentGame(tmpGame)
+        //     console.log("provl: "+ currentGame.playerSide )
+        //     PromotionOverlay(currentGame.playerSide)
+        // }
         currentGame.setFullCoordinates(body.board)
         currentGame.currentTurn = true
         if (currentGame.currentTurn) {
@@ -75,24 +73,42 @@ stompClient.onConnect = (frame) => {
     });
     stompClient.subscribe('/user/queue/chessMoveSuccess', (message) => {
         const body = JSON.parse(message.body);
+        localStorage.setItem('iDUserSend', body.iDUserSend);
+        localStorage.setItem('iDRoom', body.iDRoom);
+        localStorage.setItem('idRoomUser', body.idRoomUser);
+        localStorage.setItem('chessMove', body.chessMove);
+        localStorage.setItem('board', body.board);
+        localStorage.setItem('color', body.color.toString()); 
         localStorage.setItem('userCountdownValue', body.userCountdownValue);
         localStorage.setItem('oppCountdownValue', body.oppCountdownValue);
+        localStorage.setItem('userSendName', body.userSendName);
+        localStorage.setItem('userSendAva', body.userSendAva);
+        localStorage.setItem('userReceiveName', body.userReceiveName);
+        currentGame.setFullCoordinates(body.board)
+        currentGame.currentTurn = false
+        if (currentGame.currentTurn) {
+            localStorage.setItem('currentTurn', 'true');
+        } else {
+            localStorage.setItem('currentTurn', 'false');
+        }
+        drawBoard(currentGame.board);
+        currentGame.checkGameStatus()
         // setTimer(body.userCountdownValue,body.oppCountdownValue,true,false)
         initializeClockSelf(body.userCountdownValue);
         initializeClockOpp(body.oppCountdownValue);
     });
     stompClient.subscribe('/user/queue/countdown', (message) => {
         const body = JSON.parse(message.body);
-        if(body.userSendTempPort === localStorage.getItem("userSendTempPort")){
-            localStorage.setItem('usercountdownValue', body.countdownValue);
+        if(body.side === true){
+            // localStorage.setItem('usercountdownValue', body.countdownValue);
             initializeClockSelf(body.countdownValue);
-        }else if(body.userReceiveTempPort === localStorage.getItem("userSendTempPort")){
-            localStorage.setItem('oppcountdownValue', body.countdownValue);
+        }else if(body.side === false){
+            // localStorage.setItem('oppcountdownValue', body.countdownValue);
             initializeClockOpp(body.countdownValue);
         }
         console.log("body.countdownValue: " + body.countdownValue);
-        console.log("body.userSendTempPort: " + body.userSendTempPort);
-        console.log("body.userReceiveTempPort: " + body.userReceiveTempPort);
+        console.log("body.idUser: " + body.idUser);
+        console.log("body.side: " + body.side);
         // setTimer(body.userCountdownValue,body.oppCountdownValue,true,false)
 
     });
@@ -113,11 +129,11 @@ stompClient.onConnect = (frame) => {
     });
     stompClient.subscribe('/topic/publicChat', (message) => {
         const body = JSON.parse(message.body);
-        ChatContentFrom(body.idDUserSend, body.userSendName, body.ava, body.chat, true);
+        ChatContentFrom(body.userSendName, body.ava, body.chat, true);
     });
     stompClient.subscribe('/user/queue/chatRoom', (message) => {
         const body = JSON.parse(message.body);
-        ChatContentFrom(body.idDUserSend, body.userSendName, body.userSendAva, body.chat, false);
+        ChatContentFrom(body.userReceiveName, body.userSendAva, body.chat, false);
     });
     stompClient.subscribe('/user/queue/addFriend', (message) => {
         // const body = JSON.parse(message.body);

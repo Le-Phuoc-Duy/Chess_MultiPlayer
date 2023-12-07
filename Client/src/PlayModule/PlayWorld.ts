@@ -118,24 +118,22 @@ function joinGame(): Promise<RoomJoinedResponse> {
     stompClient.publish({
       destination: '/app/joinGame',
       headers: {},
-      body: JSON.stringify({ idUserCreate: localStorage.getItem('userID'), mode: gameMode, userCreateTempPort: window.location.port }),
+      body: JSON.stringify({ idUserCreate: localStorage.getItem('userID'), mode: gameMode}),
     });
     console.log("subscibe");
     stompClient.subscribe('/user/queue/createGameRoom', (message) => {
       const body = JSON.parse(message.body);
       // console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
-      console.log('iDUserSend: ' + body.iDUserSend + '\niDUserReceive: ' + body.iDUserReceive + '\niDRoom: ' + body.iDRoom + '\nidRoomUser: ' + body.idRoomUser + '\nchessMove: ' + body.chessMove + '\nboard: ' + body.board + '\ncolor: ' + body.color + '\nuserSendTempPort: ' + body.userSendTempPort + +'\nuserReceiveTempPort: ' + body.userReceiveTempPort);
       localStorage.setItem('iDUserSend', body.iDUserSend);
-      localStorage.setItem('iDUserReceive', body.iDUserReceive);
       localStorage.setItem('iDRoom', body.iDRoom);
       localStorage.setItem('idRoomUser', body.idRoomUser);
       localStorage.setItem('chessMove', body.chessMove);
       localStorage.setItem('board', body.board);
-      localStorage.setItem('color', body.color.toString()); // Chuyển đổi boolean thành string khi lưu
-      localStorage.setItem('userSendTempPort', body.userSendTempPort);
-      localStorage.setItem('userReceiveTempPort', body.userReceiveTempPort);
+      localStorage.setItem('color', body.color.toString()); 
       localStorage.setItem('userSendName', body.userSendName);
       localStorage.setItem('userSendAva', body.userSendAva);
+      localStorage.setItem('userCountdownValue', body.userCountdownValue);
+      localStorage.setItem('userReceiveName', body.userReceiveName);
       resolve(body);
     });
   });
@@ -178,7 +176,7 @@ function cancelJoinGame(): Promise<String> {
     stompClient.publish({
       destination: '/app/cancelJoinGame',
       headers: {},
-      body: JSON.stringify({ idUserCreate: localStorage.getItem('userID'), mode: gameMode, userCreateTempPort: window.location.port }),
+      body: JSON.stringify({ idUserCreate: localStorage.getItem('userID'), mode: gameMode}),
     });
 
     stompClient.subscribe('/user/queue/cancelJoinGame', (message) => {

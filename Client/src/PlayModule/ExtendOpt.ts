@@ -30,7 +30,7 @@ function sendEndGame(endGame: EndGame): Promise<string> {
         stompClient.publish({
             destination: '/app/endGame',
             headers: {},
-            body: JSON.stringify({ iDUserSend: endGame.iDUserSend, iDUserReceive: endGame.iDUserReceive, iDRoom: endGame.iDRoom, idRoomUser: endGame.idRoomUser, userSendTempPort: endGame.userSendTempPort, userReceiveTempPort: endGame.userReceiveTempPort, result: endGame.result }),
+            body: JSON.stringify({ iDUserSend: endGame.iDUserSend, userReceiveName: endGame.userReceiveName, iDRoom: endGame.iDRoom, idRoomUser: endGame.idRoomUser, result: endGame.result }),
         });
         resolve("Success");
     });
@@ -52,19 +52,15 @@ export function removeGame() {
 }
 export function setEndGame(gameStatus: GameStatus){
     let iDUserSend: string | null = localStorage.getItem('iDUserSend');
-    let iDUserReceive: string | null = localStorage.getItem('iDUserReceive');
+    let userReceiveName: string | null = localStorage.getItem('userReceiveName');
     let iDRoom: string | null = localStorage.getItem('iDRoom');
     let idRoomUser: string | null = localStorage.getItem('idRoomUser');
-    let userSendTempPort: string | null = localStorage.getItem('userSendTempPort');
-    let userReceiveTempPort: string | null = localStorage.getItem('userReceiveTempPort');
     let result: GameStatus | null = gameStatus
     let endGame: EndGame = new EndGame(
         iDUserSend ?? '', // Sử dụng ?? để kiểm tra null hoặc undefined và gán giá trị mặc định nếu không tồn tại
-        iDUserReceive ?? '',
+        userReceiveName ?? '',
         iDRoom ?? '',
         idRoomUser ?? '',
-        userSendTempPort ?? '',
-        userReceiveTempPort ?? '',
         result ?? ''
     );
     sendEndGame(endGame);

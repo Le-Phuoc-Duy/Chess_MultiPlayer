@@ -111,24 +111,20 @@ public class UserController {
         }
 
         chessGameUser1.setiDUserSend(user.getIdUserCreate());
-        chessGameUser1.setiDUserReceive(message.getIdUserCreate());
         chessGameUser1.setiDRoom(idRoomCreated);
         chessGameUser1.setIdRoomUser(idRoomUser1Created);
         chessGameUser1.setChessMove(null);
-        chessGameUser1.setUserSendTempPort(user.getUserCreateTempPort());
-        chessGameUser1.setUserReceiveTempPort(message.getUserCreateTempPort());
         chessGameUser1.setUserSendName(userService.getUsernameByUserID(user.getIdUserCreate()));
         chessGameUser1.setUserSendAva(userService.getUserById(user.getIdUserCreate()).getAva());
+        chessGameUser1.setUserReceiveName(userService.getUsernameByUserID(message.getIdUserCreate()));
 
         chessGameUser2.setiDUserSend(message.getIdUserCreate());
-        chessGameUser2.setiDUserReceive(user.getIdUserCreate());
         chessGameUser2.setiDRoom(idRoomCreated);
         chessGameUser2.setIdRoomUser(idRoomUser2Created);
         chessGameUser2.setChessMove(null);
-        chessGameUser2.setUserSendTempPort(message.getUserCreateTempPort());
-        chessGameUser2.setUserReceiveTempPort(user.getUserCreateTempPort());
         chessGameUser2.setUserSendName(userService.getUsernameByUserID(message.getIdUserCreate()));
         chessGameUser2.setUserSendAva(userService.getUserById(message.getIdUserCreate()).getAva());
+        chessGameUser2.setUserReceiveName(userService.getUsernameByUserID(user.getIdUserCreate()));
 
         if(color){
             chessGameUser1.setColor(color);
@@ -144,8 +140,8 @@ public class UserController {
         System.out.println(chessGameUser1.toString());
         System.out.println(chessGameUser2.toString());
         //send result to user2-user1
-        messagingTemplate.convertAndSendToUser(message.getUserCreateTempPort(), "/queue/createGameRoom", chessGameUser2);
-        messagingTemplate.convertAndSendToUser(user.getUserCreateTempPort(), "/queue/createGameRoom", chessGameUser1);
+        messagingTemplate.convertAndSendToUser(message.getIdUserCreate(), "/queue/createGameRoom", chessGameUser2);
+        messagingTemplate.convertAndSendToUser(user.getIdUserCreate(), "/queue/createGameRoom", chessGameUser1);
     }
 
     @MessageMapping("/cancelJoinGame")

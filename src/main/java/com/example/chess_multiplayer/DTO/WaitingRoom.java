@@ -4,7 +4,6 @@ public class WaitingRoom {
     private String waitingRoomId;
     private String userCreateId;
     private int mode;
-    private String tempPort;
 
     public String getUserCreateId() {
         return userCreateId;
@@ -31,11 +30,4 @@ public class WaitingRoom {
         this.waitingRoomId = waitingRoomId;
     }
 
-    public String getTempPort() {
-        return tempPort;
-    }
-
-    public void setTempPort(String tempPort) {
-        this.tempPort = tempPort;
-    }
 }

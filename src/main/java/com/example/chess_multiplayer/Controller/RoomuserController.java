@@ -29,12 +29,12 @@ public class RoomuserController implements CountdownTimerListener {
     private AccountService accountService;
     private final Set<CountdownTimer> countdownTimers = new HashSet<>();
     @Override
-    public void onTimerFinish(String userSendTempPort, String userReceiveTempPort, String idRoomUser, String idRoomUserReceive, String idRoom, String idUserSend, String idUserReceive) {
-        TimeOut timeOutUserSend = new TimeOut("Time out", userSendTempPort);
-        TimeOut timeOutUserReviece = new TimeOut("Opponent Time out", userReceiveTempPort);
-        messagingTemplate.convertAndSendToUser(timeOutUserSend.getUserTempPort(), "/queue/timeout", timeOutUserSend);
-        messagingTemplate.convertAndSendToUser(timeOutUserReviece.getUserTempPort(), "/queue/timeout", timeOutUserReviece);
-        checkAndRemoveFinishedTimersUserSendTempPort(userReceiveTempPort);
+    public void onTimerFinish(String idRoomUser, String idRoomUserReceive, String idRoom, String idUserSend, String idUserReceive) {
+        TimeOut timeOutUserSend = new TimeOut("Time out", idUserSend);
+        TimeOut timeOutUserReviece = new TimeOut("Opponent Time out", idUserReceive);
+        messagingTemplate.convertAndSendToUser(timeOutUserSend.getIdUser(), "/queue/timeout", timeOutUserSend);
+        messagingTemplate.convertAndSendToUser(timeOutUserReviece.getIdUser(), "/queue/timeout", timeOutUserReviece);
+        checkAndRemoveFinishedTimersUserSendId(idUserReceive);
 
         // Update user values
         userService.updateUserLoseAndElo(idUserSend); // Increment win by 1, and elo by 50
@@ -46,21 +46,22 @@ public class RoomuserController implements CountdownTimerListener {
         // Update room user values
         roomuserService.updateRoomUserResult(idRoomUser, Result.LOSE.toString());
         roomuserService.updateRoomUserResult(idRoomUserReceive, Result.WIN.toString());
-        System.out.println("Time out for user: " + userSendTempPort);
+        System.out.println("Time out for user: " + idUserSend);
     }
 
     @Override
-    public void countdown(String userSendTempPort, String userReceiveTempPort, int countdownValue) {
-        CountdownTimer countdownTimer = new CountdownTimer(countdownValue, userSendTempPort,userReceiveTempPort);
-        messagingTemplate.convertAndSendToUser(countdownTimer.getUserSendTempPort(), "/queue/countdown", countdownTimer);
-        messagingTemplate.convertAndSendToUser(countdownTimer.getUserReceiveTempPort(), "/queue/countdown", countdownTimer);
+    public void countdown(String idUserSend, String idUserReceive, int countdownValue) {
+        Countdown countdownUserSend = new Countdown(countdownValue,idUserSend,true);
+        Countdown countdownUserReceive = new Countdown(countdownValue, idUserReceive, false);
+        messagingTemplate.convertAndSendToUser(countdownUserSend.getIdUser(), "/queue/countdown", countdownUserSend);
+        messagingTemplate.convertAndSendToUser(countdownUserReceive.getIdUser(), "/queue/countdown", countdownUserReceive);
     }
 
-    public void checkAndRemoveFinishedTimersUserSendTempPort(String userSendTempPort) {
+    public void checkAndRemoveFinishedTimersUserSendId(String idUser) {
         Iterator<CountdownTimer> iterator = countdownTimers.iterator();
         while (iterator.hasNext()) {
             CountdownTimer timer = iterator.next();
-            if (timer.getUserSendTempPort().equals(userSendTempPort)) {
+            if (timer.getIdUserSend().equals(idUser)) {
                 timer.stopCountdown();
                 iterator.remove();
             }
@@ -91,8 +92,8 @@ public class RoomuserController implements CountdownTimerListener {
             }
         }
     }
-    public void createCountdownTimer(int countdownValue, String idRoomUser, boolean shouldDecreaseValue, String userSendTempPort, String userReceiveTempPort, String idRoomUserReceive, String idRoom, String idUserSend, String idUserReceive) {
-        CountdownTimer timer = new CountdownTimer(countdownValue, idRoomUser, this,shouldDecreaseValue, userSendTempPort, userReceiveTempPort, idRoomUserReceive, idRoom, idUserSend, idUserReceive);
+    public void createCountdownTimer(int countdownValue, String idRoomUser, boolean shouldDecreaseValue, String idRoomUserReceive, String idRoom, String idUserSend, String idUserReceive) {
+        CountdownTimer timer = new CountdownTimer(countdownValue, idRoomUser, this,shouldDecreaseValue, idRoomUserReceive, idRoom, idUserSend, idUserReceive);
         checkAndRemoveFinishedTimers();
         timer.startCountdown();
         countdownTimers.add(timer);
@@ -141,16 +142,14 @@ public class RoomuserController implements CountdownTimerListener {
         int mode = roomService.getRoomById(message.getiDRoom()).getMode();
         System.out.println("mode: "+ mode);
         ChessGame chessGameUserReceive = new ChessGame();
-        chessGameUserReceive.setiDUserSend(message.getiDUserReceive());
-        chessGameUserReceive.setiDUserReceive(message.getiDUserSend());
+        chessGameUserReceive.setiDUserSend(UserOppId);
         chessGameUserReceive.setiDRoom(message.getiDRoom());
-        if(getRoomuserIdByRoomIdAndUserId(message.getiDRoom(), message.getiDUserReceive())!=null){
-            chessGameUserReceive.setIdRoomUser(getRoomuserIdByRoomIdAndUserId(message.getiDRoom(), message.getiDUserReceive()));
+        if(getRoomuserIdByRoomIdAndUserId(message.getiDRoom(), UserOppId)!=null){
+            chessGameUserReceive.setIdRoomUser(getRoomuserIdByRoomIdAndUserId(message.getiDRoom(), UserOppId));
             chessGameUserReceive.setChessMove(message.getChessMove());
             chessGameUserReceive.setBoard(reverseString(message.getBoard()));
             chessGameUserReceive.setColor(!message.getColor());
-            chessGameUserReceive.setUserSendTempPort(message.getUserReceiveTempPort());
-            chessGameUserReceive.setUserReceiveTempPort(message.getUserSendTempPort());
+            chessGameUserReceive.setUserReceiveName(userService.getUsernameByUserID(UserId));
             if(containsCountdownTimerWithIdUser(message.getIdRoomUser()) && containsCountdownTimerWithIdUser(chessGameUserReceive.getIdRoomUser())){
                 switch (mode){
                     case -1 -> {
@@ -167,25 +166,24 @@ public class RoomuserController implements CountdownTimerListener {
             }else{
                 switch (mode){
                     case -1 -> {
-                        createCountdownTimer(120, message.getIdRoomUser(),false, message.getUserSendTempPort(), message.getUserReceiveTempPort(), chessGameUserReceive.getIdRoomUser(), message.getiDRoom(), message.getiDUserSend(), message.getiDUserReceive());
-                        createCountdownTimer(120, chessGameUserReceive.getIdRoomUser(),true, message.getUserReceiveTempPort(), message.getUserSendTempPort(),message.getIdRoomUser(), message.getiDRoom(), message.getiDUserReceive(),message.getiDUserSend());
+                        createCountdownTimer(120, message.getIdRoomUser(),false, chessGameUserReceive.getIdRoomUser(), message.getiDRoom(), UserId, UserOppId);
+                        createCountdownTimer(120, chessGameUserReceive.getIdRoomUser(),true, message.getIdRoomUser(), message.getiDRoom(), UserOppId, UserId);
                     }
                     case -2 -> {
-                        System.out.println("mode: "+ mode);
-                        createCountdownTimer(180, message.getIdRoomUser(),false, message.getUserSendTempPort(), message.getUserReceiveTempPort(), chessGameUserReceive.getIdRoomUser(), message.getiDRoom(), message.getiDUserSend(), message.getiDUserReceive());
-                        createCountdownTimer(180, chessGameUserReceive.getIdRoomUser(),true, message.getUserReceiveTempPort(), message.getUserSendTempPort(),message.getIdRoomUser(), message.getiDRoom(), message.getiDUserReceive(),message.getiDUserSend());
+                        createCountdownTimer(180, message.getIdRoomUser(),false, chessGameUserReceive.getIdRoomUser(), message.getiDRoom(), UserId, UserOppId);
+                        createCountdownTimer(180, chessGameUserReceive.getIdRoomUser(),true, message.getIdRoomUser(), message.getiDRoom(), UserOppId, UserId);
                     }
                     case -3 -> {
-                        createCountdownTimer(300, message.getIdRoomUser(),false, message.getUserSendTempPort(), message.getUserReceiveTempPort(), chessGameUserReceive.getIdRoomUser(), message.getiDRoom(), message.getiDUserSend(), message.getiDUserReceive());
-                        createCountdownTimer(300, chessGameUserReceive.getIdRoomUser(),true, message.getUserReceiveTempPort(), message.getUserSendTempPort(),message.getIdRoomUser(), message.getiDRoom(), message.getiDUserReceive(),message.getiDUserSend());
+                        createCountdownTimer(300, message.getIdRoomUser(),false, chessGameUserReceive.getIdRoomUser(), message.getiDRoom(), UserId, UserOppId);
+                        createCountdownTimer(300, chessGameUserReceive.getIdRoomUser(),true, message.getIdRoomUser(), message.getiDRoom(), UserOppId, UserId);
                     }
                     case -4 -> {
-                        createCountdownTimer(600, message.getIdRoomUser(),false, message.getUserSendTempPort(), message.getUserReceiveTempPort(), chessGameUserReceive.getIdRoomUser(), message.getiDRoom(), message.getiDUserSend(), message.getiDUserReceive());
-                        createCountdownTimer(600, chessGameUserReceive.getIdRoomUser(),true, message.getUserReceiveTempPort(), message.getUserSendTempPort(),message.getIdRoomUser(), message.getiDRoom(), message.getiDUserReceive(),message.getiDUserSend());
+                        createCountdownTimer(600, message.getIdRoomUser(),false, chessGameUserReceive.getIdRoomUser(), message.getiDRoom(), UserId, UserOppId);
+                        createCountdownTimer(600, chessGameUserReceive.getIdRoomUser(),true, message.getIdRoomUser(), message.getiDRoom(), UserOppId, UserId);
                     }
                     default ->{
-                        createCountdownTimer(mode, message.getIdRoomUser(),false, message.getUserSendTempPort(), message.getUserReceiveTempPort(), chessGameUserReceive.getIdRoomUser(), message.getiDRoom(), message.getiDUserSend(), message.getiDUserReceive());
-                        createCountdownTimer(mode, chessGameUserReceive.getIdRoomUser(),true, message.getUserReceiveTempPort(), message.getUserSendTempPort(),message.getIdRoomUser(), message.getiDRoom(), message.getiDUserReceive(),message.getiDUserSend());
+                        createCountdownTimer(mode, message.getIdRoomUser(),false, chessGameUserReceive.getIdRoomUser(), message.getiDRoom(), UserId, UserOppId);
+                        createCountdownTimer(mode, chessGameUserReceive.getIdRoomUser(),true, message.getIdRoomUser(), message.getiDRoom(), UserOppId, UserId);
                     }
                 }
             }
@@ -195,23 +193,23 @@ public class RoomuserController implements CountdownTimerListener {
             chessGameUserReceive.setUserCountdownValue(getCountdownTimerWithIdRoomUser(chessGameUserReceive.getIdRoomUser()));
             chessGameUserReceive.setOppCountdownValue(getCountdownTimerWithIdRoomUser(message.getIdRoomUser()));
 
-            messagingTemplate.convertAndSendToUser(UserId, "/queue/chessMoveSuccess",message );
+            messagingTemplate.convertAndSendToUser(UserId, "/queue/chessMoveSuccess",message);
             messagingTemplate.convertAndSendToUser(UserOppId, "/queue/chessMove",chessGameUserReceive );
         }else{
-            messagingTemplate.convertAndSendToUser(UserOppId, "/queue/chessMove", null);
+            messagingTemplate.convertAndSendToUser(UserId, "/queue/chessMove", null);
         }
     }
     @MessageMapping("/endGame")
     public void endGame(GameStatus message) {
         System.out.println("endGame");
+        String AccOppId = accountService.getAccID(message.getUserReceiveName());
+        String UserOppId = userService.getIdUserByIdAcc(AccOppId);
         GameStatus gameStatusUserReceive = new GameStatus();
-        gameStatusUserReceive.setiDUserSend(message.getiDUserReceive());
-        gameStatusUserReceive.setiDUserReceive(message.getiDUserSend());
+        gameStatusUserReceive.setiDUserSend(UserOppId);
         gameStatusUserReceive.setiDRoom(message.getiDRoom());
-        if(getRoomuserIdByRoomIdAndUserId(message.getiDRoom(), message.getiDUserReceive())!=null){
-            gameStatusUserReceive.setIdRoomUser(getRoomuserIdByRoomIdAndUserId(message.getiDRoom(), message.getiDUserReceive()));
-            gameStatusUserReceive.setUserSendTempPort(message.getUserReceiveTempPort());
-            gameStatusUserReceive.setUserReceiveTempPort(message.getUserSendTempPort());
+        gameStatusUserReceive.setUserReceiveName(userService.getUsernameByUserID(message.getiDUserSend()));
+        if(getRoomuserIdByRoomIdAndUserId(message.getiDRoom(), UserOppId)!=null){
+            gameStatusUserReceive.setIdRoomUser(getRoomuserIdByRoomIdAndUserId(message.getiDRoom(), UserOppId));
             switch (message.getResult()){
                 case WIN -> {
                     gameStatusUserReceive.setResult(Result.LOSE);
@@ -229,8 +227,8 @@ public class RoomuserController implements CountdownTimerListener {
 
                     checkAndRemoveFinishedTimersRoomUser(message.getIdRoomUser());
                     checkAndRemoveFinishedTimersRoomUser(gameStatusUserReceive.getIdRoomUser());
-                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
-                    messagingTemplate.convertAndSendToUser(message.getUserSendTempPort(), "/queue/endGame",message );
+                    messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(message.getiDUserSend(), "/queue/endGame",message );
                 }
                 case DRAW -> {
                     gameStatusUserReceive.setResult(Result.DRAW);
@@ -248,8 +246,8 @@ public class RoomuserController implements CountdownTimerListener {
                     checkAndRemoveFinishedTimersRoomUser(message.getIdRoomUser());
                     checkAndRemoveFinishedTimersRoomUser(gameStatusUserReceive.getIdRoomUser());
 
-                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
-                    messagingTemplate.convertAndSendToUser(message.getUserSendTempPort(), "/queue/endGame",message );
+                    messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(message.getiDUserSend(), "/queue/endGame",message );
                 }
                 case LOSE -> {
                     gameStatusUserReceive.setResult(Result.WIN);
@@ -267,13 +265,13 @@ public class RoomuserController implements CountdownTimerListener {
 
                     checkAndRemoveFinishedTimersRoomUser(message.getIdRoomUser());
                     checkAndRemoveFinishedTimersRoomUser(gameStatusUserReceive.getIdRoomUser());
-                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
-                    messagingTemplate.convertAndSendToUser(message.getUserSendTempPort(), "/queue/endGame",message );
+                    messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(message.getiDUserSend(), "/queue/endGame",message );
 
                 }
                 case DRAW_REQUEST -> {
                     gameStatusUserReceive.setResult(Result.DRAW_REQUEST);
-                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
                 }
                 case DRAW_ACCEPT -> {
                     message.setResult(Result.DRAW);
@@ -293,12 +291,12 @@ public class RoomuserController implements CountdownTimerListener {
                     checkAndRemoveFinishedTimersRoomUser(message.getIdRoomUser());
                     checkAndRemoveFinishedTimersRoomUser(gameStatusUserReceive.getIdRoomUser());
                     gameStatusUserReceive.setResult(Result.DRAW_ACCEPT);
-                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
-                    messagingTemplate.convertAndSendToUser(message.getUserSendTempPort(), "/queue/endGame",message );
+                    messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(message.getiDUserSend(), "/queue/endGame",message );
                 }
                 case DRAW_DENY -> {
                     gameStatusUserReceive.setResult(Result.DRAW_DENY);
-                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
                 }
                 case QUIT -> {
                     message.setResult(Result.LOSE);
@@ -318,7 +316,7 @@ public class RoomuserController implements CountdownTimerListener {
                     checkAndRemoveFinishedTimersRoomUser(message.getIdRoomUser());
                     checkAndRemoveFinishedTimersRoomUser(gameStatusUserReceive.getIdRoomUser());
                     gameStatusUserReceive.setResult(Result.QUIT);
-                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
                 }
                 case SURRENDER -> {
                     message.setResult(Result.LOSE);
@@ -338,15 +336,15 @@ public class RoomuserController implements CountdownTimerListener {
                     checkAndRemoveFinishedTimersRoomUser(message.getIdRoomUser());
                     checkAndRemoveFinishedTimersRoomUser(gameStatusUserReceive.getIdRoomUser());
                     gameStatusUserReceive.setResult(Result.SURRENDER);
-                    messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame",gameStatusUserReceive );
-                    messagingTemplate.convertAndSendToUser(message.getUserSendTempPort(), "/queue/endGame",message );
+                    messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
+                    messagingTemplate.convertAndSendToUser(message.getiDUserSend(), "/queue/endGame",message );
                 }
                 default -> {
                     gameStatusUserReceive.setResult(Result.ACTIVE);
                 }
             }
         }else{
-            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/endGame", null);
+            messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame", null);
         }
 
     }
@@ -354,19 +352,19 @@ public class RoomuserController implements CountdownTimerListener {
     public void chatRoom(ChatRoom message) {
         roomuserService.updateChatById(message.getIdRoomUser(),message.getChat());
         ChatRoom chatRoomUserReceive = new ChatRoom();
-        chatRoomUserReceive.setIdUserSend(message.getIdUserReceive());
-        chatRoomUserReceive.setUserSendName(userService.getUsernameByUserID(message.getIdUserSend()));
-        chatRoomUserReceive.setUserSendAva(userService.getUserById(message.getIdUserSend()).getAva());
-        chatRoomUserReceive.setIdUserReceive(message.getIdUserSend());
+        String AccOppId = accountService.getAccID(message.getUserReceiveName());
+        String UserOppId = userService.getIdUserByIdAcc(AccOppId);
+        chatRoomUserReceive.setIdUserSend(UserOppId);//ban than
+        chatRoomUserReceive.setUserSendName(userService.getUsernameByUserID(message.getIdUserSend()));//bi sai thanh doi thu
+        chatRoomUserReceive.setUserSendAva(userService.getUserById(message.getIdUserSend()).getAva());//bi sai thanh doi thu
         chatRoomUserReceive.setIdRoom(message.getIdRoom());
-        if(getRoomuserIdByRoomIdAndUserId(message.getIdRoom(), message.getIdUserReceive())!=null){
-            chatRoomUserReceive.setIdRoomUser(getRoomuserIdByRoomIdAndUserId(message.getIdRoom(), message.getIdUserReceive()));
+        chatRoomUserReceive.setUserReceiveName(userService.getUsernameByUserID(message.getIdUserSend()));//doi thu
+        if(getRoomuserIdByRoomIdAndUserId(message.getIdRoom(), UserOppId)!=null){
+            chatRoomUserReceive.setIdRoomUser(getRoomuserIdByRoomIdAndUserId(message.getIdRoom(), UserOppId));
             chatRoomUserReceive.setChat(message.getChat());
-            chatRoomUserReceive.setUserSendTempPort(message.getUserReceiveTempPort());
-            chatRoomUserReceive.setUserReceiveTempPort(message.getUserSendTempPort());
-            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/chatRoom",chatRoomUserReceive );
+            messagingTemplate.convertAndSendToUser(UserOppId, "/queue/chatRoom",chatRoomUserReceive );
         }else{
-            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/chatRoom", null);
+            messagingTemplate.convertAndSendToUser(UserOppId, "/queue/chatRoom", null);
         }
     }
     public String reverseString(String inputString) {

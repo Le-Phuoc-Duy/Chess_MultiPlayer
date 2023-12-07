@@ -41,10 +41,8 @@ public class RoomController {
         waitingRoom.setWaitingRoomId(waitingRoomId);
         waitingRoom.setUserCreateId(message.getUserCreateId());
         waitingRoom.setMode(message.getMode());
-        waitingRoom.setTempPort(message.getTempPort());
         // Lưu thông tin phòng vào danh sách chờ
         waitingRooms.add(waitingRoom);
-        System.out.println(waitingRoom.toString());
         return waitingRoom;
     }
 
@@ -116,24 +114,20 @@ public class RoomController {
                 }
             }
             chessGameUser1.setiDUserSend(waitingRoom.getUserCreateId());
-            chessGameUser1.setiDUserReceive(message.getIdUserJoin());
             chessGameUser1.setiDRoom(idRoomCreated);
             chessGameUser1.setIdRoomUser(idRoomUser1Created);
             chessGameUser1.setChessMove(null);
-            chessGameUser1.setUserSendTempPort(waitingRoom.getTempPort());
-            chessGameUser1.setUserReceiveTempPort(message.getTempPort());
             chessGameUser1.setUserSendName(userService.getUsernameByUserID(message.getIdUserJoin()));
             chessGameUser1.setUserSendAva(userService.getUserById(message.getIdUserJoin()).getAva());
+            chessGameUser1.setUserReceiveName(userService.getUsernameByUserID(waitingRoom.getUserCreateId()));
 
             chessGameUser2.setiDUserSend(message.getIdUserJoin());
-            chessGameUser2.setiDUserReceive(waitingRoom.getUserCreateId());
             chessGameUser2.setiDRoom(idRoomCreated);
             chessGameUser2.setIdRoomUser(idRoomUser2Created);
             chessGameUser2.setChessMove(null);
-            chessGameUser2.setUserSendTempPort(message.getTempPort());
-            chessGameUser2.setUserReceiveTempPort(waitingRoom.getTempPort());
             chessGameUser2.setUserSendName(userService.getUsernameByUserID(waitingRoom.getUserCreateId()));
             chessGameUser2.setUserSendAva(userService.getUserById(waitingRoom.getUserCreateId()).getAva());
+            chessGameUser2.setUserReceiveName(userService.getUsernameByUserID(message.getIdUserJoin()));
 
             if(color == true){
                 chessGameUser1.setColor(color);
@@ -146,13 +140,11 @@ public class RoomController {
                 chessGameUser2.setBoard("rnbqkbnrpppppppp////////////////////////////////PPPPPPPPRNBQKBNR");
                 chessGameUser1.setBoard("RNBKQBNRPPPPPPPP////////////////////////////////pppppppprnbkqbnr");
             }
-            System.out.println(chessGameUser1.toString());
-            System.out.println(chessGameUser2.toString());
             //send result to user2-user1
             UserInterceptor.updateStatusPrincipal(message.getIdUserJoin(),"INGAME");
             UserInterceptor.updateStatusPrincipal(waitingRoom.getUserCreateId(),"INGAME");
-            messagingTemplate.convertAndSendToUser(message.getIdUserJoin(), "/queue/roomJoined", chessGameUser2);
-            messagingTemplate.convertAndSendToUser(waitingRoom.getUserCreateId(), "/queue/roomJoined", chessGameUser1);
+            messagingTemplate.convertAndSendToUser(chessGameUser2.getiDUserSend(), "/queue/roomJoined", chessGameUser2);
+            messagingTemplate.convertAndSendToUser(chessGameUser1.getiDUserSend(), "/queue/roomJoined", chessGameUser1);
         } else {
             LoginReponse loginReponse = new LoginReponse();
             loginReponse.setUserID(message.getIdUserJoin());

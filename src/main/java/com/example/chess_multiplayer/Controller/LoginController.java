@@ -39,7 +39,7 @@ public class LoginController {
                 String UserId = userController.getIdUserByIDAcc(AccId);
                 // Gửi thông báo thành công qua WebSocket
                 loginReponse.setUserID(UserId);
-                loginReponse.setUserName(message.getUsername());
+                loginReponse.setUserName(username);
                 loginReponse.setAva(userService.getUserById(UserId).getAva());
                 loginReponse.setMessage("Đăng nhập thành công");
                 System.out.println(message.getTempPort());

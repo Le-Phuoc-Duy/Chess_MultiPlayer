@@ -4,14 +4,11 @@ public class ChessGame {
     private String iDUserSend;
     private String userSendName;
     private int userSendAva;
-    private String iDUserReceive;
     private String iDRoom;
     private String idRoomUser;
     private String chessMove;
     private String board;
     private Boolean color;
-    private String userSendTempPort;
-    private String userReceiveTempPort;
     private int userCountdownValue;
     private int oppCountdownValue;
     private String userReceiveName;
@@ -57,36 +54,12 @@ public class ChessGame {
     }
 
 
-    public String getiDUserReceive() {
-        return iDUserReceive;
-    }
-
-    public void setiDUserReceive(String iDUserReceive) {
-        this.iDUserReceive = iDUserReceive;
-    }
-
     public String getIdRoomUser() {
         return idRoomUser;
     }
 
     public void setIdRoomUser(String idRoomUser) {
         this.idRoomUser = idRoomUser;
-    }
-
-    public String getUserSendTempPort() {
-        return userSendTempPort;
-    }
-
-    public void setUserSendTempPort(String userSendTempPort) {
-        this.userSendTempPort = userSendTempPort;
-    }
-
-    public String getUserReceiveTempPort() {
-        return userReceiveTempPort;
-    }
-
-    public void setUserReceiveTempPort(String userReceiveTempPort) {
-        this.userReceiveTempPort = userReceiveTempPort;
     }
 
     public String getUserSendName() {

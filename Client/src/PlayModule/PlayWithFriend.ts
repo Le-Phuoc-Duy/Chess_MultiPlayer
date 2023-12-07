@@ -10,13 +10,13 @@ function createRoom(mode: number): Promise<string> {
         stompClient.publish({
             destination: '/app/createRoom',
             headers: {},
-            body: JSON.stringify({ userCreateId: localStorage.getItem('userID'), mode: mode, tempPort: window.location.port }),
+            body: JSON.stringify({ userCreateId: localStorage.getItem('userID'), mode: mode}),
         });
 
         stompClient.subscribe('/user/queue/roomCreated', (message) => {
             const body = JSON.parse(message.body);
             // console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
-            console.log('waitingRoomId: ' + body.waitingRoomId + '\nuserCreateId: ' + body.userCreateId + '\nsessionUserCreateId: ' + body.sessionUserCreateId + '\nmode: ' + body.mode);
+            console.log('waitingRoomId: ' + body.waitingRoomId + '\nuserCreateId: ' + body.userCreateId + '\nmode: ' + body.mode);
             resolve(body.waitingRoomId);
         });
 
@@ -27,19 +27,17 @@ function joinRoom(): Promise<RoomJoinedResponse> {
         stompClient.subscribe('/user/queue/roomJoined', (message) => {
             const body = JSON.parse(message.body);
             // console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
-            console.log('iDUserSend: ' + body.iDUserSend + '\niDUserReceive: ' + body.iDUserReceive + '\niDRoom: ' + body.iDRoom + '\nidRoomUser: ' + body.idRoomUser + '\nchessMove: ' + body.chessMove + '\nboard: ' + body.board + '\ncolor: ' + body.color + '\nuserSendTempPort: ' + body.userSendTempPort + +'\nuserReceiveTempPort: ' + body.userReceiveTempPort);
+            // console.log('iDUserSend: ' + body.iDUserSend + '\niDUserReceive: ' + body.iDUserReceive + '\niDRoom: ' + body.iDRoom + '\nidRoomUser: ' + body.idRoomUser + '\nchessMove: ' + body.chessMove + '\nboard: ' + body.board + '\ncolor: ' + body.color + '\nuserSendTempPort: ' + body.userSendTempPort + +'\nuserReceiveTempPort: ' + body.userReceiveTempPort);
             localStorage.setItem('iDUserSend', body.iDUserSend);
-            localStorage.setItem('iDUserReceive', body.iDUserReceive);
             localStorage.setItem('iDRoom', body.iDRoom);
             localStorage.setItem('idRoomUser', body.idRoomUser);
             localStorage.setItem('chessMove', body.chessMove);
             localStorage.setItem('board', body.board);
-            localStorage.setItem('color', body.color.toString()); // Chuyển đổi boolean thành string khi lưu
-            localStorage.setItem('userSendTempPort', body.userSendTempPort);
-            localStorage.setItem('userReceiveTempPort', body.userReceiveTempPort);
+            localStorage.setItem('color', body.color.toString()); 
             localStorage.setItem('userSendName', body.userSendName);
             localStorage.setItem('userSendAva', body.userSendAva);
             localStorage.setItem('userCountdownValue', body.userCountdownValue);
+            localStorage.setItem('userReceiveName', body.userReceiveName);
             resolve(body);
         });
     });
@@ -49,7 +47,7 @@ export function sendChessMove(CreateChessMove: RoomJoinedResponse): Promise<stri
         stompClient.publish({
             destination: '/app/chessMove',
             headers: {},
-            body: JSON.stringify({ userSendName: localStorage.getItem('userName'),iDUserSend: CreateChessMove.iDUserSend, iDUserReceive: CreateChessMove.iDUserReceive, iDRoom: CreateChessMove.iDRoom, idRoomUser: CreateChessMove.idRoomUser, chessMove: CreateChessMove.chessMove, board: CreateChessMove.board, color: CreateChessMove.color, userSendTempPort: CreateChessMove.userSendTempPort, userReceiveTempPort: CreateChessMove.userReceiveTempPort, userReceiveName: localStorage.getItem('userSendName')  }),
+            body: JSON.stringify({iDUserSend: CreateChessMove.iDUserSend, userSendName: localStorage.getItem('userName'), iDRoom: CreateChessMove.iDRoom, idRoomUser: CreateChessMove.idRoomUser, chessMove: CreateChessMove.chessMove, board: CreateChessMove.board, color: CreateChessMove.color, userReceiveName: localStorage.getItem('userReceiveName') }),
         });
         resolve("Success");
     });
@@ -92,7 +90,7 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
             if (formValues) {
                 stompClient.publish({
                     destination: '/app/joinRoom',
-                    body: JSON.stringify({ waitingRoomId: formValues[0], idUserJoin: localStorage.getItem('userID'), tempPort: window.location.port }),
+                    body: JSON.stringify({ waitingRoomId: formValues[0], idUserJoin: localStorage.getItem('userID')}),
                 })
                 joinRoom()
                   .then((result) => {
