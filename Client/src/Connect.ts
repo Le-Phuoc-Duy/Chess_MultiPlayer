@@ -7,13 +7,8 @@ import { sendChessMove } from './PlayModule/PlayWithFriend';
 import { ChatContentFrom } from './PlayModule/Chat';
 import Swal from 'sweetalert2'; 
 import { removeGame, setEndGame } from './PlayModule/ExtendOpt';
-import { profileRender, standingRender } from './AccountModule/Profile';
-// let session = localStorage.getItem('userID');
-// if (!session) {
-//     session = 'guest-' + Date.now(); // Generate a unique ID for guest users
-//     localStorage.setItem('session', session);
-// }
-// localStorage.setItem('userID', '');
+import { listFriendRender, profileRender, sendInvatationFriend, standingRender } from './AccountModule/Profile';
+
 export var currentGame: Game = new Game(Color.NOT, new Board, true, 0);
 const socket = new SockJS('http://' + window.location.hostname + ':8888/ws');
 export var stompClient = new Client({ 
@@ -79,6 +74,71 @@ stompClient.onConnect = (frame) => {
     stompClient.subscribe('/user/queue/chatRoom', (message) => {
         const body = JSON.parse(message.body);
         ChatContentFrom(body.idDUserSend, body.userSendName, body.userSendAva, body.chat, false);
+    });
+    stompClient.subscribe('/user/queue/addFriend', (message) => {
+        // const body = JSON.parse(message.body);
+        // console.log(body.result)
+        console.log("add fe" + message.body)
+        switch(message.body){
+            case "FRIEND_REQUEST":
+                Swal.fire({
+                    title: "Đối thủ gửi lời mời kết bạn",
+                    showDenyButton: true,
+                    showConfirmButton: true, 
+                    confirmButtonText: "Chấp nhận",
+                    denyButtonText: "Từ chối"
+                  }).then((result) => { 
+                    if (result.isConfirmed) {
+                        sendInvatationFriend("FRIEND_ACCEPT")
+                    } else if (result.isDenied) {
+                        sendInvatationFriend("FRIEND_DENY")
+                    }
+                  });
+                break
+            case "FRIEND_DENY":
+                let ToastDeny = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 5000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                ToastDeny.fire({
+                    icon: "error",
+                    title: "Đối thủ từ chối kết bạn"
+                })
+                break
+            case "FRIEND_ACCEPT":
+                let ToastAccept = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 5000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                ToastAccept.fire({
+                    icon: "success",
+                    title: "Đối thủ chấp nhận kết bạn"
+                })
+                break
+            case "FRIEND_ALREADY":
+                Swal.fire({
+                    icon: 'error',
+                    title: "Đã là bạn bè", 
+                    showCloseButton: true, 
+                    }).then((result) => {  
+                    });
+                break
+            
+        }
     });
     stompClient.subscribe('/user/queue/endGame', (message) => {
         const body = JSON.parse(message.body);
@@ -151,6 +211,10 @@ stompClient.onConnect = (frame) => {
     stompClient.subscribe('/user/queue/standing', (message) => {
         const body = JSON.parse(message.body); 
         standingRender(body)  
+    });
+    stompClient.subscribe('/user/queue/myFriend', (message) => {
+        const body = JSON.parse(message.body);
+        listFriendRender(body)  
     });
 };
 // Kết nối tới server
@@ -284,10 +348,14 @@ buttons.forEach((button) => {
 }); 
 // Lưu trạng thái của currentGame vào localStorage trước khi reload
 window.addEventListener('beforeunload', () => { 
-    //Thêm !== Color.NOT để trừ trường hợp login nhưng chưa đánh
-    if(localStorage.getItem('userID') != null && currentGame.playerSide !== Color.NOT){
+    //Thêm !== Color.NOT để trừ trường hợp đã login nhưng chưa đánh
+    if(currentGame.playerSide !== Color.NOT){
         localStorage.setItem('savedGame', JSON.stringify(currentGame));
     }
+    stompClient.publish({
+        destination: '/app/logout', 
+        headers: {},   
+    });
 });
 export function checkIsloggedIn() {
     const isLoggedIn = localStorage.getItem('userID');

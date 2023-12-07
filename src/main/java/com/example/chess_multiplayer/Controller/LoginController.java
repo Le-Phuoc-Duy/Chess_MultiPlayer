@@ -43,7 +43,7 @@ public class LoginController {
                 loginReponse.setAva(userService.getUserById(UserId).getAva());
                 loginReponse.setMessage("Đăng nhập thành công");
                 System.out.println(message.getTempPort());
-                UserInterceptor.updatePrincipal(principal.getName(),new PricipalCustome(UserId));
+                UserInterceptor.updatePrincipal(principal.getName(),new PricipalCustome(UserId,"ONLINE"));
                 UserInterceptor.printUserMap();
                 return loginReponse;
 //                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/loginStatus", loginReponse);

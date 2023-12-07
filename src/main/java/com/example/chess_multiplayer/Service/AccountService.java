@@ -46,7 +46,14 @@ public class AccountService {
         }
         return null;
     }
-
+    public String getAccID(String username){
+        Account account = accountRepository.findByUsername(username);
+        if (account == null) {
+            return null;
+        }else{
+            return account.getiDAcc();
+        }
+    }
     public boolean isUsernameExists(String username) {
         return accountRepository.existsByUsername(username);
     }

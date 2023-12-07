@@ -32,17 +32,22 @@
   </head>
 
   <body>
+    <button id="ccPrintPricipal">ccPrintPricipal</button>
     <div class="container-fluid"> 
       <div class="row">
         <!--Clock & ava  -->
         <div class="col-sm-7 col-md-7 col-lg-7 col-xl-1 mt-3">  
           <div class="clockdiv" style="display: none;" >
             <span class="time mb-2" id="opponentTime"></span>
-            <img class="mb-2" id="opponentAva" width="80%" alt>
-            <h6 id="opponentName"></h6>
+            <img class="mb-2" id="opponentAva" width="70%" alt>
+            <h6 id="opponentName"></h6>  
+            <div class="friend-icon">
+              <i class="fa-solid fa-user-plus" id="btnAddFriend"></i>
+              <span class="add-friend-text">Thêm bạn bè</span> 
+          </div> 
           </div>
           <div class="clockdiv position-sticky top-100" style="display: none;">
-            <img class="mb-2" id="selfAva" width="80%" alt>
+            <img class="mb-2" id="selfAva" width="70%" alt>
             <h6 id="selfName"></h6>
             <span class="time" id="selfTime"></span>
           </div> 
@@ -305,8 +310,7 @@
                   <tbody>  
                   </tbody>
                 </table> 
-                <ul class="pagination pagination-sm mt-3 mb-0 justify-content-end"> 
-                </ul> 
+                <ul id="paginationBXH" class="pagination pagination-sm mt-3 mb-0 justify-content-end"></ul> 
                 <table class="table" id="tableFriend" style="display: none;">
                   <thead>
                     <tr>

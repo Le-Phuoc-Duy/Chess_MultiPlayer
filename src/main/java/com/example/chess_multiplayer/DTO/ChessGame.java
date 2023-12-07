@@ -12,6 +12,7 @@ public class ChessGame {
     private Boolean color;
     private String userSendTempPort;
     private String userReceiveTempPort;
+    private String userReceiveName;
 
     public Boolean getColor() {
         return color;
@@ -100,5 +101,13 @@ public class ChessGame {
 
     public void setUserSendAva(int userSendAva) {
         this.userSendAva = userSendAva;
+    }
+
+    public String getUserReceiveName() {
+        return userReceiveName;
+    }
+
+    public void setUserReceiveName(String userReceiveName) {
+        this.userReceiveName = userReceiveName;
     }
 }

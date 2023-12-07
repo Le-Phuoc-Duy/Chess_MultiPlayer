@@ -98,3 +98,25 @@ input.avaInput[type="radio"]:checked + label {
   #chatModePrivate:checked + .form-check-label {
     border: none !important;
   }
+.friend-icon {
+    position: relative;
+    display: inline-block; 
+}
+
+.add-friend-text {
+    position: absolute;
+    top: 100%; 
+    left: 140%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-size: 0.7vw; 
+    white-space: nowrap;
+    background-color: white;
+    color: black; 
+    padding: 6%
+}
+
+.friend-icon:hover .add-friend-text {
+    opacity: 1;
+}

@@ -6,10 +6,8 @@ document.getElementById('profileButton')?.addEventListener('click', function(){
     document.getElementById('tableBXH')!.style.display = 'block'  
     document.getElementById('mainGame')!.style.display = 'none'
     stompClient.publish({
-        destination: '/app/profile',
-        // destination: '/app/standing',
-        headers: {}, 
-        // body: JSON.stringify({tempPort: window.location.port})
+        destination: '/app/profile', 
+        headers: {},  
         body: localStorage.getItem('userID')!.toString()
     });
 })
@@ -60,13 +58,20 @@ export function profileRender(rank: string,elo: string, numberOfWon: string, num
 document.getElementById('inpBXH')!.addEventListener('change', function (this: HTMLInputElement) {
     if (this.checked) {
         document.getElementById('tableBXH')!.style.display = 'block';
-        document.getElementById('tableFriend')!.style.display = 'none'; 
+        document.getElementById('paginationBXH')!.style.display = 'flex';
+        document.getElementById('tableFriend')!.style.display = 'none';  
     }
 });
 document.getElementById('inpFriend')!.addEventListener('change', function (this: HTMLInputElement) {
     if (this.checked) {
         document.getElementById('tableBXH')!.style.display = 'none';
+        document.getElementById('paginationBXH')!.style.display = 'none';
         document.getElementById('tableFriend')!.style.display = 'block'; 
+        stompClient.publish({
+            destination: '/app/myFriend', 
+            headers: {},  
+            body: localStorage.getItem('userID')!.toString()
+        });
     }
 });
 export function standingRender(content: any){
@@ -136,4 +141,24 @@ function createPagination(totalIndices: number) {
     }
 
     renderIndices();
+}
+//Friend 
+document.getElementById('btnAddFriend')!.addEventListener('click', () => {
+    sendInvatationFriend("FRIEND_REQUEST")
+});
+export function sendInvatationFriend(result: string){
+    stompClient.publish({
+        destination: '/app/addFriend',
+        headers: {},
+        body: JSON.stringify({ userInviteID: localStorage.getItem('iDUserSend'), 
+                                userInvitedID: localStorage.getItem('iDUserReceive'), result: result}),
+    });
+}
+export function listFriendRender(content: any){
+    content.forEach((standing: any, index: number) => { 
+        console.log("listFriendRender")
+        console.log(standing.name)
+        console.log(standing.elo)
+        console.log(standing.status) 
+    });
 }

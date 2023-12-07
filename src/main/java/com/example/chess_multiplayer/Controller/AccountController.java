@@ -11,6 +11,9 @@ public class AccountController {
     public String getAccId(String username, String password){
         return accountService.getAccID(username,password);
     }
+    public String getAccId(String username){
+        return accountService.getAccID(username);
+    }
     public boolean authenticate(String username, String password){
         return accountService.authenticate(username,password);
     }

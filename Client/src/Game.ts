@@ -70,7 +70,7 @@ export class Game {
 		startBox = this._board.getBox(startX, startY)
 		endBox = this._board.getBox(endX, endY)
 		let move = this.makeMove(startBox, endBox)
-		if (move) this._currentTurn = true
+		if (move) this._currentTurn = false
 		return move
 	}
 	private makeMove(startPoint: Point, endPoint: Point): boolean {

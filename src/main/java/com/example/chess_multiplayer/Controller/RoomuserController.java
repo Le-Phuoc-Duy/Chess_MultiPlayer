@@ -3,6 +3,7 @@ package com.example.chess_multiplayer.Controller;
 import com.example.chess_multiplayer.DTO.*;
 import com.example.chess_multiplayer.Entity.Roomuser;
 import com.example.chess_multiplayer.Enum.Result;
+import com.example.chess_multiplayer.Service.AccountService;
 import com.example.chess_multiplayer.Service.RoomService;
 import com.example.chess_multiplayer.Service.RoomuserService;
 import com.example.chess_multiplayer.Service.UserService;
@@ -24,6 +25,8 @@ public class RoomuserController {
     private RoomService roomService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private AccountService accountService;
     public String creatRoomuser(String idUser, String idRoom, int mode, boolean side){
         try{
             return roomuserService.createRoomuser(idUser,idRoom,mode,side);
@@ -33,6 +36,10 @@ public class RoomuserController {
     }
     @MessageMapping("/chessMove")
     public void chessMove(ChessGame message) {
+        String AccId = accountService.getAccID(message.getUserSendName());
+        String UserId = userService.getIdUserByIdAcc(AccId);
+        String AccOppId = accountService.getAccID(message.getUserReceiveName());
+        String UserOppId = userService.getIdUserByIdAcc(AccOppId);
         ChessGame chessGameUserReceive = new ChessGame();
         chessGameUserReceive.setiDUserSend(message.getiDUserReceive());
         chessGameUserReceive.setiDUserReceive(message.getiDUserSend());
@@ -44,9 +51,9 @@ public class RoomuserController {
             chessGameUserReceive.setColor(!message.getColor());
             chessGameUserReceive.setUserSendTempPort(message.getUserReceiveTempPort());
             chessGameUserReceive.setUserReceiveTempPort(message.getUserSendTempPort());
-            messagingTemplate.convertAndSendToUser(message.getiDUserReceive(), "/queue/chessMove",chessGameUserReceive );
+            messagingTemplate.convertAndSendToUser(UserOppId, "/queue/chessMove",chessGameUserReceive );
         }else{
-            messagingTemplate.convertAndSendToUser(message.getiDUserReceive(), "/queue/chessMove", null);
+            messagingTemplate.convertAndSendToUser(UserOppId, "/queue/chessMove", null);
         }
     }
     @MessageMapping("/endGame")

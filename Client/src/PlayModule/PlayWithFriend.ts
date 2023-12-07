@@ -48,7 +48,7 @@ export function sendChessMove(CreateChessMove: RoomJoinedResponse): Promise<stri
         stompClient.publish({
             destination: '/app/chessMove',
             headers: {},
-            body: JSON.stringify({ iDUserSend: CreateChessMove.iDUserSend, iDUserReceive: CreateChessMove.iDUserReceive, iDRoom: CreateChessMove.iDRoom, idRoomUser: CreateChessMove.idRoomUser, chessMove: CreateChessMove.chessMove, board: CreateChessMove.board, color: CreateChessMove.color, userSendTempPort: CreateChessMove.userSendTempPort, userReceiveTempPort: CreateChessMove.userReceiveTempPort }),
+            body: JSON.stringify({ userSendName: localStorage.getItem('userName'),iDUserSend: CreateChessMove.iDUserSend, iDUserReceive: CreateChessMove.iDUserReceive, iDRoom: CreateChessMove.iDRoom, idRoomUser: CreateChessMove.idRoomUser, chessMove: CreateChessMove.chessMove, board: CreateChessMove.board, color: CreateChessMove.color, userSendTempPort: CreateChessMove.userSendTempPort, userReceiveTempPort: CreateChessMove.userReceiveTempPort, userReceiveName: localStorage.getItem('userSendName')  }),
         });
         resolve("Success");
     });

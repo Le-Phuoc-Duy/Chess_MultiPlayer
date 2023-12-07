@@ -7,6 +7,7 @@ import com.example.chess_multiplayer.DTO.LoginReponse;
 import com.example.chess_multiplayer.Service.AccountService;
 import com.example.chess_multiplayer.Service.RoomService;
 import com.example.chess_multiplayer.Service.UserService;
+import com.example.chess_multiplayer.config.UserInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -125,6 +126,8 @@ public class RoomController {
             System.out.println(chessGameUser1.toString());
             System.out.println(chessGameUser2.toString());
             //send result to user2-user1
+            UserInterceptor.updateStatusPrincipal(message.getIdUserJoin(),"INGAME");
+            UserInterceptor.updateStatusPrincipal(waitingRoom.getUserCreateId(),"INGAME");
             messagingTemplate.convertAndSendToUser(message.getIdUserJoin(), "/queue/roomJoined", chessGameUser2);
             messagingTemplate.convertAndSendToUser(waitingRoom.getUserCreateId(), "/queue/roomJoined", chessGameUser1);
         } else {

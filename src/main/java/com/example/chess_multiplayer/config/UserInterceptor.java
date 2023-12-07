@@ -31,13 +31,13 @@ public class UserInterceptor implements ChannelInterceptor {
                     if ("null".equals(name)){
                         System.out.println("null");
                         final String randomId = UUID.randomUUID().toString();
-                        pricipalCustome = new PricipalCustome(randomId);
+                        pricipalCustome = new PricipalCustome(randomId,"ONLINE");
                         userMap.put(randomId, pricipalCustome);
                     }else{
                         //Có userID, lần đầu đăng nhập
                         if (pricipalCustome == null) {
                             System.out.println("tempPort: " + tempPort);
-                            pricipalCustome = new PricipalCustome(name);
+                            pricipalCustome = new PricipalCustome(name,"ONLINE");
                             userMap.put(name, pricipalCustome);
                         }
                     }
@@ -48,13 +48,33 @@ public class UserInterceptor implements ChannelInterceptor {
         return message;
     }
 
+
     public static void updatePrincipal(String oldId, PricipalCustome newPrincipal) {
         userMap.remove(oldId);
         userMap.put(newPrincipal.getName(), newPrincipal);
     }
     public static void printUserMap() {
         for (Map.Entry<String, PricipalCustome> entry : userMap.entrySet()) {
-            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue() + ", Status = " + entry.getValue().getStatus());
         }
+    }
+
+    public static void updateStatusPrincipal(String userID, String newStatus) {
+        PricipalCustome principal = userMap.get(userID);
+        if (principal != null) {
+            principal.setStatus(newStatus);
+        }
+    }
+    public static String getStatusByUserID(String userID) {
+        String status = "OFFLINE";
+        for (Map.Entry<String, PricipalCustome> entry : userMap.entrySet()) {
+            if(userID.equals(entry.getKey())) {
+                status = entry.getValue().getStatus();
+            }
+        }
+        return status;
+    }
+    public static void removePrincipal(String userId) {
+        userMap.remove(userId);
     }
 }
