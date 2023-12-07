@@ -14,7 +14,7 @@ const socket = new SockJS('http://' + window.location.hostname + ':8888/ws');
 export const stompClient = new Client({
     webSocketFactory: () => socket,
     connectHeaders: {
-        tempPort: window.location.port,
+        tempPort: localStorage.getItem('userID')!
     },
     debug: (msg) => console.log(msg),
     reconnectDelay: 1000,

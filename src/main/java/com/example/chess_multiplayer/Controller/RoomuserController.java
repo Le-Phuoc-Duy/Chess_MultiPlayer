@@ -195,8 +195,8 @@ public class RoomuserController implements CountdownTimerListener {
             chessGameUserReceive.setUserCountdownValue(getCountdownTimerWithIdRoomUser(chessGameUserReceive.getIdRoomUser()));
             chessGameUserReceive.setOppCountdownValue(getCountdownTimerWithIdRoomUser(message.getIdRoomUser()));
 
-            messagingTemplate.convertAndSendToUser(chessGameUserReceive.getUserReceiveTempPort(), "/queue/chessMoveSuccess",message );
-            messagingTemplate.convertAndSendToUser(message.getUserReceiveTempPort(), "/queue/chessMove",chessGameUserReceive );
+            messagingTemplate.convertAndSendToUser(UserId, "/queue/chessMoveSuccess",message );
+            messagingTemplate.convertAndSendToUser(UserOppId, "/queue/chessMove",chessGameUserReceive );
         }else{
             messagingTemplate.convertAndSendToUser(UserOppId, "/queue/chessMove", null);
         }
