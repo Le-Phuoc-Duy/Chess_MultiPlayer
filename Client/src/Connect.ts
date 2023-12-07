@@ -55,29 +55,47 @@ stompClient.onConnect = (frame) => {
         }
         drawBoard(currentGame.board);
         currentGame.checkGameStatus()
-        setTimer(body.userCountdownValue,body.oppCountdownValue,false,true)
-        
+        // setTimer(body.userCountdownValue,body.oppCountdownValue,false,true)
+        initializeClockSelf(body.userCountdownValue);
+        initializeClockOpp(body.oppCountdownValue);
     });
     stompClient.subscribe('/user/queue/chessMoveSuccess', (message) => {
         const body = JSON.parse(message.body);
         localStorage.setItem('userCountdownValue', body.userCountdownValue);
         localStorage.setItem('oppCountdownValue', body.oppCountdownValue);
-        setTimer(body.userCountdownValue,body.oppCountdownValue,true,false)
+        // setTimer(body.userCountdownValue,body.oppCountdownValue,true,false)
+        initializeClockSelf(body.userCountdownValue);
+        initializeClockOpp(body.oppCountdownValue);
+    });
+    stompClient.subscribe('/user/queue/countdown', (message) => {
+        const body = JSON.parse(message.body);
+        if(body.userSendTempPort === localStorage.getItem("userSendTempPort")){
+            localStorage.setItem('usercountdownValue', body.countdownValue);
+            initializeClockSelf(body.countdownValue);
+        }else if(body.userReceiveTempPort === localStorage.getItem("userSendTempPort")){
+            localStorage.setItem('oppcountdownValue', body.countdownValue);
+            initializeClockOpp(body.countdownValue);
+        }
+        console.log("body.countdownValue: " + body.countdownValue);
+        console.log("body.userSendTempPort: " + body.userSendTempPort);
+        console.log("body.userReceiveTempPort: " + body.userReceiveTempPort);
+        // setTimer(body.userCountdownValue,body.oppCountdownValue,true,false)
+
     });
     stompClient.subscribe('/user/queue/timeout', (message) => {
         const body = JSON.parse(message.body);
         if(body.notify == "Time out"){
             Swal.fire("Hết thời gian! Bạn đã thua")
-            .then(()=>{
-                removeGame()
-            })
+              .then(()=>{
+                  removeGame()
+              })
         }else{
             Swal.fire("Đối thủ hết giờ! Bạn đã thắng")
-            .then(()=>{
-                removeGame()
-            })
+              .then(()=>{
+                  removeGame()
+              })
         }
-        
+
     });
     stompClient.subscribe('/topic/publicChat', (message) => {
         const body = JSON.parse(message.body);
@@ -94,30 +112,30 @@ stompClient.onConnect = (frame) => {
         switch(body.result){
             case "DRAW":
                 Swal.fire("Cờ hòa! Trận đấu kết thúc")
-                .then(()=>{
-                    removeGame()
-                })
+                  .then(()=>{
+                      removeGame()
+                  })
                 break;
             case "WIN":
                 Swal.fire("Bạn đã chiến thắng")
-                .then(()=>{
-                    removeGame()
-                })
+                  .then(()=>{
+                      removeGame()
+                  })
                 break;
             case "LOSE":
                 Swal.fire("Bạn đã thua")
-                .then(()=>{
-                    removeGame()
-                })
+                  .then(()=>{
+                      removeGame()
+                  })
                 break;
             case "DRAW_REQUEST":
                 Swal.fire("Đối thủ cầu hòa!")
                 break;
             case "DRAW_ACCEPT":
                 Swal.fire("Đối thủ chấp nhận hòa! Trận đấu kết thúc")
-                .then(()=>{
-                    removeGame()
-                })
+                  .then(()=>{
+                      removeGame()
+                  })
                 break;
             case "DRAW_DENY":
                 Swal.fire("Đối thủ từ chối cầu hòa! Trận đấu tiếp tục")
@@ -125,19 +143,19 @@ stompClient.onConnect = (frame) => {
                 break;
             case "QUIT":
                 Swal.fire("Đối thủ thoát trận! Bạn đã chiến thắng")
-                .then(()=>{
-                    removeGame()
-                })
+                  .then(()=>{
+                      removeGame()
+                  })
                 break;
             case "SURRENDER":
-                    Swal.fire("Đối thủ đầu hàng! Bạn đã chiến thắng")
-                    .then(()=>{
-                        removeGame()
-                    })
-                    break;
+                Swal.fire("Đối thủ đầu hàng! Bạn đã chiến thắng")
+                  .then(()=>{
+                      removeGame()
+                  })
+                break;
         }
     });
-    
+
 };
 // Kết nối tới server
 stompClient.activate();
@@ -226,17 +244,17 @@ function ClickPiece(r: number, c: number, game: Game) {
                 color = false;
             }
             let CreateChessMove: RoomJoinedResponse = new RoomJoinedResponse(
-                iDUserSend ?? '', // Sử dụng ?? để kiểm tra null hoặc undefined và gán giá trị mặc định nếu không tồn tại
-                iDUserReceive ?? '',
-                iDRoom ?? '',
-                idRoomUser ?? '',
-                chessMove ?? '',
-                board ?? '',
-                color ?? false, // Gán giá trị mặc định nếu không tồn tại hoặc không hợp lệ
-                userSendTempPort ?? '',
-                userReceiveTempPort ?? '',
-                1,
-                1
+              iDUserSend ?? '', // Sử dụng ?? để kiểm tra null hoặc undefined và gán giá trị mặc định nếu không tồn tại
+              iDUserReceive ?? '',
+              iDRoom ?? '',
+              idRoomUser ?? '',
+              chessMove ?? '',
+              board ?? '',
+              color ?? false, // Gán giá trị mặc định nếu không tồn tại hoặc không hợp lệ
+              userSendTempPort ?? '',
+              userReceiveTempPort ?? '',
+              1,
+              1
             );
             sendChessMove(CreateChessMove);
         }else{
@@ -251,7 +269,7 @@ function ClickPiece(r: number, c: number, game: Game) {
         console.log("!secleted")
         selected = true
         startX = r //parseInt(coordinates.charAt(0))
-        startY = c //parseInt(coordinates.charAt(1)) 
+        startY = c //parseInt(coordinates.charAt(1))
     }
 }
 //Remove màu selected
@@ -313,16 +331,16 @@ window.addEventListener('load', () => {
         PromotionOverlay(currentGame.playerSide);
     } else {
         setCurrentGameAferLoad()
-            .then((result) => {
-                console.log("currentGame.playerSide: " + currentGame.playerSide);
-                var reDrawGame: Game = new Game(currentGame.playerSide, new Board, currentGame.currentTurn, currentGame.status);
-                reDrawGame.setFullCoordinates(localStorage.getItem('board')!);
-                setCurrentGame(reDrawGame)
-                drawBoard(reDrawGame.board);
-                PromotionOverlay(currentGame.playerSide);
-            })
-            .catch((error) => {
-            });
+          .then((result) => {
+              console.log("currentGame.playerSide: " + currentGame.playerSide);
+              var reDrawGame: Game = new Game(currentGame.playerSide, new Board, currentGame.currentTurn, currentGame.status);
+              reDrawGame.setFullCoordinates(localStorage.getItem('board')!);
+              setCurrentGame(reDrawGame)
+              drawBoard(reDrawGame.board);
+              PromotionOverlay(currentGame.playerSide);
+          })
+          .catch((error) => {
+          });
     }
 });
 function setCurrentGameAferLoad(): Promise<string> {
@@ -353,12 +371,12 @@ export function PromotionOverlay(color: Color) {
             element.style.display = 'block'
         });
         // ava
-        (document.getElementById('selfAva') as HTMLImageElement).src = './assets/ava0' + localStorage.getItem('ava') + '.png'; 
+        (document.getElementById('selfAva') as HTMLImageElement).src = './assets/ava0' + localStorage.getItem('ava') + '.png';
         (document.getElementById('opponentAva') as HTMLImageElement).src = './assets/ava0' + localStorage.getItem('userSendAva') + '.png'
         // name
         document.getElementById('selfName')!.innerHTML = localStorage.getItem('userName')!.toString()
         document.getElementById('opponentName')!.innerHTML = localStorage.getItem('userSendName')!.toString()
-        
+
         document.getElementById('afterGame')!.style.display = 'block';
         document.getElementById('beforeGame')!.style.display = 'none';
 
@@ -433,55 +451,15 @@ function getTimeRemaining(endtime: number) {
     };
 }
 
-
-export let selfEndTime: number;
-export let opponentEndTime: number;
-export let selfTimeStop = true;
-export let oppTimeStop = true;
-export function setTimer(selfEndTimeLC: number, opponentEndTimeLC: number, selfTimeStopLC: boolean, oppTimeStopLC: boolean){
-    selfEndTime = selfEndTimeLC;
-    opponentEndTime = opponentEndTimeLC;
-    selfTimeStop = selfTimeStopLC;
-    oppTimeStop = oppTimeStopLC;
-    initializeClock();
-}   
-
-function initializeClock() {
+export function initializeClockSelf(selfEndTime: number){
     var selfTime = document.getElementById('selfTime');
+    var t1 = getTimeRemaining(selfEndTime);
+    selfTime!.innerHTML =
+      ('0' + t1.minutes).slice(-2) + ' : ' + ('0' + t1.seconds).slice(-2);
+}
+export function initializeClockOpp(opponentEndTime: number){
     var opponentTime = document.getElementById('opponentTime');
-    function initializeClockSelf(){
-        var t1 = getTimeRemaining(selfEndTime);
-        selfTime!.innerHTML =
-            ('0' + t1.minutes).slice(-2) + ' : ' + ('0' + t1.seconds).slice(-2);
-    }
-    function initializeClockOpp(){
-        var t2 = getTimeRemaining(opponentEndTime);
-        opponentTime!.innerHTML =
-            ('0' + t2.minutes).slice(-2) + ' : ' + ('0' + t2.seconds).slice(-2);
-    }
-    function updateClockSelf() {
-        var t1 = getTimeRemaining(selfEndTime);
-        if(t1.total <= 0 || selfTimeStop){
-            clearInterval(timeintervalSelf);
-        }else{
-            selfTime!.innerHTML =
-            ('0' + t1.minutes).slice(-2) + ' : ' + ('0' + t1.seconds).slice(-2);
-            selfEndTime--;
-        }
-    }
-
-    function updateClockOpp() {
-        var t2 = getTimeRemaining(opponentEndTime);
-        if(t2.total <= 0 || oppTimeStop){
-            clearInterval(timeintervalOpp);
-        }else {
-            opponentTime!.innerHTML =
-            ('0' + t2.minutes).slice(-2) + ' : ' + ('0' + t2.seconds).slice(-2);
-            opponentEndTime--;
-        }
-    }
-    initializeClockSelf();
-    initializeClockOpp();
-    var timeintervalSelf = setInterval(updateClockSelf, 1000);
-    var timeintervalOpp = setInterval(updateClockOpp, 1000);
+    var t2 = getTimeRemaining(opponentEndTime);
+    opponentTime!.innerHTML =
+      ('0' + t2.minutes).slice(-2) + ' : ' + ('0' + t2.seconds).slice(-2);
 }

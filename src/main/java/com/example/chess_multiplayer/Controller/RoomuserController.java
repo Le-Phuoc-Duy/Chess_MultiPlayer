@@ -45,6 +45,14 @@ public class RoomuserController implements CountdownTimerListener {
         roomuserService.updateRoomUserResult(idRoomUserReceive, Result.WIN.toString());
         System.out.println("Time out for user: " + userSendTempPort);
     }
+
+    @Override
+    public void countdown(String userSendTempPort, String userReceiveTempPort, int countdownValue) {
+        CountdownTimer countdownTimer = new CountdownTimer(countdownValue, userSendTempPort,userReceiveTempPort);
+        messagingTemplate.convertAndSendToUser(countdownTimer.getUserSendTempPort(), "/queue/countdown", countdownTimer);
+        messagingTemplate.convertAndSendToUser(countdownTimer.getUserReceiveTempPort(), "/queue/countdown", countdownTimer);
+    }
+
     public void checkAndRemoveFinishedTimersUserSendTempPort(String userSendTempPort) {
         Iterator<CountdownTimer> iterator = countdownTimers.iterator();
         while (iterator.hasNext()) {
@@ -139,13 +147,13 @@ public class RoomuserController implements CountdownTimerListener {
             if(containsCountdownTimerWithIdUser(message.getIdRoomUser()) && containsCountdownTimerWithIdUser(chessGameUserReceive.getIdRoomUser())){
                 switch (mode){
                     case -1 -> {
-                        stopCountdownTimerWithIdRoomUser(message.getIdRoomUser(), 1);
-                    }
-                    case -2 -> {
                         stopCountdownTimerWithIdRoomUser(message.getIdRoomUser(), 2);
                     }
+                    case -2 -> {
+                        stopCountdownTimerWithIdRoomUser(message.getIdRoomUser(), 3);
+                    }
                     default -> {
-                        stopCountdownTimerWithIdRoomUser(message.getIdRoomUser(), 0);
+                        stopCountdownTimerWithIdRoomUser(message.getIdRoomUser(), 1);
                     }
                 }
                 startCountdownTimerWithIdRoomUser(chessGameUserReceive.getIdRoomUser());

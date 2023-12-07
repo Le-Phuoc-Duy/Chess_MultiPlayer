@@ -102,8 +102,8 @@ public class RoomController {
                     chessGameUser2.setUserCountdownValue(180);
                 }
                 case -3 -> {
-                    chessGameUser1.setUserCountdownValue(360);
-                    chessGameUser2.setUserCountdownValue(360);
+                    chessGameUser1.setUserCountdownValue(300);
+                    chessGameUser2.setUserCountdownValue(300);
                 }
                 case -4 -> {
                     chessGameUser1.setUserCountdownValue(600);

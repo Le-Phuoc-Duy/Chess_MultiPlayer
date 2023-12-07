@@ -33,19 +33,29 @@ public class CountdownTimer {
         this.idUserReceive = idUserReceive;
     }
 
+    public CountdownTimer(int countdownValue, String userSendTempPort, String userReceiveTempPort) {
+        this.countdownValue = countdownValue;
+        this.userSendTempPort = userSendTempPort;
+        this.userReceiveTempPort = userReceiveTempPort;
+        executorService = null;
+        idRoomUser = null;
+        listener = null;
+    }
+
     public void startCountdown() {
         executorService.scheduleAtFixedRate(() -> {
-                if (shouldDecreaseValue && countdownValue >= 0) {
-                    System.out.println("Countdown for " + idRoomUser + ": " + countdownValue);
-                    countdownValue--;
-                } else if(countdownValue >= 0){
-                    System.out.println("Stop countdown for " + idRoomUser + ": " + countdownValue);
-                }else{
-                    stopCountdown();
-                    if (listener != null) {
-                        listener.onTimerFinish(userSendTempPort,userReceiveTempPort,idRoomUser,idRoomUserReceive,idRoom,idUserSend, idUserReceive);
-                    }
+            if (shouldDecreaseValue && countdownValue >= 0) {
+                System.out.println("Countdown for " + idRoomUser + ": " + countdownValue);
+                listener.countdown(userSendTempPort,userReceiveTempPort, countdownValue);
+                countdownValue--;
+            } else if(countdownValue >= 0){
+                System.out.println("Stop countdown for " + idRoomUser + ": " + countdownValue);
+            }else{
+                stopCountdown();
+                if (listener != null) {
+                    listener.onTimerFinish(userSendTempPort,userReceiveTempPort,idRoomUser,idRoomUserReceive,idRoom,idUserSend, idUserReceive);
                 }
+            }
         }, 0, 1, TimeUnit.SECONDS);
     }
 

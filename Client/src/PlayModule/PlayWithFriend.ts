@@ -1,5 +1,5 @@
 import { Color } from "../Enum";
-import { PromotionOverlay, currentGame, drawBoard, setCurrentGame, setTimer, stompClient, selfEndTime, opponentEndTime, selfTimeStop, oppTimeStop } from "../Connect";
+import { PromotionOverlay, currentGame, drawBoard, setCurrentGame, stompClient, initializeClockSelf, initializeClockOpp } from "../Connect";
 import { RoomJoinedResponse } from "../RoomJoinedResponse";
 import Swal from "sweetalert2";
 import { Game } from "../Game";
@@ -78,7 +78,7 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                 // input: "number",
                 title: "Mã phòng",
                 html:
-                    '<input type="number" id="swal-input1" class="swal2-input" placeholder="Nhập mã phòng">',
+                  '<input type="number" id="swal-input1" class="swal2-input" placeholder="Nhập mã phòng">',
                 focusConfirm: false,
                 preConfirm: () => {
                     let idRoom = (document.getElementById('swal-input1')! as HTMLInputElement).value
@@ -95,56 +95,58 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                     body: JSON.stringify({ waitingRoomId: formValues[0], idUserJoin: localStorage.getItem('userID'), tempPort: window.location.port }),
                 })
                 joinRoom()
-                    .then((result) => {
-                        if (result) {
-                            console.log('iDUserSend: ' + result.iDUserSend + '\niDUserReceive: ' + result.iDUserReceive + '\niDRoom: ' + result.iDRoom + '\nidRoomUser: ' + result.idRoomUser + '\nchessMove: ' + result.chessMove + '\nboard: ' + result.board + '\ncolor: ' + result.color);
-                            if (result.color) {
-                                console.log("self la white, opp la black")
-                                var gameByJoin: Game = new Game(Color.WHITE, new Board, true, 0);
-                            } else {
-                                console.log("self la black, opp la white")
-                                var gameByJoin: Game = new Game(Color.BLACK, new Board, false, 0);
-                            }
-                            gameByJoin.setFullCoordinates(result.board);
-                            setCurrentGame(gameByJoin)
-                            drawBoard(gameByJoin.board);
-                            PromotionOverlay(currentGame.playerSide);
-                            console.log("result.userCountdownValue: " + result.userCountdownValue);
-                            setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
-                            const Toast = Swal.mixin({
-                                toast: true,
-                                position: "top-end",
-                                showConfirmButton: false,
-                                timer: 5000,
-                                timerProgressBar: true,
-                                didOpen: (toast) => {
-                                    toast.onmouseenter = Swal.stopTimer;
-                                    toast.onmouseleave = Swal.resumeTimer;
-                                }
-                            });
-                            Toast.fire({
-                                icon: "success",
-                                title: "Vào phòng thành công. Bắt đầu trận đấu"
-                            });
-                        }
-                    })
-                    .catch((error) => {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: "top-end",
-                            showConfirmButton: false,
-                            timer: 5000,
-                            timerProgressBar: true,
-                            didOpen: (toast) => {
-                                toast.onmouseenter = Swal.stopTimer;
-                                toast.onmouseleave = Swal.resumeTimer;
-                            }
-                        });
-                        Toast.fire({
-                            icon: "success",
-                            title: "Mã phòng không tồn tại"
-                        });
-                    });
+                  .then((result) => {
+                      if (result) {
+                          console.log('iDUserSend: ' + result.iDUserSend + '\niDUserReceive: ' + result.iDUserReceive + '\niDRoom: ' + result.iDRoom + '\nidRoomUser: ' + result.idRoomUser + '\nchessMove: ' + result.chessMove + '\nboard: ' + result.board + '\ncolor: ' + result.color);
+                          if (result.color) {
+                              console.log("self la white, opp la black")
+                              var gameByJoin: Game = new Game(Color.WHITE, new Board, true, 0);
+                          } else {
+                              console.log("self la black, opp la white")
+                              var gameByJoin: Game = new Game(Color.BLACK, new Board, false, 0);
+                          }
+                          gameByJoin.setFullCoordinates(result.board);
+                          setCurrentGame(gameByJoin)
+                          drawBoard(gameByJoin.board);
+                          PromotionOverlay(currentGame.playerSide);
+                          console.log("result.userCountdownValue: " + result.userCountdownValue);
+                          // setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
+                          initializeClockSelf(result.userCountdownValue);
+                          initializeClockOpp(result.userCountdownValue);
+                          const Toast = Swal.mixin({
+                              toast: true,
+                              position: "top-end",
+                              showConfirmButton: false,
+                              timer: 5000,
+                              timerProgressBar: true,
+                              didOpen: (toast) => {
+                                  toast.onmouseenter = Swal.stopTimer;
+                                  toast.onmouseleave = Swal.resumeTimer;
+                              }
+                          });
+                          Toast.fire({
+                              icon: "success",
+                              title: "Vào phòng thành công. Bắt đầu trận đấu"
+                          });
+                      }
+                  })
+                  .catch((error) => {
+                      const Toast = Swal.mixin({
+                          toast: true,
+                          position: "top-end",
+                          showConfirmButton: false,
+                          timer: 5000,
+                          timerProgressBar: true,
+                          didOpen: (toast) => {
+                              toast.onmouseenter = Swal.stopTimer;
+                              toast.onmouseleave = Swal.resumeTimer;
+                          }
+                      });
+                      Toast.fire({
+                          icon: "success",
+                          title: "Mã phòng không tồn tại"
+                      });
+                  });
             }
         }
         if (option === "createRoom") {
@@ -167,12 +169,12 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                     let s: number;
                     let minute = (document.getElementById('minute') as HTMLInputElement).value;
                     let second = (document.getElementById('second') as HTMLInputElement).value;
-                    if (isNaN(parseInt(minute))) { 
+                    if (isNaN(parseInt(minute))) {
                         m = 0;
                     }else{
                         m = parseInt(minute);
                     }
-                    if (isNaN(parseInt(second))) { 
+                    if (isNaN(parseInt(second))) {
                         s = 0;
                     }else{
                         s = parseInt(second);
@@ -181,54 +183,56 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                     break;
             }
             createRoom(gameMode)
-                .then((result) => {
-                    if (result) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Tạo phòng thành công!',
-                            text: `ID phòng của bạn là: ${result.toString()}`,
-                        })
-                        joinRoom().then((result) => {
-                            if (result) {
-                                const Toast = Swal.mixin({
-                                    toast: true,
-                                    position: "top-end",
-                                    showConfirmButton: false,
-                                    timer: 5000,
-                                    timerProgressBar: true,
-                                    didOpen: (toast) => {
-                                        toast.onmouseenter = Swal.stopTimer;
-                                        toast.onmouseleave = Swal.resumeTimer;
-                                    }
-                                });
-                                Toast.fire({
-                                    icon: "success",
-                                    title: "Đã có người chơi khác tham gia, Bắt đầu trận đấu"
-                                });
-                                if (result.color) {
-                                    console.log("self la white, opp la black")
-                                    var gameByCreate: Game = new Game(Color.WHITE, new Board, true, 0);
-                                } else {
-                                    console.log("self la black, opp la white")
-                                    var gameByCreate: Game = new Game(Color.BLACK, new Board, false, 0);
-                                }
-                                gameByCreate.setFullCoordinates(result.board);
-                                setCurrentGame(gameByCreate)
-                                drawBoard(gameByCreate.board);
-                                PromotionOverlay(currentGame.playerSide);
-                                console.log("result.userCountdownValue: " + result.userCountdownValue);
-                                setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
-                            }
-                        })
-                    }
-                })
-                .catch((error) => {
-                    Swal.fire({
-                        icon: "error",
-                        text: "Tạo phòng thất bại",
-                    }).then(() => {
-                    });
-                });
+              .then((result) => {
+                  if (result) {
+                      Swal.fire({
+                          icon: 'success',
+                          title: 'Tạo phòng thành công!',
+                          text: `ID phòng của bạn là: ${result.toString()}`,
+                      })
+                      joinRoom().then((result) => {
+                          if (result) {
+                              const Toast = Swal.mixin({
+                                  toast: true,
+                                  position: "top-end",
+                                  showConfirmButton: false,
+                                  timer: 5000,
+                                  timerProgressBar: true,
+                                  didOpen: (toast) => {
+                                      toast.onmouseenter = Swal.stopTimer;
+                                      toast.onmouseleave = Swal.resumeTimer;
+                                  }
+                              });
+                              Toast.fire({
+                                  icon: "success",
+                                  title: "Đã có người chơi khác tham gia, Bắt đầu trận đấu"
+                              });
+                              if (result.color) {
+                                  console.log("self la white, opp la black")
+                                  var gameByCreate: Game = new Game(Color.WHITE, new Board, true, 0);
+                              } else {
+                                  console.log("self la black, opp la white")
+                                  var gameByCreate: Game = new Game(Color.BLACK, new Board, false, 0);
+                              }
+                              gameByCreate.setFullCoordinates(result.board);
+                              setCurrentGame(gameByCreate)
+                              drawBoard(gameByCreate.board);
+                              PromotionOverlay(currentGame.playerSide);
+                              console.log("result.userCountdownValue: " + result.userCountdownValue);
+                              // setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
+                              initializeClockSelf(result.userCountdownValue);
+                              initializeClockOpp(result.userCountdownValue);
+                          }
+                      })
+                  }
+              })
+              .catch((error) => {
+                  Swal.fire({
+                      icon: "error",
+                      text: "Tạo phòng thất bại",
+                  }).then(() => {
+                  });
+              });
         }
     }
 })
