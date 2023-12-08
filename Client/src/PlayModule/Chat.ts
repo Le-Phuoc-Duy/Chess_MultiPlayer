@@ -90,16 +90,15 @@ function sendChatToServer(): Promise<string> {
             }else{
                 return new Promise((resolve, reject) => {
                     let idUserSend: string | null = localStorage.getItem('iDUserSend');
-                    let idUserReceive: string | null = localStorage.getItem('iDUserReceive');
+                    let userSendName: string | null = localStorage.getItem('userSendName');
+                    let userReceiveName: string | null = localStorage.getItem('userReceiveName');
                     let idRoom: string | null = localStorage.getItem('iDRoom');
                     let idRoomUser: string | null = localStorage.getItem('idRoomUser');
                     const chat = inputValue;
-                    let userSendTempPort: string | null = localStorage.getItem('userSendTempPort');
-                    let userReceiveTempPort: string | null = localStorage.getItem('userReceiveTempPort');
                     stompClient.publish({
                         destination: '/app/chatRoom',
                         headers: {},
-                        body: JSON.stringify({ idUserSend: idUserSend, idUserReceive: idUserReceive, idRoom: idRoom, idRoomUser: idRoomUser, chat: chat, userSendTempPort: userSendTempPort, userReceiveTempPort: userReceiveTempPort }),
+                        body: JSON.stringify({ idUserSend: idUserSend, idRoom: idRoom, idRoomUser: idRoomUser, chat: chat, userSendName: userSendName, userReceiveName: userReceiveName }),
                     });
                     resolve("chatAll Success");
                     MyChatContent(inputValue,avaNumber,false);
@@ -114,8 +113,8 @@ function sendChatToServer(): Promise<string> {
     }
     
 }
-export function ChatContentFrom(idUserSend: string, senderName: string, senderAvatar: number, messageContent: string, chatMode: boolean) {
-    if(idUserSend != localStorage.getItem('userID') || localStorage.getItem('userID') == null){
+export function ChatContentFrom(senderName: string, senderAvatar: number, messageContent: string, chatMode: boolean) {
+    if(senderName != localStorage.getItem('userSendName') || localStorage.getItem('userID') == null){
         const newMessageDiv = document.createElement('div');
         newMessageDiv.classList.add('d-flex', 'justify-content-between');
 

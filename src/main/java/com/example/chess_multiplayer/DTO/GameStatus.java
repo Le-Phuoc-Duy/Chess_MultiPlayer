@@ -4,12 +4,10 @@ import com.example.chess_multiplayer.Enum.Result;
 
 public class GameStatus {
     private String iDUserSend;
-    private String iDUserReceive;
+    private String userReceiveName;
     private Result result;
     private String iDRoom;
     private String idRoomUser;
-    private String userSendTempPort;
-    private String userReceiveTempPort;
 
     public String getiDUserSend() {
         return iDUserSend;
@@ -17,14 +15,6 @@ public class GameStatus {
 
     public void setiDUserSend(String iDUserSend) {
         this.iDUserSend = iDUserSend;
-    }
-
-    public String getiDUserReceive() {
-        return iDUserReceive;
-    }
-
-    public void setiDUserReceive(String iDUserReceive) {
-        this.iDUserReceive = iDUserReceive;
     }
 
 
@@ -44,27 +34,19 @@ public class GameStatus {
         this.idRoomUser = idRoomUser;
     }
 
-    public String getUserReceiveTempPort() {
-        return userReceiveTempPort;
-    }
-
-    public void setUserReceiveTempPort(String userReceiveTempPort) {
-        this.userReceiveTempPort = userReceiveTempPort;
-    }
-
-    public String getUserSendTempPort() {
-        return userSendTempPort;
-    }
-
-    public void setUserSendTempPort(String userSendTempPort) {
-        this.userSendTempPort = userSendTempPort;
-    }
-
     public Result getResult() {
         return result;
     }
 
     public void setResult(Result result) {
         this.result = result;
+    }
+
+    public String getUserReceiveName() {
+        return userReceiveName;
+    }
+
+    public void setUserReceiveName(String userReceiveName) {
+        this.userReceiveName = userReceiveName;
     }
 }

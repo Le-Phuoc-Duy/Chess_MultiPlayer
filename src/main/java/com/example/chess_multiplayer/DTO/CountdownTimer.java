@@ -11,32 +11,28 @@ public class CountdownTimer {
     private final String idRoomUser;
     private final CountdownTimerListener listener;
     private boolean shouldDecreaseValue;
-    private String userSendTempPort;
-    private String userReceiveTempPort;
     private String idRoomUserReceive;
     private String idRoom;
     private String idUserSend;
     private String idUserReceive;
 
 
-    public CountdownTimer(int countdownValue, String idRoomUser, CountdownTimerListener listener, boolean shouldDecreaseValue, String userSendTempPort, String userReceiveTempPort, String idRoomUserReceive, String idRoom, String idUserSend, String idUserReceive) {
+    public CountdownTimer(int countdownValue, String idRoomUser, CountdownTimerListener listener, boolean shouldDecreaseValue, String idRoomUserReceive, String idRoom, String idUserSend, String idUserReceive) {
         this.countdownValue = countdownValue;
         this.executorService = Executors.newSingleThreadScheduledExecutor();
         this.idRoomUser = idRoomUser;
         this.listener = listener;
         this.shouldDecreaseValue = shouldDecreaseValue;
-        this.userSendTempPort = userSendTempPort;
-        this.userReceiveTempPort = userReceiveTempPort;
         this.idRoomUserReceive = idRoomUserReceive;
         this.idRoom = idRoom;
         this.idUserSend = idUserSend;
         this.idUserReceive = idUserReceive;
     }
 
-    public CountdownTimer(int countdownValue, String userSendTempPort, String userReceiveTempPort) {
+    public CountdownTimer(int countdownValue,String idUserSend, String idUserReceive) {
         this.countdownValue = countdownValue;
-        this.userSendTempPort = userSendTempPort;
-        this.userReceiveTempPort = userReceiveTempPort;
+        this.idUserSend = idUserSend;
+        this.idUserReceive = idUserReceive;
         executorService = null;
         idRoomUser = null;
         listener = null;
@@ -46,14 +42,14 @@ public class CountdownTimer {
         executorService.scheduleAtFixedRate(() -> {
             if (shouldDecreaseValue && countdownValue >= 0) {
                 System.out.println("Countdown for " + idRoomUser + ": " + countdownValue);
-                listener.countdown(userSendTempPort,userReceiveTempPort, countdownValue);
+                listener.countdown(idUserSend,idUserReceive,countdownValue);
                 countdownValue--;
             } else if(countdownValue >= 0){
                 System.out.println("Stop countdown for " + idRoomUser + ": " + countdownValue);
             }else{
                 stopCountdown();
                 if (listener != null) {
-                    listener.onTimerFinish(userSendTempPort,userReceiveTempPort,idRoomUser,idRoomUserReceive,idRoom,idUserSend, idUserReceive);
+                    listener.onTimerFinish(idRoomUser,idRoomUserReceive,idRoom,idUserSend,idUserReceive);
                 }
             }
         }, 0, 1, TimeUnit.SECONDS);
@@ -82,19 +78,19 @@ public class CountdownTimer {
         this.shouldDecreaseValue = shouldDecrease;
     }
 
-    public String getUserSendTempPort() {
-        return userSendTempPort;
+    public String getIdUserSend() {
+        return idUserSend;
     }
 
-    public void setUserSendTempPort(String userSendTempPort) {
-        this.userSendTempPort = userSendTempPort;
+    public void setIdUserSend(String idUserSend) {
+        this.idUserSend = idUserSend;
     }
 
-    public String getUserReceiveTempPort() {
-        return userReceiveTempPort;
+    public String getIdUserReceive() {
+        return idUserReceive;
     }
 
-    public void setUserReceiveTempPort(String userReceiveTempPort) {
-        this.userReceiveTempPort = userReceiveTempPort;
+    public void setIdUserReceive(String idUserReceive) {
+        this.idUserReceive = idUserReceive;
     }
 }

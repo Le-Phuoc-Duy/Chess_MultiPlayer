@@ -6,7 +6,6 @@ public class publicChat {
     private String chat;
     private int ava;
 
-
     public String getIdDUserSend() {
         return idDUserSend;
     }

@@ -4,12 +4,10 @@ public class ChatRoom {
     private String idUserSend;
     private String userSendName;
     private int userSendAva;
-    private String idUserReceive;
     private String idRoom;
     private String idRoomUser;
     private String chat;
-    private String userSendTempPort;
-    private String userReceiveTempPort;
+    private String userReceiveName;
 
     public String getIdUserSend() {
         return idUserSend;
@@ -17,14 +15,6 @@ public class ChatRoom {
 
     public void setIdUserSend(String idUserSend) {
         this.idUserSend = idUserSend;
-    }
-
-    public String getIdUserReceive() {
-        return idUserReceive;
-    }
-
-    public void setIdUserReceive(String idUserReceive) {
-        this.idUserReceive = idUserReceive;
     }
 
     public String getIdRoom() {
@@ -51,22 +41,6 @@ public class ChatRoom {
         this.chat = chat;
     }
 
-    public String getUserSendTempPort() {
-        return userSendTempPort;
-    }
-
-    public void setUserSendTempPort(String userSendTempPort) {
-        this.userSendTempPort = userSendTempPort;
-    }
-
-    public String getUserReceiveTempPort() {
-        return userReceiveTempPort;
-    }
-
-    public void setUserReceiveTempPort(String userReceiveTempPort) {
-        this.userReceiveTempPort = userReceiveTempPort;
-    }
-
     public String getUserSendName() {
         return userSendName;
     }
@@ -81,5 +55,13 @@ public class ChatRoom {
 
     public void setUserSendAva(int userSendAva) {
         this.userSendAva = userSendAva;
+    }
+
+    public String getUserReceiveName() {
+        return userReceiveName;
+    }
+
+    public void setUserReceiveName(String userReceiveName) {
+        this.userReceiveName = userReceiveName;
     }
 }
