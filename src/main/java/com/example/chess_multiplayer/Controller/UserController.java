@@ -114,7 +114,8 @@ public class UserController {
         chessGameUser1.setiDRoom(idRoomCreated);
         chessGameUser1.setIdRoomUser(idRoomUser1Created);
         chessGameUser1.setChessMove(null);
-        chessGameUser1.setUserSendName(userService.getUsernameByUserID(user.getIdUserCreate()));
+//        chessGameUser1.setUserSendName(userService.getUsernameByUserID(user.getIdUserCreate()));
+        chessGameUser1.setUserName(userService.getUsernameByUserID(user.getIdUserCreate()));
         chessGameUser1.setUserSendAva(userService.getUserById(user.getIdUserCreate()).getAva());
         chessGameUser1.setUserReceiveName(userService.getUsernameByUserID(message.getIdUserCreate()));
 
@@ -122,7 +123,8 @@ public class UserController {
         chessGameUser2.setiDRoom(idRoomCreated);
         chessGameUser2.setIdRoomUser(idRoomUser2Created);
         chessGameUser2.setChessMove(null);
-        chessGameUser2.setUserSendName(userService.getUsernameByUserID(message.getIdUserCreate()));
+//        chessGameUser2.setUserSendName(userService.getUsernameByUserID(message.getIdUserCreate()));
+        chessGameUser2.setUserName(userService.getUsernameByUserID(message.getIdUserCreate()));
         chessGameUser2.setUserSendAva(userService.getUserById(message.getIdUserCreate()).getAva());
         chessGameUser2.setUserReceiveName(userService.getUsernameByUserID(user.getIdUserCreate()));
 

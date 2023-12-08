@@ -34,7 +34,7 @@ function joinRoom(): Promise<RoomJoinedResponse> {
             localStorage.setItem('chessMove', body.chessMove);
             localStorage.setItem('board', body.board);
             localStorage.setItem('color', body.color.toString()); 
-            localStorage.setItem('userSendName', body.userSendName);
+            // localStorage.setItem('userSendName', body.userSendName);
             localStorage.setItem('userSendAva', body.userSendAva);
             localStorage.setItem('userCountdownValue', body.userCountdownValue);
             localStorage.setItem('userReceiveName', body.userReceiveName);
@@ -47,7 +47,10 @@ export function sendChessMove(CreateChessMove: RoomJoinedResponse): Promise<stri
         stompClient.publish({
             destination: '/app/chessMove',
             headers: {},
-            body: JSON.stringify({iDUserSend: CreateChessMove.iDUserSend, userSendName: localStorage.getItem('userName'), iDRoom: CreateChessMove.iDRoom, idRoomUser: CreateChessMove.idRoomUser, chessMove: CreateChessMove.chessMove, board: CreateChessMove.board, color: CreateChessMove.color, userReceiveName: localStorage.getItem('userReceiveName') }),
+            body: JSON.stringify({iDUserSend: CreateChessMove.iDUserSend, userName: localStorage.getItem('userName'), 
+                                    iDRoom: CreateChessMove.iDRoom, idRoomUser: CreateChessMove.idRoomUser, 
+                                    chessMove: CreateChessMove.chessMove, board: CreateChessMove.board, 
+                                    color: CreateChessMove.color, userReceiveName: localStorage.getItem('userReceiveName') }),
         });
         resolve("Success");
     });

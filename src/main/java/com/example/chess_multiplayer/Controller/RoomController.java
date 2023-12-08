@@ -117,17 +117,17 @@ public class RoomController {
             chessGameUser1.setiDRoom(idRoomCreated);
             chessGameUser1.setIdRoomUser(idRoomUser1Created);
             chessGameUser1.setChessMove(null);
-            chessGameUser1.setUserSendName(userService.getUsernameByUserID(message.getIdUserJoin()));
+//            chessGameUser1.setUserSendName(userService.getUsernameByUserID(message.getIdUserJoin()));
             chessGameUser1.setUserSendAva(userService.getUserById(message.getIdUserJoin()).getAva());
-            chessGameUser1.setUserReceiveName(userService.getUsernameByUserID(waitingRoom.getUserCreateId()));
+            chessGameUser1.setUserReceiveName(userService.getUsernameByUserID(message.getIdUserJoin()));
 
             chessGameUser2.setiDUserSend(message.getIdUserJoin());
             chessGameUser2.setiDRoom(idRoomCreated);
             chessGameUser2.setIdRoomUser(idRoomUser2Created);
             chessGameUser2.setChessMove(null);
-            chessGameUser2.setUserSendName(userService.getUsernameByUserID(waitingRoom.getUserCreateId()));
+//            chessGameUser2.setUserSendName(userService.getUsernameByUserID(waitingRoom.getUserCreateId()));
             chessGameUser2.setUserSendAva(userService.getUserById(waitingRoom.getUserCreateId()).getAva());
-            chessGameUser2.setUserReceiveName(userService.getUsernameByUserID(message.getIdUserJoin()));
+            chessGameUser2.setUserReceiveName(userService.getUsernameByUserID(waitingRoom.getUserCreateId()));
 
             if(color == true){
                 chessGameUser1.setColor(color);

@@ -70,7 +70,7 @@ function sendChatToServer(): Promise<string> {
                 }
             });
         }else{
-            if(localStorage.getItem('iDUserReceive') == null){
+            if(localStorage.getItem('userReceiveName') == null){
                 const Toast = Swal.mixin({
                     toast: true,
                     position: "top-end",
@@ -90,7 +90,7 @@ function sendChatToServer(): Promise<string> {
             }else{
                 return new Promise((resolve, reject) => {
                     let idUserSend: string | null = localStorage.getItem('iDUserSend');
-                    let userSendName: string | null = localStorage.getItem('userSendName');
+                    let userSendName: string | null = localStorage.getItem('userName');
                     let userReceiveName: string | null = localStorage.getItem('userReceiveName');
                     let idRoom: string | null = localStorage.getItem('iDRoom');
                     let idRoomUser: string | null = localStorage.getItem('idRoomUser');
@@ -113,8 +113,8 @@ function sendChatToServer(): Promise<string> {
     }
     
 }
-export function ChatContentFrom(senderName: string, senderAvatar: number, messageContent: string, chatMode: boolean) {
-    if(senderName != localStorage.getItem('userSendName') || localStorage.getItem('userID') == null){
+export function ChatContentFrom(senderName: string, senderAvatar: number, messageContent: string, chatMode: boolean) {   
+    if(senderName != localStorage.getItem('userName') || localStorage.getItem('userID') == null){
         const newMessageDiv = document.createElement('div');
         newMessageDiv.classList.add('d-flex', 'justify-content-between');
 

@@ -6,7 +6,7 @@ function sendRegister(name: string, pass: string,ava: number): Promise<string> {
         stompClient.publish({
             destination: '/app/register',
             headers: {},
-            body: JSON.stringify({ username: name, password: pass , tempPort: window.location.port, ava:ava}),
+            body: JSON.stringify({ username: name, password: pass , ava:ava}),
         });
 
         stompClient.subscribe('/user/queue/registerStatus', (message) => {
@@ -89,7 +89,7 @@ document.getElementById("registerButton")?.addEventListener("click",async () => 
                             toast: true,
                             position: "top-end",
                             showConfirmButton: false,
-                            timer: 5000,
+                            timer: 2000,
                             timerProgressBar: true,
                             didOpen: (toast) => {
                             toast.onmouseenter = Swal.stopTimer;
@@ -99,6 +99,8 @@ document.getElementById("registerButton")?.addEventListener("click",async () => 
                         Toast.fire({
                             icon: "success",
                             title: "Đăng ký thành công"
+                        }).then(()=>{
+                            location.reload()
                         });
                         
                     })
@@ -107,7 +109,7 @@ document.getElementById("registerButton")?.addEventListener("click",async () => 
                             toast: true,
                             position: "top-end",
                             showConfirmButton: false,
-                            timer: 3000,
+                            timer: 2000,
                             timerProgressBar: true,
                             didOpen: (toast) => {
                             toast.onmouseenter = Swal.stopTimer;

@@ -13,9 +13,7 @@ document.getElementById('profileButton')?.addEventListener('click', function(){
 })
 document.getElementById('backProfile')?.addEventListener('click', function(){
     document.getElementById('profileSection')!.style.display = 'none'  
-    document.getElementById('mainGame')!.style.display = 'block'
-    // document.getElementById('tableBXH')!.style.display = 'block'  
-    // document.getElementById('mainGame')!.style.display = 'none' 
+    document.getElementById('mainGame')!.style.display = 'block' 
 })
 
 export function profileRender(rank: string,elo: string, numberOfWon: string, numberOfDrawn: string, numberOfLost: string, numberOfStanding: number){
@@ -29,31 +27,36 @@ export function profileRender(rank: string,elo: string, numberOfWon: string, num
         body: '1'
     });
     createPagination(Math.ceil(numberOfStanding/4)) 
-    console.log("nnn" + numberOfDrawn)
-    var chartData = {
-        labels: ['Thắng', 'Thua', 'Hòa'],
-        datasets: [{
-            label: 'Số trận',
-            data: [numberOfWon, numberOfLost, numberOfDrawn],
-            borderWidth: 1 
-        }]
-    };
-    var options = {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'top',
-            }, 
-        },
-    
+    console.log("nnn" + numberOfDrawn+ numberOfLost + numberOfWon) 
+    if(numberOfDrawn == "0" && numberOfLost == "0" && numberOfWon == "0"){
+        document.getElementById('divAchieve')!.classList.add('d-none')
+    }else{
+        document.getElementById('divAchieve')!.classList.remove('d-none')
+        var chartData = {
+            labels: ['Thắng', 'Thua', 'Hòa'],
+            datasets: [{
+                label: 'Số trận',
+                data: [numberOfWon, numberOfLost, numberOfDrawn],
+                borderWidth: 1 
+            }]
+        }; 
+        var options = {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }, 
+            },
+        
+        } 
+        var ctx = document.getElementById('achieve')!.getContext('2d')  
+        chart = new Chart(ctx, {
+            type: "pie",
+            data: chartData, 
+            options: options, 
+        });  
+
     }
-    var chart = null;
-    var ctx = document.getElementById('achieve')!.getContext('2d') 
-    chart = new Chart(ctx, {
-        type: "pie",
-        data: chartData, 
-        options: options, 
-    });  
 }
 document.getElementById('inpBXH')!.addEventListener('change', function (this: HTMLInputElement) {
     if (this.checked) {
@@ -71,6 +74,7 @@ document.getElementById('inpFriend')!.addEventListener('change', function (this:
             destination: '/app/myFriend', 
             headers: {},  
             body: localStorage.getItem('userID')!.toString()
+            // body: '1'
         });
     }
 });
@@ -151,14 +155,53 @@ export function sendInvatationFriend(result: string){
         destination: '/app/addFriend',
         headers: {},
         body: JSON.stringify({ userInviteID: localStorage.getItem('iDUserSend'), 
-                                userInvitedID: localStorage.getItem('iDUserReceive'), result: result}),
+                                userInvitedName: localStorage.getItem('userReceiveName'), result: result}),
     });
 }
-export function listFriendRender(content: any){
-    content.forEach((standing: any, index: number) => { 
-        console.log("listFriendRender")
-        console.log(standing.name)
-        console.log(standing.elo)
-        console.log(standing.status) 
+export function listFriendRender(content: any){ 
+    const tableBody = document.querySelector("#tableFriend tbody"); 
+    tableBody!.innerHTML = "";
+    
+    content.forEach((friend: any, index: number) => { 
+        let tr = document.createElement('tr');
+
+        let tdIndex = document.createElement('td')
+        tdIndex.textContent = (index + 1).toString()
+        let tdName = document.createElement('td');
+        tdName.textContent = friend.name.length > 12 ? friend.name.substring(0, 12) + '...' : friend.name
+
+        let spanStatus = document.createElement('span'); 
+        spanStatus.className = "mx-2 mt-2 d-inline-block rounded-circle";
+        spanStatus.style.width = "10px";
+        spanStatus.style.height = "10px";
+        if (friend.status === 'ONLINE') {
+            spanStatus.className += " bg-success";
+        } 
+        if (friend.status === 'OFFLINE') {
+            spanStatus.className += " bg-warning";
+        }
+        if (friend.status === 'INGAME') {
+            spanStatus.className += " bg-danger";
+        }
+        tdName.appendChild(spanStatus)
+
+        let tdElo = document.createElement('td');
+        tdElo.textContent = friend.elo 
+
+        let tdPlay = document.createElement('td');
+        let buttonPlay = document.createElement('button');
+        buttonPlay.className = "btn btn-sm btn-success btnInvite";
+        buttonPlay.value = friend.name;
+        buttonPlay.textContent = "Mời";
+        buttonPlay.addEventListener('click', function(){
+            console.log(this.value)
+        })
+        tdPlay.appendChild(buttonPlay)
+        
+        tr.appendChild(tdIndex);
+        tr.appendChild(tdName);
+        tr.appendChild(tdElo);
+        tr.appendChild(tdPlay);
+        tableBody!.appendChild(tr); 
     });
-}
+} 

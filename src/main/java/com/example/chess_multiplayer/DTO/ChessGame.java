@@ -2,7 +2,8 @@ package com.example.chess_multiplayer.DTO;
 
 public class ChessGame {
     private String iDUserSend;
-    private String userSendName;
+    private String userName;
+//    private String userSendName;
     private int userSendAva;
     private String iDRoom;
     private String idRoomUser;
@@ -12,6 +13,13 @@ public class ChessGame {
     private int userCountdownValue;
     private int oppCountdownValue;
     private String userReceiveName;
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
     public Boolean getColor() {
         return color;
@@ -62,13 +70,13 @@ public class ChessGame {
         this.idRoomUser = idRoomUser;
     }
 
-    public String getUserSendName() {
-        return userSendName;
-    }
-
-    public void setUserSendName(String userSendName) {
-        this.userSendName = userSendName;
-    }
+//    public String getUserSendName() {
+//        return userSendName;
+//    }
+//
+//    public void setUserSendName(String userSendName) {
+//        this.userSendName = userSendName;
+//    }
 
     public int getUserSendAva() {
         return userSendAva;

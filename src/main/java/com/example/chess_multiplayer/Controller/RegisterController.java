@@ -5,9 +5,13 @@ import com.example.chess_multiplayer.DTO.LoginReponse;
 import com.example.chess_multiplayer.DTO.RegisterRequest;
 import com.example.chess_multiplayer.Service.AccountService;
 import com.example.chess_multiplayer.Service.UserService;
+import com.example.chess_multiplayer.config.PricipalCustome;
+import com.example.chess_multiplayer.config.UserInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
@@ -26,7 +30,8 @@ public class RegisterController {
     private UserService userService;
     @MessageMapping("/register")
 //    @SendTo("/queue/loginStatus")
-    public void login(RegisterRequest message) {
+    @SendToUser("/queue/registerStatus")
+    public LoginReponse login(@Payload RegisterRequest message, Principal principal) {
         String username = message.getUsername();
         String password = message.getPassword();
         int ava = message.getAva();
@@ -43,17 +48,25 @@ public class RegisterController {
                 loginReponse.setUserName(username);
                 loginReponse.setAva(ava);
                 loginReponse.setMessage("Đăng ký thành công");
-                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/registerStatus", loginReponse);
+
+                String AccId = accountController.getAccId(username,password);
+                String UserId = userController.getIdUserByIDAcc(AccId);
+                System.out.println("rg: " + userId + "/" + principal.getName());
+                UserInterceptor.updatePrincipal(principal.getName(),new PricipalCustome(UserId,"ONLINE"));
+                return loginReponse;
+//                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/registerStatus", loginReponse);
             } else {
                 // Gửi thông báo đăng ký thất bại (tài khoản đã tồn tại) qua WebSocket
                 loginReponse.setUserID(null);
                 loginReponse.setMessage("Tài khoản đã tồn tại");
-                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/registerStatus", loginReponse);
+                return loginReponse;
+//                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/registerStatus", loginReponse);
             }
         } catch (Exception ex) {
             loginReponse.setUserID(null);
             loginReponse.setMessage("Đăng ký thất bại: " + ex.getMessage());
-            messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/registerStatus", loginReponse);
+            return loginReponse;
+//            messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/registerStatus", loginReponse);
         }
 
     }
