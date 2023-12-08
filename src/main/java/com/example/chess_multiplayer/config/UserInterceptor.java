@@ -1,5 +1,6 @@
 package com.example.chess_multiplayer.config;
 
+import com.example.chess_multiplayer.Server.ServerApplication;
 import org.springframework.messaging.support.ChannelInterceptor;
 
 import java.util.*;
@@ -57,6 +58,7 @@ public class UserInterceptor implements ChannelInterceptor {
         for (Map.Entry<String, PricipalCustome> entry : userMap.entrySet()) {
             System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue() + ", Status = " + entry.getValue().getStatus());
         }
+        ServerApplication.setTxtLoginLog("cc");
     }
 
     public static void updateStatusPrincipal(String userID, String newStatus) {
