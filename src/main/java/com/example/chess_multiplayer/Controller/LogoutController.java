@@ -12,7 +12,6 @@ public class LogoutController {
     @MessageMapping("/logout")
     public void logout (Principal principal){
         UserInterceptor.removePrincipal(principal.getName());
-        System.out.println("--Sau logout---"); UserInterceptor.printUserMap();
     }
     @MessageMapping("/ccPrint")
     public void ccPrint (){

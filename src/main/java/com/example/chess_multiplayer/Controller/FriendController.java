@@ -4,6 +4,7 @@ import com.example.chess_multiplayer.DTO.FriendReponse;
 import com.example.chess_multiplayer.DTO.FriendRequest;
 import com.example.chess_multiplayer.Entity.Friend;
 import com.example.chess_multiplayer.Entity.User;
+import com.example.chess_multiplayer.Service.AccountService;
 import com.example.chess_multiplayer.Service.FriendService;
 import com.example.chess_multiplayer.Service.UserService;
 import com.example.chess_multiplayer.config.UserInterceptor;
@@ -25,14 +26,18 @@ public class FriendController {
     @Autowired
     private UserService userService;
     @Autowired
+    private AccountService accountService;
+    @Autowired
     private FriendService friendService;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/addFriend")
     public void addFriend(@Payload FriendRequest friendRequest) {
+        String AccInvitedId = accountService.getAccID(friendRequest.getUserInvitedName());
+        String UserInvitedId = userService.getIdUserByIdAcc(AccInvitedId);
         User userInvite = userService.getUserById(friendRequest.getUserInviteID());
-        User userInvited = userService.getUserById(friendRequest.getUserInvitedID());
+        User userInvited = userService.getUserById(UserInvitedId);
         System.out.println("addFriend" + userInvite.getIDUser() + ":" + userInvited.getIDUser());
         if(friendService.isExistFriend(userInvite, userInvited)){
             System.out.println("FRIEND_ALREADY");
@@ -62,6 +67,8 @@ public class FriendController {
     @MessageMapping("/myFriend")
     @SendToUser("/queue/myFriend")
     public ArrayList<FriendReponse> getListFriend(@Payload String userID){
+//        String userID = principal.getName();
+        System.out.println("my friend");
         ArrayList<FriendReponse> friendResponses = new ArrayList<>();
         ArrayList<String> listFriendID = new ArrayList<>();
         listFriendID = friendService.getListFriend(userService.getUserById(userID));

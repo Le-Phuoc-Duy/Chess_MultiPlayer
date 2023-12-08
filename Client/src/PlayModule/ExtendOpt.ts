@@ -30,7 +30,8 @@ function sendEndGame(endGame: EndGame): Promise<string> {
         stompClient.publish({
             destination: '/app/endGame',
             headers: {},
-            body: JSON.stringify({ iDUserSend: endGame.iDUserSend, userReceiveName: endGame.userReceiveName, iDRoom: endGame.iDRoom, idRoomUser: endGame.idRoomUser, result: endGame.result }),
+            body: JSON.stringify({ iDUserSend: endGame.iDUserSend, userReceiveName: endGame.userReceiveName, 
+                                    iDRoom: endGame.iDRoom, idRoomUser: endGame.idRoomUser, result: endGame.result }),
         });
         resolve("Success");
     });

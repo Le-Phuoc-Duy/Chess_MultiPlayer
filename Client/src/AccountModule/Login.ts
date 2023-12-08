@@ -51,7 +51,7 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
                             toast: true,
                             position: "top-end",
                             showConfirmButton: false,
-                            timer: 1000,
+                            timer: 200,
                             timerProgressBar: true,
                             didOpen: (toast) => {
                             toast.onmouseenter = Swal.stopTimer;

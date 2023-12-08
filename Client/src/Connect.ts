@@ -36,7 +36,6 @@ stompClient.onConnect = (frame) => {
     stompClient.subscribe('/user/queue/chessMove', (message) => {
         const body = JSON.parse(message.body);
         // console.log('iDUserSend: ' + body.iDUserSend + '\niDUserReceive: ' + body.iDUserReceive + '\niDRoom: ' + body.iDRoom + '\nidRoomUser: ' + body.idRoomUser + '\nchessMove: ' + body.chessMove + '\nboard: ' + body.board + '\ncolor: ' + body.color)
-
         localStorage.setItem('iDUserSend', body.iDUserSend);
         localStorage.setItem('iDRoom', body.iDRoom);
         localStorage.setItem('idRoomUser', body.idRoomUser);
@@ -45,19 +44,18 @@ stompClient.onConnect = (frame) => {
         localStorage.setItem('color', body.color.toString()); 
         localStorage.setItem('userCountdownValue', body.userCountdownValue);
         localStorage.setItem('oppCountdownValue', body.oppCountdownValue);
-        localStorage.setItem('userSendName', body.userSendName);
+        // localStorage.setItem('userSendName', body.userSendName);
         localStorage.setItem('userSendAva', body.userSendAva);
         localStorage.setItem('userReceiveName', body.userReceiveName);
-        // //Trường hợp đăng nhập 1 acc trên 2 máy
-        // if(currentGame.playerSide === Color.NOT){
-        //     var tmpColor: Color
-        //     tmpColor = localStorage.getItem('color') === "true" ? Color.WHITE : Color.BLACK;
-        //     var tmpGame: Game = new Game(tmpColor,new Board,true,GameStatus.WIN)
-        //     console.log(1)
-        //     setCurrentGame(tmpGame)
-        //     console.log("provl: "+ currentGame.playerSide )
-        //     PromotionOverlay(currentGame.playerSide)
-        // }
+        //Trường hợp đăng nhập 1 acc trên 2 máy
+        if(currentGame.playerSide === Color.NOT){
+            var tmpColor: Color
+            tmpColor = localStorage.getItem('color') === "true" ? Color.WHITE : Color.BLACK;
+            var tmpGame: Game = new Game(tmpColor,new Board,true,GameStatus.WIN) 
+            setCurrentGame(tmpGame)
+            console.log("provl: "+ currentGame.playerSide )
+            PromotionOverlay(currentGame.playerSide)
+        }
         currentGame.setFullCoordinates(body.board)
         currentGame.currentTurn = true
         if (currentGame.currentTurn) {
@@ -81,9 +79,19 @@ stompClient.onConnect = (frame) => {
         localStorage.setItem('color', body.color.toString()); 
         localStorage.setItem('userCountdownValue', body.userCountdownValue);
         localStorage.setItem('oppCountdownValue', body.oppCountdownValue);
-        localStorage.setItem('userSendName', body.userSendName);
+        // localStorage.setItem('userSendName', body.userSendName);
         localStorage.setItem('userSendAva', body.userSendAva);
         localStorage.setItem('userReceiveName', body.userReceiveName);
+        //Trường hợp đăng nhập 1 acc trên 2 máy
+        if(currentGame.playerSide === Color.NOT){
+            var tmpColor: Color
+            tmpColor = localStorage.getItem('color') === "true" ? Color.WHITE : Color.BLACK;
+            var tmpGame: Game = new Game(tmpColor,new Board,true,GameStatus.WIN) 
+            setCurrentGame(tmpGame)
+            console.log("provl: "+ currentGame.playerSide )
+            PromotionOverlay(currentGame.playerSide)
+        }
+
         currentGame.setFullCoordinates(body.board)
         currentGame.currentTurn = false
         if (currentGame.currentTurn) {
@@ -92,7 +100,7 @@ stompClient.onConnect = (frame) => {
             localStorage.setItem('currentTurn', 'false');
         }
         drawBoard(currentGame.board);
-        currentGame.checkGameStatus()
+        // currentGame.checkGameStatus()
         // setTimer(body.userCountdownValue,body.oppCountdownValue,true,false)
         initializeClockSelf(body.userCountdownValue);
         initializeClockOpp(body.oppCountdownValue);
@@ -489,7 +497,7 @@ export function PromotionOverlay(color: Color) {
         (document.getElementById('opponentAva') as HTMLImageElement).src = './assets/ava0' + localStorage.getItem('userSendAva') + '.png'
         // name
         document.getElementById('selfName')!.innerHTML = localStorage.getItem('userName')!.toString()
-        document.getElementById('opponentName')!.innerHTML = localStorage.getItem('userSendName')!.toString()
+        document.getElementById('opponentName')!.innerHTML = localStorage.getItem('userReceiveName')!.toString()
 
         document.getElementById('afterGame')!.style.display = 'block';
         document.getElementById('beforeGame')!.style.display = 'none';

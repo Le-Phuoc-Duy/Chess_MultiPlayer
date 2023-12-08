@@ -130,7 +130,7 @@ function joinGame(): Promise<RoomJoinedResponse> {
       localStorage.setItem('chessMove', body.chessMove);
       localStorage.setItem('board', body.board);
       localStorage.setItem('color', body.color.toString()); 
-      localStorage.setItem('userSendName', body.userSendName);
+      // localStorage.setItem('userSendName', body.userSendName);
       localStorage.setItem('userSendAva', body.userSendAva);
       localStorage.setItem('userCountdownValue', body.userCountdownValue);
       localStorage.setItem('userReceiveName', body.userReceiveName);

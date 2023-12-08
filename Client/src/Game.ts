@@ -72,7 +72,7 @@ export class Game {
 		let sourcePiece: Piece | null			//Quân cờ di chuyển
 		let chkPromotion: boolean = false
 		sourcePiece = startPoint.piece
-		console.log("img " + sourcePiece?.image + startPoint.row + startPoint.col) 
+		// console.log("img " + sourcePiece?.image + startPoint.row + startPoint.col) 
 		//Không chọn quân cờ, chọn ô cờ
 		if (sourcePiece === null) {
 			console.log("sourcePiece")
@@ -90,8 +90,8 @@ export class Game {
 		}
 		//Nước cờ có đúng logic không?
 		if (!sourcePiece.canMove(this._board, startPoint, endPoint)) {
-			console.log("invalid move " + startPoint.row + startPoint.col)
-			console.log("invalid move " + endPoint.row + endPoint.col)
+			// console.log("invalid move " + startPoint.row + startPoint.col)
+			// console.log("invalid move " + endPoint.row + endPoint.col)
 			return false
 		}
 		//Catsling?
@@ -193,7 +193,7 @@ export class Game {
 		}
 		//Promotion?
 		if (endPoint.row === 0 && (this._board.getBox(startPoint.row, startPoint.col).piece?.name === 'p' || this._board.getBox(startPoint.row, startPoint.col).piece?.name === 'P')) {
-			console.log("piece promote" + piecePromoted)
+			// console.log("piece promote" + piecePromoted)
 			if (this._playerSide === Color.WHITE) {
 				if (piecePromoted === "Queen") {
 					this._board.getBox(startPoint.row, startPoint.col).piece = new Queen(Color.WHITE, "./assets/White-Queen.png", "Q")
@@ -262,7 +262,7 @@ export class Game {
 				this._board.kingMoved = true
 				this.board.catsling = Catsling.NOT
 			}
-			console.log("dang chieu")
+			// console.log("dang chieu")
 			return false
 		} else {
 			if (this._board.catsling === Catsling.EXCUTE) this._board.catsling = Catsling.DONE
@@ -282,14 +282,14 @@ export class Game {
 			&& this._board.getBox(rowOfKing - 1, colOfKing + 1).piece?.color === opponentColor
 			&& (this._board.getBox(rowOfKing - 1, colOfKing + 1).piece?.name === 'p'
 				|| this._board.getBox(rowOfKing - 1, colOfKing + 1).piece?.name === 'P')) {
-			console.log("tot chieu +1")
+			// console.log("tot chieu +1")
 			return true
 		}
 		if (rowOfKing - 1 >= 0 && colOfKing - 1 >= 0
 			&& this._board.getBox(rowOfKing - 1, colOfKing - 1).piece?.color === opponentColor
 			&& (this._board.getBox(rowOfKing - 1, colOfKing - 1).piece?.name === 'p'
 				|| this._board.getBox(rowOfKing - 1, colOfKing - 1).piece?.name === 'P')) {
-			console.log("tot chieu -1")
+			// console.log("tot chieu -1")
 			return true
 		}
 		//Mã chiếu
@@ -311,7 +311,7 @@ export class Game {
 				if (this._board.getBox(targetRow, targetCol).piece?.color === opponentColor
 					&& (this._board.getBox(targetRow, targetCol).piece?.name === 'n'
 						|| this._board.getBox(targetRow, targetCol).piece?.name === 'N')) {
-					console.log("ma chieu" + knightMove.row + knightMove.col)
+					// console.log("ma chieu" + knightMove.row + knightMove.col)
 					return true
 				}
 			}
@@ -336,9 +336,9 @@ export class Game {
 						|| this._board.getBox(r, c).piece?.name === 'R'
 						|| this._board.getBox(r, c).piece?.name === 'q'
 						|| this._board.getBox(r, c).piece?.name === 'Q') {
-						console.log("chiếu theo dọc hoặc ngang" + direction.row + direction.col)
-						console.log("quân chiếu" + this._board.getBox(r, c).piece?.name + r + c)
-						console.log("quân vua" + rowOfKing + colOfKing)
+						// console.log("chiếu theo dọc hoặc ngang" + direction.row + direction.col)
+						// console.log("quân chiếu" + this._board.getBox(r, c).piece?.name + r + c)
+						// console.log("quân vua" + rowOfKing + colOfKing)
 						return true;
 					} else if (this._board.getBox(r, c).piece !== null) {
 						break
@@ -365,7 +365,7 @@ export class Game {
 						|| this._board.getBox(diagRow, diagCol).piece?.name === 'B'
 						|| this._board.getBox(diagRow, diagCol).piece?.name === 'q'
 						|| this._board.getBox(diagRow, diagCol).piece?.name === 'Q') {
-						console.log("chiếu theo đường chéo" + digDirection.row + digDirection.col)
+						// console.log("chiếu theo đường chéo" + digDirection.row + digDirection.col)
 						return true
 					} else if (this._board.getBox(diagRow, diagCol).piece !== null) {
 						break

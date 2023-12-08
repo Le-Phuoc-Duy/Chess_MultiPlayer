@@ -135,7 +135,7 @@ public class RoomuserController implements CountdownTimerListener {
     }
     @MessageMapping("/chessMove")
     public void chessMove(ChessGame message) {
-        String AccId = accountService.getAccID(message.getUserSendName());
+        String AccId = accountService.getAccID(message.getUserName());
         String UserId = userService.getIdUserByIdAcc(AccId);
         String AccOppId = accountService.getAccID(message.getUserReceiveName());
         String UserOppId = userService.getIdUserByIdAcc(AccOppId);
