@@ -134,11 +134,13 @@ public class RoomController {
                 chessGameUser2.setColor(!color);
                 chessGameUser1.setBoard("rnbqkbnrpppppppp////////////////////////////////PPPPPPPPRNBQKBNR");
                 chessGameUser2.setBoard("RNBKQBNRPPPPPPPP////////////////////////////////pppppppprnbkqbnr");
+                UserInterceptor.changeRoom("INCREASE",idRoomCreated,chessGameUser1.getiDUserSend(),chessGameUser2.getiDUserSend(),"Đang chơi");
             }else{
                 chessGameUser1.setColor(color);
                 chessGameUser2.setColor(!color);
                 chessGameUser2.setBoard("rnbqkbnrpppppppp////////////////////////////////PPPPPPPPRNBQKBNR");
                 chessGameUser1.setBoard("RNBKQBNRPPPPPPPP////////////////////////////////pppppppprnbkqbnr");
+                UserInterceptor.changeRoom("INCREASE",idRoomCreated,chessGameUser2.getiDUserSend(),chessGameUser1.getiDUserSend(),"Đang chơi");
             }
             //send result to user2-user1
             UserInterceptor.updateStatusPrincipal(message.getIdUserJoin(),"INGAME");

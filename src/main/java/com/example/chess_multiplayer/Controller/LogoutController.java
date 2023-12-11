@@ -11,12 +11,7 @@ import java.security.Principal;
 public class LogoutController {
     @MessageMapping("/logout")
     public void logout (Principal principal){
+        UserInterceptor.changeOnline("DECREASE",principal.getName());
         UserInterceptor.removePrincipal(principal.getName());
     }
-    @MessageMapping("/ccPrint")
-    public void ccPrint (){
-        System.out.println("--ccPrint---"); UserInterceptor.printUserMap();
-    }
-
-
 }

@@ -98,4 +98,7 @@ public class RoomuserService {
             roomuserRepository.save(roomUser);
         }
     }
+    public boolean findSideByRoomIdAndUserId(String roomId, String userId){
+        return roomuserRepository.findSideByRoomIdAndUserId(roomId,userId);
+    }
 }

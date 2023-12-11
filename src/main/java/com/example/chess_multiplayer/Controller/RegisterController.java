@@ -53,6 +53,7 @@ public class RegisterController {
                 String UserId = userController.getIdUserByIDAcc(AccId);
                 System.out.println("rg: " + userId + "/" + principal.getName());
                 UserInterceptor.updatePrincipal(principal.getName(),new PricipalCustome(UserId,"ONLINE"));
+                UserInterceptor.changeOnline("INCREASE",UserId);
                 return loginReponse;
 //                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/registerStatus", loginReponse);
             } else {

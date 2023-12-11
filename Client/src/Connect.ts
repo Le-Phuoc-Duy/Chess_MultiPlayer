@@ -10,6 +10,10 @@ import { removeGame, setEndGame } from './PlayModule/ExtendOpt';
 import { listFriendRender, profileRender, sendInvatationFriend, standingRender } from './AccountModule/Profile';
 
 export var currentGame: Game = new Game(Color.NOT, new Board, true, 0);
+var logoutExecuted: boolean = false
+export function setLogoutExecuted(value: boolean){
+    logoutExecuted = value
+}
 const socket = new SockJS('http://' + window.location.hostname + ':8888/ws');
 export const stompClient = new Client({
     webSocketFactory: () => socket,
@@ -114,9 +118,9 @@ stompClient.onConnect = (frame) => {
             // localStorage.setItem('oppcountdownValue', body.countdownValue);
             initializeClockOpp(body.countdownValue);
         }
-        console.log("body.countdownValue: " + body.countdownValue);
-        console.log("body.idUser: " + body.idUser);
-        console.log("body.side: " + body.side);
+        // console.log("body.countdownValue: " + body.countdownValue);
+        // console.log("body.idUser: " + body.idUser);
+        // console.log("body.side: " + body.side);
         // setTimer(body.userCountdownValue,body.oppCountdownValue,true,false)
 
     });
@@ -415,10 +419,13 @@ window.addEventListener('beforeunload', () => {
     if(currentGame.playerSide !== Color.NOT){
         localStorage.setItem('savedGame', JSON.stringify(currentGame));
     }
-    stompClient.publish({
-        destination: '/app/logout',
-        headers: {},
-    });
+    //Nếu đăng xuất, không gửi đến server (vì ở logout đã thực hiện gửi)
+    if(!logoutExecuted){
+        stompClient.publish({
+            destination: '/app/logout',
+            headers: {},
+        });
+    }
 });
 export function checkIsloggedIn() {
     const isLoggedIn = localStorage.getItem('userID');

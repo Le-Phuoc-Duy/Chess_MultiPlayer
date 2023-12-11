@@ -47,9 +47,10 @@ export function sendChessMove(CreateChessMove: RoomJoinedResponse): Promise<stri
         stompClient.publish({
             destination: '/app/chessMove',
             headers: {},
-            body: JSON.stringify({iDUserSend: CreateChessMove.iDUserSend, userName: localStorage.getItem('userName'), 
-                                    iDRoom: CreateChessMove.iDRoom, idRoomUser: CreateChessMove.idRoomUser, 
-                                    chessMove: CreateChessMove.chessMove, board: CreateChessMove.board, 
+            body: JSON.stringify({iDUserSend: CreateChessMove.iDUserSend, userName: localStorage.getItem('userName'),
+                                    iDRoom: CreateChessMove.iDRoom, userSendAva: localStorage.getItem('ava'),
+                                    idRoomUser: CreateChessMove.idRoomUser,  chessMove: CreateChessMove.chessMove, 
+                                    board: CreateChessMove.board, 
                                     color: CreateChessMove.color, userReceiveName: localStorage.getItem('userReceiveName') }),
         });
         resolve("Success");

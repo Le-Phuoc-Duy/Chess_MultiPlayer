@@ -44,7 +44,8 @@ public class LoginController {
                 loginReponse.setMessage("Đăng nhập thành công");
                 System.out.println(message.getTempPort());
                 UserInterceptor.updatePrincipal(principal.getName(),new PricipalCustome(UserId,"ONLINE"));
-                UserInterceptor.printUserMap();
+//                UserInterceptor.printUserMap();
+                UserInterceptor.changeOnline("INCREASE",UserId);
                 return loginReponse;
 //                messagingTemplate.convertAndSendToUser(message.getTempPort(), "/queue/loginStatus", loginReponse);
             } else {

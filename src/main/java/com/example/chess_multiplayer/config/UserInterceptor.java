@@ -33,12 +33,14 @@ public class UserInterceptor implements ChannelInterceptor {
                         System.out.println("null");
                         final String randomId = UUID.randomUUID().toString();
                         pricipalCustome = new PricipalCustome(randomId,"ONLINE");
+                        changeOnline("INCREASE",randomId);
                         userMap.put(randomId, pricipalCustome);
                     }else{
                         //Có userID, lần đầu đăng nhập
                         if (pricipalCustome == null) {
                             System.out.println("tempPort: " + tempPort);
                             pricipalCustome = new PricipalCustome(name,"ONLINE");
+                            changeOnline("INCREASE",name);
                             userMap.put(name, pricipalCustome);
                         }
                     }
@@ -58,7 +60,6 @@ public class UserInterceptor implements ChannelInterceptor {
         for (Map.Entry<String, PricipalCustome> entry : userMap.entrySet()) {
             System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue() + ", Status = " + entry.getValue().getStatus());
         }
-        ServerApplication.setTxtLoginLog("cc");
     }
 
     public static void updateStatusPrincipal(String userID, String newStatus) {
@@ -78,5 +79,11 @@ public class UserInterceptor implements ChannelInterceptor {
     }
     public static void removePrincipal(String userId) {
         userMap.remove(userId);
+    }
+    public static void changeOnline(String opt, String newUserID){
+        ServerApplication.changeOnline(opt, newUserID);
+    }
+    public static void changeRoom(String opt, String roomID ,String blackID, String whiteID, String result){
+        ServerApplication.changeRoom(opt, roomID, blackID, whiteID, result);
     }
 }

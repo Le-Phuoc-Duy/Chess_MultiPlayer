@@ -8,6 +8,8 @@ import com.example.chess_multiplayer.Interface.CountdownTimerListener;
 import com.example.chess_multiplayer.Service.RoomService;
 import com.example.chess_multiplayer.Service.RoomuserService;
 import com.example.chess_multiplayer.Service.UserService;
+import com.example.chess_multiplayer.config.PricipalCustome;
+import com.example.chess_multiplayer.config.UserInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -43,6 +45,13 @@ public class RoomuserController implements CountdownTimerListener {
         // Update room values
         roomService.updateRoomTimeEnd(idRoom);
 
+        // Update Room for server
+        if(roomuserService.findSideByRoomIdAndUserId(idRoom,idUserSend))
+            UserInterceptor.changeRoom("DECREASE",idRoom,idUserSend,idUserReceive,"Quân đen thắng");
+        else
+            UserInterceptor.changeRoom("DECREASE",idRoom,idUserReceive,idUserSend,"Quân trắng thắng");
+        UserInterceptor.updateStatusPrincipal(idUserSend,"ONLINE");
+        UserInterceptor.updateStatusPrincipal(idUserReceive,"ONLINE");
         // Update room user values
         roomuserService.updateRoomUserResult(idRoomUser, Result.LOSE.toString());
         roomuserService.updateRoomUserResult(idRoomUserReceive, Result.WIN.toString());
@@ -144,6 +153,8 @@ public class RoomuserController implements CountdownTimerListener {
         ChessGame chessGameUserReceive = new ChessGame();
         chessGameUserReceive.setiDUserSend(UserOppId);
         chessGameUserReceive.setiDRoom(message.getiDRoom());
+        chessGameUserReceive.setUserSendAva(message.getUserSendAva());
+        message.setUserSendAva(userService.getUserById(UserOppId).getAva());
         if(getRoomuserIdByRoomIdAndUserId(message.getiDRoom(), UserOppId)!=null){
             chessGameUserReceive.setIdRoomUser(getRoomuserIdByRoomIdAndUserId(message.getiDRoom(), UserOppId));
             chessGameUserReceive.setChessMove(message.getChessMove());
@@ -227,6 +238,12 @@ public class RoomuserController implements CountdownTimerListener {
 
                     checkAndRemoveFinishedTimersRoomUser(message.getIdRoomUser());
                     checkAndRemoveFinishedTimersRoomUser(gameStatusUserReceive.getIdRoomUser());
+                    if(roomuserService.findSideByRoomIdAndUserId(gameStatusUserReceive.getiDRoom(), message.getiDUserSend()))
+                        UserInterceptor.changeRoom("DECREASE",gameStatusUserReceive.getiDRoom(),message.getiDUserSend(),gameStatusUserReceive.getiDUserSend(),"Quân trắng thắng");
+                    else
+                        UserInterceptor.changeRoom("DECREASE",gameStatusUserReceive.getiDRoom(),gameStatusUserReceive.getiDUserSend(),message.getiDUserSend(),"Quân đen thắng");
+                    UserInterceptor.updateStatusPrincipal(gameStatusUserReceive.getiDUserSend(),"ONLINE");
+                    UserInterceptor.updateStatusPrincipal(message.getiDUserSend(),"ONLINE");
                     messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
                     messagingTemplate.convertAndSendToUser(message.getiDUserSend(), "/queue/endGame",message );
                 }
@@ -245,7 +262,12 @@ public class RoomuserController implements CountdownTimerListener {
 
                     checkAndRemoveFinishedTimersRoomUser(message.getIdRoomUser());
                     checkAndRemoveFinishedTimersRoomUser(gameStatusUserReceive.getIdRoomUser());
-
+                    if(roomuserService.findSideByRoomIdAndUserId(gameStatusUserReceive.getiDRoom(), message.getiDUserSend()))
+                        UserInterceptor.changeRoom("DECREASE",gameStatusUserReceive.getiDRoom(),message.getiDUserSend(),gameStatusUserReceive.getiDUserSend(),"Hòa");
+                    else
+                        UserInterceptor.changeRoom("DECREASE",gameStatusUserReceive.getiDRoom(),gameStatusUserReceive.getiDUserSend(),message.getiDUserSend(),"Hòa");
+                    UserInterceptor.updateStatusPrincipal(gameStatusUserReceive.getiDUserSend(),"ONLINE");
+                    UserInterceptor.updateStatusPrincipal(message.getiDUserSend(),"ONLINE");
                     messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
                     messagingTemplate.convertAndSendToUser(message.getiDUserSend(), "/queue/endGame",message );
                 }
@@ -265,6 +287,12 @@ public class RoomuserController implements CountdownTimerListener {
 
                     checkAndRemoveFinishedTimersRoomUser(message.getIdRoomUser());
                     checkAndRemoveFinishedTimersRoomUser(gameStatusUserReceive.getIdRoomUser());
+                    if(roomuserService.findSideByRoomIdAndUserId(gameStatusUserReceive.getiDRoom(), message.getiDUserSend()))
+                        UserInterceptor.changeRoom("DECREASE",gameStatusUserReceive.getiDRoom(),message.getiDUserSend(),gameStatusUserReceive.getiDUserSend(),"Quân đen thắng");
+                    else
+                        UserInterceptor.changeRoom("DECREASE",gameStatusUserReceive.getiDRoom(),gameStatusUserReceive.getiDUserSend(),message.getiDUserSend(),"Quân trắng thắng");
+                    UserInterceptor.updateStatusPrincipal(gameStatusUserReceive.getiDUserSend(),"ONLINE");
+                    UserInterceptor.updateStatusPrincipal(message.getiDUserSend(),"ONLINE");
                     messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
                     messagingTemplate.convertAndSendToUser(message.getiDUserSend(), "/queue/endGame",message );
 
@@ -291,6 +319,12 @@ public class RoomuserController implements CountdownTimerListener {
                     checkAndRemoveFinishedTimersRoomUser(message.getIdRoomUser());
                     checkAndRemoveFinishedTimersRoomUser(gameStatusUserReceive.getIdRoomUser());
                     gameStatusUserReceive.setResult(Result.DRAW_ACCEPT);
+                    if(roomuserService.findSideByRoomIdAndUserId(gameStatusUserReceive.getiDRoom(), message.getiDUserSend()))
+                        UserInterceptor.changeRoom("DECREASE",gameStatusUserReceive.getiDRoom(),message.getiDUserSend(),gameStatusUserReceive.getiDUserSend(),"Hòa");
+                    else
+                        UserInterceptor.changeRoom("DECREASE",gameStatusUserReceive.getiDRoom(),gameStatusUserReceive.getiDUserSend(),message.getiDUserSend(),"Hòa");
+                    UserInterceptor.updateStatusPrincipal(gameStatusUserReceive.getiDUserSend(),"ONLINE");
+                    UserInterceptor.updateStatusPrincipal(message.getiDUserSend(),"ONLINE");
                     messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
                     messagingTemplate.convertAndSendToUser(message.getiDUserSend(), "/queue/endGame",message );
                 }
@@ -316,6 +350,11 @@ public class RoomuserController implements CountdownTimerListener {
                     checkAndRemoveFinishedTimersRoomUser(message.getIdRoomUser());
                     checkAndRemoveFinishedTimersRoomUser(gameStatusUserReceive.getIdRoomUser());
                     gameStatusUserReceive.setResult(Result.QUIT);
+                    if(roomuserService.findSideByRoomIdAndUserId(gameStatusUserReceive.getiDRoom(), message.getiDUserSend()))
+                        UserInterceptor.changeRoom("DECREASE",gameStatusUserReceive.getiDRoom(),message.getiDUserSend(),gameStatusUserReceive.getiDUserSend(),"Quân đen thắng");
+                    else
+                        UserInterceptor.changeRoom("DECREASE",gameStatusUserReceive.getiDRoom(),gameStatusUserReceive.getiDUserSend(),message.getiDUserSend(),"Quân trắng thắng");
+                    UserInterceptor.updateStatusPrincipal(gameStatusUserReceive.getiDUserSend(),"ONLINE");
                     messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
                 }
                 case SURRENDER -> {
@@ -336,6 +375,12 @@ public class RoomuserController implements CountdownTimerListener {
                     checkAndRemoveFinishedTimersRoomUser(message.getIdRoomUser());
                     checkAndRemoveFinishedTimersRoomUser(gameStatusUserReceive.getIdRoomUser());
                     gameStatusUserReceive.setResult(Result.SURRENDER);
+                    if(roomuserService.findSideByRoomIdAndUserId(gameStatusUserReceive.getiDRoom(), message.getiDUserSend()))
+                        UserInterceptor.changeRoom("DECREASE",gameStatusUserReceive.getiDRoom(),message.getiDUserSend(),gameStatusUserReceive.getiDUserSend(),"Quân đen thắng");
+                    else
+                        UserInterceptor.changeRoom("DECREASE",gameStatusUserReceive.getiDRoom(),gameStatusUserReceive.getiDUserSend(),message.getiDUserSend(),"Quân trắng thắng");
+                    UserInterceptor.updateStatusPrincipal(gameStatusUserReceive.getiDUserSend(),"ONLINE");
+                    UserInterceptor.updateStatusPrincipal(message.getiDUserSend(),"ONLINE");
                     messagingTemplate.convertAndSendToUser(gameStatusUserReceive.getiDUserSend(), "/queue/endGame",gameStatusUserReceive );
                     messagingTemplate.convertAndSendToUser(message.getiDUserSend(), "/queue/endGame",message );
                 }

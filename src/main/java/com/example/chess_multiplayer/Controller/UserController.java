@@ -7,6 +7,7 @@ import com.example.chess_multiplayer.Service.UserService;
 import com.example.chess_multiplayer.Entity.User;
 import com.example.chess_multiplayer.Entity.Account;
 
+import com.example.chess_multiplayer.config.UserInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -116,7 +117,7 @@ public class UserController {
         chessGameUser1.setChessMove(null);
 //        chessGameUser1.setUserSendName(userService.getUsernameByUserID(user.getIdUserCreate()));
         chessGameUser1.setUserName(userService.getUsernameByUserID(user.getIdUserCreate()));
-        chessGameUser1.setUserSendAva(userService.getUserById(user.getIdUserCreate()).getAva());
+        chessGameUser1.setUserSendAva(userService.getUserById(message.getIdUserCreate()).getAva());
         chessGameUser1.setUserReceiveName(userService.getUsernameByUserID(message.getIdUserCreate()));
 
         chessGameUser2.setiDUserSend(message.getIdUserCreate());
@@ -125,7 +126,7 @@ public class UserController {
         chessGameUser2.setChessMove(null);
 //        chessGameUser2.setUserSendName(userService.getUsernameByUserID(message.getIdUserCreate()));
         chessGameUser2.setUserName(userService.getUsernameByUserID(message.getIdUserCreate()));
-        chessGameUser2.setUserSendAva(userService.getUserById(message.getIdUserCreate()).getAva());
+        chessGameUser2.setUserSendAva(userService.getUserById(user.getIdUserCreate()).getAva());
         chessGameUser2.setUserReceiveName(userService.getUsernameByUserID(user.getIdUserCreate()));
 
         if(color){
@@ -133,14 +134,19 @@ public class UserController {
             chessGameUser2.setColor(!color);
             chessGameUser1.setBoard("rnbqkbnrpppppppp////////////////////////////////PPPPPPPPRNBQKBNR");
             chessGameUser2.setBoard("RNBQKBNRPPPPPPPP////////////////////////////////pppppppprnbqkbnr");
+            UserInterceptor.changeRoom("INCREASE",idRoomCreated,chessGameUser1.getiDUserSend(),chessGameUser2.getiDUserSend(),"Đang chơi");
         }else{
             chessGameUser1.setColor(color);
             chessGameUser2.setColor(!color);
             chessGameUser2.setBoard("rnbqkbnrpppppppp////////////////////////////////PPPPPPPPRNBQKBNR");
             chessGameUser1.setBoard("RNBQKBNRPPPPPPPP////////////////////////////////pppppppprnbqkbnr");
+            UserInterceptor.changeRoom("INCREASE",idRoomCreated,chessGameUser2.getiDUserSend(),chessGameUser1.getiDUserSend(),"Đang chơi");
+
         }
         System.out.println(chessGameUser1.toString());
         System.out.println(chessGameUser2.toString());
+        UserInterceptor.updateStatusPrincipal(message.getIdUserCreate(),"INGAME");
+        UserInterceptor.updateStatusPrincipal(user.getIdUserCreate(),"INGAME");
         //send result to user2-user1
         messagingTemplate.convertAndSendToUser(message.getIdUserCreate(), "/queue/createGameRoom", chessGameUser2);
         messagingTemplate.convertAndSendToUser(user.getIdUserCreate(), "/queue/createGameRoom", chessGameUser1);

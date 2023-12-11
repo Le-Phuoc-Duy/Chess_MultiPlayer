@@ -2,7 +2,7 @@ import { GameStatus } from "../Enum";
 import Swal from "sweetalert2";
 import { EndGame } from "../EndGame";
 import { setEndGame } from "../PlayModule/ExtendOpt";
-import { stompClient } from "../Connect";
+import { logoutExecuted, setLogoutExecuted, stompClient } from "../Connect";
 
 document.getElementById("logoutButton")?.addEventListener("click",async () => {
     const Toast = Swal.mixin({
@@ -21,6 +21,7 @@ document.getElementById("logoutButton")?.addEventListener("click",async () => {
         title: "Đăng xuất thành công"
     }); 
     setEndGame(GameStatus.QUIT)
+    setLogoutExecuted(true)
     stompClient.publish({
         destination: '/app/logout', 
         headers: {},  
@@ -28,11 +29,4 @@ document.getElementById("logoutButton")?.addEventListener("click",async () => {
     });
     localStorage.clear();
     window.location.reload();
-})
-document.getElementById("ccPrintPricipal")?.addEventListener("click",async () => { 
-    stompClient.publish({
-        destination: '/app/ccPrint', 
-        headers: {},  
-        // body: "cc"
-    }); 
-})
+}) 
