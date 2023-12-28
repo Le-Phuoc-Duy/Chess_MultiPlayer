@@ -1,4 +1,9 @@
-import { stompClient } from "../Connect";
+import Swal from "sweetalert2";
+import { PromotionOverlay, currentGame, drawBoard, initializeClockOpp, initializeClockSelf, setCurrentGame, stompClient } from "../Connect";
+import { Color, Invite } from "../Enum";
+import { joinRoom } from "../PlayModule/PlayWithFriend";
+import { Game } from "../Game";
+import { Board } from "../Board";
 
 // import { Chart } from "chart.js";  
 document.getElementById('profileButton')?.addEventListener('click', function(){
@@ -135,11 +140,7 @@ function createPagination(totalIndices: number) {
                 activeIndex = start + index;
                 renderIndices();
                 console.log("page " + activeIndex)
-                stompClient.publish({
-                    destination: '/app/standing', 
-                    headers: {},  
-                    body: activeIndex.toString()
-                });
+                
             });
         });
     }
@@ -194,7 +195,9 @@ export function listFriendRender(content: any){
         buttonPlay.value = friend.name;
         buttonPlay.textContent = "Mời";
         buttonPlay.addEventListener('click', function(){
-            console.log(this.value)
+            if(friend.status === "ONLINE"){
+                showModal(friend.name);
+            }
         })
         tdPlay.appendChild(buttonPlay)
         
@@ -204,4 +207,114 @@ export function listFriendRender(content: any){
         tr.appendChild(tdPlay);
         tableBody!.appendChild(tr); 
     });
-} 
+}
+function showModal(oopName: String) {
+    const selectOptions = `
+    <style>
+      .custom-select {
+        position: relative;
+        display: inline-block;
+        font-family: Arial, sans-serif;
+        width: 200px; /* Adjust width as needed */
+      }
+    
+      .select-dropdown {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-color: #fff;
+        cursor: pointer;
+      }
+    
+      .custom-arrow {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        pointer-events: none;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #555;
+      }
+    </style>
+    <div class="custom-select">
+      <select id="options" class="select-dropdown">
+        <option value="-1">2|1</option>
+        <option value="-2">3|2</option>
+        <option value="-3">5</option>
+        <option value="-4">10</option>
+      </select>
+      <span class="custom-arrow"></span>
+    </div>
+    `;
+
+    // Hiển thị swal với dropdown và button submit
+    Swal.fire({
+      title: 'Chọn chế độ',
+      html: selectOptions,
+      showCancelButton: true,
+      confirmButtonText: 'Mời',
+      cancelButtonText: 'Hủy',
+      preConfirm: () => {
+        const selectedOption = (document.getElementById('options') as HTMLInputElement).value;
+        // Xử lý khi người dùng nhấn submit
+        // Ở đây bạn có thể thực hiện các hành động tùy thuộc vào option được chọn
+        stompClient.publish({
+            destination: '/app/inviteFriend',
+            headers: {},
+            body: JSON.stringify({ idDUserSend: localStorage.getItem('userID'), userName: localStorage.getItem('userName'), mode: parseInt(selectedOption), userReceiveName: oopName, message: Invite.Request}),
+        });
+        console.log("idDUserSend: ", localStorage.getItem('userID'))
+        console.log("userName: ", localStorage.getItem('userName'))
+        console.log("mode: ", parseInt(selectedOption))
+        console.log("userReceiveName: ", oopName)
+        console.log("message: ", Invite.Request)
+        joinRoom().then((result) => {
+            if (result) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 5000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "success",
+                    title: "Đã có người chơi khác tham gia, Bắt đầu trận đấu"
+                });
+                if (result.color) {
+                    console.log("self la white, opp la black")
+                    var gameByCreate: Game = new Game(Color.WHITE, new Board, true, 0);
+                } else {
+                    console.log("self la black, opp la white")
+                    var gameByCreate: Game = new Game(Color.BLACK, new Board, false, 0);
+                }
+                gameByCreate.setFullCoordinates(result.board);
+                setCurrentGame(gameByCreate)
+                drawBoard(gameByCreate.board);
+                PromotionOverlay(currentGame.playerSide);
+                console.log("result.userCountdownValue: " + result.userCountdownValue);
+                // setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
+                initializeClockSelf(result.userCountdownValue);
+                initializeClockOpp(result.userCountdownValue);
+            }
+        })
+        stompClient.subscribe('/user/queue/replyInvite', (message) => {
+            const body = JSON.parse(message.body);
+            if(body.message == "Deny"){
+                Swal.fire("Đối phương từ chối lời mời")
+            }    
+        });
+      }
+    });
+  }

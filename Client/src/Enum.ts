@@ -21,3 +21,8 @@ export enum Catsling{
     DONE,
     EXCUTE
 }
+export enum Invite{
+    Request,
+    Accept,
+    Deny
+}

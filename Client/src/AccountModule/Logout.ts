@@ -20,7 +20,9 @@ document.getElementById("logoutButton")?.addEventListener("click",async () => {
         icon: "success",
         title: "Đăng xuất thành công"
     }); 
-    setEndGame(GameStatus.QUIT)
+    if(localStorage.getItem("board") != null){
+        setEndGame(GameStatus.QUIT);
+    }
     setLogoutExecuted(true)
     stompClient.publish({
         destination: '/app/logout', 

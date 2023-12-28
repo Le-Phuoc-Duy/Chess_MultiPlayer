@@ -14,10 +14,9 @@ import org.w3c.dom.UserDataHandler;
 @EnableWebSocket
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/queue"); // Đăng ký một topic /queue - topic: tat ca; queue: ca nhan rieng biet
+        config.enableSimpleBroker("/topic", "/queue");
         config.setApplicationDestinationPrefixes("/app"); // Xử lý các tin nhắn đến /app
     }
 

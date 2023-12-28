@@ -41,7 +41,6 @@ public class CountdownTimer {
     public void startCountdown() {
         executorService.scheduleAtFixedRate(() -> {
             if (shouldDecreaseValue && countdownValue >= 0) {
-                System.out.println("Countdown for " + idRoomUser + ": " + countdownValue);
                 listener.countdown(idUserSend,idUserReceive,countdownValue);
                 countdownValue--;
             } else if(countdownValue >= 0){

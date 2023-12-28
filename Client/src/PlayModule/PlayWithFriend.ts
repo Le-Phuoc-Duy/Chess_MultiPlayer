@@ -15,14 +15,12 @@ function createRoom(mode: number): Promise<string> {
 
         stompClient.subscribe('/user/queue/roomCreated', (message) => {
             const body = JSON.parse(message.body);
-            // console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
-            console.log('waitingRoomId: ' + body.waitingRoomId + '\nuserCreateId: ' + body.userCreateId + '\nmode: ' + body.mode);
             resolve(body.waitingRoomId);
         });
 
     });
 }
-function joinRoom(): Promise<RoomJoinedResponse> { 
+export function joinRoom(): Promise<RoomJoinedResponse> { 
     return new Promise((resolve, reject) => {
         stompClient.subscribe('/user/queue/roomJoined', (message) => {
             const body = JSON.parse(message.body);

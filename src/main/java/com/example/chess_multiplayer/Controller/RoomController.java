@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 
 import java.util.*;
@@ -31,6 +32,7 @@ public class RoomController {
     private Set<WaitingRoom> waitingRooms = new HashSet<>();
     private Set<String> RandomWaitingRoomIds = new HashSet<>();
 
+    @Async
     @MessageMapping("/createRoom")
     @SendToUser("/queue/roomCreated")
     public WaitingRoom createRoom(WaitingRoom message) {
@@ -57,6 +59,7 @@ public class RoomController {
         return waitingRoomId;
     }
 
+    @Async
     @MessageMapping("/joinRoom")
     public void joinRoom(JoinRoom message) {
         // Kiểm tra xem phòng có tồn tại trong danh sách chờ hay không

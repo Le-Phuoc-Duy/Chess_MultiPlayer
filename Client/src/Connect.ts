@@ -1,9 +1,9 @@
 import { Client } from '@stomp/stompjs';
 import { Game } from './Game';
-import { Color, GameStatus } from './Enum';
+import { Color, GameStatus, Invite } from './Enum';
 import { Board } from './Board';
 import { RoomJoinedResponse } from './RoomJoinedResponse';
-import { sendChessMove } from './PlayModule/PlayWithFriend';
+import { joinRoom, sendChessMove } from './PlayModule/PlayWithFriend';
 import { ChatContentFrom } from './PlayModule/Chat';
 import Swal from 'sweetalert2';
 import { removeGame, setEndGame } from './PlayModule/ExtendOpt';
@@ -112,17 +112,92 @@ stompClient.onConnect = (frame) => {
     stompClient.subscribe('/user/queue/countdown', (message) => {
         const body = JSON.parse(message.body);
         if(body.side === true){
-            // localStorage.setItem('usercountdownValue', body.countdownValue);
             initializeClockSelf(body.countdownValue);
         }else if(body.side === false){
             // localStorage.setItem('oppcountdownValue', body.countdownValue);
             initializeClockOpp(body.countdownValue);
         }
-        // console.log("body.countdownValue: " + body.countdownValue);
-        // console.log("body.idUser: " + body.idUser);
-        // console.log("body.side: " + body.side);
-        // setTimer(body.userCountdownValue,body.oppCountdownValue,true,false)
-
+    });
+    stompClient.subscribe('/user/queue/inviteFriend', (message) => {
+        const body = JSON.parse(message.body);
+        let mode: String;
+        if(body.message == "Request"){
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                  confirmButton: "btn btn-success",
+                  cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: false
+              });
+              if(body.mode == -1) mode = "2|1 phút";
+              else if(body.mode == -2) mode  = "3|2 phút";
+              else if(body.mode == -3) mode = "5 phút";
+              else mode = "10 phút";
+              swalWithBootstrapButtons.fire({
+                title: "Lời mời",
+                text: "Tài khoản "+body.userReceiveName +" mời đánh cờ ở chế độ " + mode +"!",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Chấp nhận",
+                cancelButtonText: "Từ chối",
+                reverseButtons: true
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    body.message = Invite.Accept;
+                    stompClient.publish({
+                        destination: '/app/replyInvite',
+                        headers: {},
+                        body: JSON.stringify({iDUserSend: body.iDUserSend, userName: body.userName, mode: body.mode, userReceiveName: body.userReceiveName, message: Invite.Accept}),
+                    });
+                    joinRoom().then((result) => {
+                        if (result) {
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: "top-end",
+                                showConfirmButton: false,
+                                timer: 5000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.onmouseenter = Swal.stopTimer;
+                                    toast.onmouseleave = Swal.resumeTimer;
+                                }
+                            });
+                            Toast.fire({
+                                icon: "success",
+                                title: "Đã có người chơi khác tham gia, Bắt đầu trận đấu"
+                            });
+                            if (result.color) {
+                                console.log("self la white, opp la black")
+                                var gameByCreate: Game = new Game(Color.WHITE, new Board, true, 0);
+                            } else {
+                                console.log("self la black, opp la white")
+                                var gameByCreate: Game = new Game(Color.BLACK, new Board, false, 0);
+                            }
+                            gameByCreate.setFullCoordinates(result.board);
+                            setCurrentGame(gameByCreate)
+                            drawBoard(gameByCreate.board);
+                            PromotionOverlay(currentGame.playerSide);
+                            console.log("result.userCountdownValue: " + result.userCountdownValue);
+                            // setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
+                            initializeClockSelf(result.userCountdownValue);
+                            initializeClockOpp(result.userCountdownValue);
+                        }
+                    })
+                    //idDUserSend: body.iDUserSend, userName: body.userName, mode: body.mode, userReceiveName: body.userReceiveName, message: Invite.Accept
+                } else {
+                    stompClient.publish({
+                        destination: '/app/replyInvite',
+                        headers: {},
+                        body: JSON.stringify({iDUserSend: body.iDUserSend, userName: body.userName, mode: body.mode, userReceiveName: body.userReceiveName, message: Invite.Deny}),
+                    });
+                  swalWithBootstrapButtons.fire({
+                    title: "Từ chối",
+                    text: "Bạn đã từ chối lời mời",
+                    icon: "error"
+                  });
+                }
+              });
+        }
     });
     stompClient.subscribe('/user/queue/timeout', (message) => {
         const body = JSON.parse(message.body);
@@ -563,3 +638,4 @@ export function initializeClockOpp(opponentEndTime: number){
     opponentTime!.innerHTML =
       ('0' + t2.minutes).slice(-2) + ' : ' + ('0' + t2.seconds).slice(-2);
 }
+
