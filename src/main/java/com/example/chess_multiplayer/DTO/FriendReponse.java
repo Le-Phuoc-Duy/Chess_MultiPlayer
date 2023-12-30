@@ -1,7 +1,6 @@
 package com.example.chess_multiplayer.DTO;
 
 public class FriendReponse {
-//    private String userID;
     private String name;
     private int elo;
     private String status;

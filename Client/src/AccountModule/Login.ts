@@ -6,12 +6,11 @@ function sendLogin(name: string, pass: string): Promise<string> {
         stompClient.publish({
             destination: '/app/login',
             headers: {},
-            body: JSON.stringify({ username: name, password: pass , tempPort: window.location.port}),
+            body: JSON.stringify({ username: name, password: pass}),
         });
 
         stompClient.subscribe('/user/queue/loginStatus', (message) => {
             const body = JSON.parse(message.body);
-            console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
             if (body.message === "Đăng nhập thành công") {
                 localStorage.clear();
                 localStorage.setItem('userID', body.userID);
@@ -33,7 +32,6 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
             '<input id="swal-input2" class="swal2-input" placeholder="Mật khẩu" type="password">',
         focusConfirm: false, 
         preConfirm: () => {
-            //   let inputUsername = document.getElementById('swal-input1')! as HTMLInputElement;
             let username = (document.getElementById('swal-input1')! as HTMLInputElement).value
             let password = (document.getElementById('swal-input2')! as HTMLInputElement).value //document.getElementById('swal-input2')!.value;
             if (!username && !password) {
@@ -42,6 +40,8 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
                 Swal.showValidationMessage('Vui lòng không để trống mật khẩu');
             } else if (!username){
                 Swal.showValidationMessage('Vui lòng không để trống tên người dùng');
+            // } else if (password.length < 5) {
+            //     Swal.showValidationMessage('Mật khẩu phải có ít nhất 5 ký tự.');
             } else { 
                 sendLogin(username, password)
                     .then((result) => { 
@@ -71,7 +71,7 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
                             toast: true,
                             position: "top-end",
                             showConfirmButton: false,
-                            timer: 3000,
+                            timer: 300,
                             timerProgressBar: true,
                             didOpen: (toast) => {
                             toast.onmouseenter = Swal.stopTimer;

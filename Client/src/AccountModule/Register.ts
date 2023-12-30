@@ -11,7 +11,6 @@ function sendRegister(name: string, pass: string,ava: number): Promise<string> {
 
         stompClient.subscribe('/user/queue/registerStatus', (message) => {
             const body = JSON.parse(message.body);
-            console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
             if (body.message === "Đăng ký thành công") {
                 localStorage.clear();
                 localStorage.setItem('userID', body.userID);
@@ -64,7 +63,6 @@ document.getElementById("registerButton")?.addEventListener("click",async () => 
 
         focusConfirm: false,
         preConfirm: () => {
-            //   let inputUsername = document.getElementById('swal-input1')! as HTMLInputElement;
             let username = (document.getElementById('swal-input1')! as HTMLInputElement).value
             let password = (document.getElementById('swal-input2')! as HTMLInputElement).value
             let confirmPassword = (document.getElementById('swal-input2')! as HTMLInputElement).value
@@ -89,7 +87,7 @@ document.getElementById("registerButton")?.addEventListener("click",async () => 
                             toast: true,
                             position: "top-end",
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 200,
                             timerProgressBar: true,
                             didOpen: (toast) => {
                             toast.onmouseenter = Swal.stopTimer;

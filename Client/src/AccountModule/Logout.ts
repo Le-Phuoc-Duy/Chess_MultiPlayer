@@ -1,8 +1,7 @@
 import { GameStatus } from "../Enum"; 
 import Swal from "sweetalert2";
-import { EndGame } from "../EndGame";
 import { setEndGame } from "../PlayModule/ExtendOpt";
-import { logoutExecuted, setLogoutExecuted, stompClient } from "../Connect";
+import { setLogoutExecuted, stompClient } from "../Connect";
 
 document.getElementById("logoutButton")?.addEventListener("click",async () => {
     const Toast = Swal.mixin({
@@ -26,8 +25,7 @@ document.getElementById("logoutButton")?.addEventListener("click",async () => {
     setLogoutExecuted(true)
     stompClient.publish({
         destination: '/app/logout', 
-        headers: {},  
-        // body: localStorage.getItem('userID')!.toString()
+        headers: {},   
     });
     localStorage.clear();
     window.location.reload();

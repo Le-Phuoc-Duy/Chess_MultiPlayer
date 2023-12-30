@@ -10,7 +10,6 @@ export class Knight extends Piece{
     }
     canMove(board: Board, startPoint: Point, endPoint: Point): boolean { 
         if(endPoint.piece && endPoint.piece.color === this.color){ 
-            console.log("knight spy")
             return false
         }
         let col: number = Math.abs(startPoint.col - endPoint.col)

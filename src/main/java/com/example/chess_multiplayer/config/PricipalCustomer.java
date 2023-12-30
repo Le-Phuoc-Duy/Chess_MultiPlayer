@@ -2,20 +2,20 @@ package com.example.chess_multiplayer.config;
 
 import java.security.Principal;
 
-public class PricipalCustome implements Principal {
-    private String name;
+public class PricipalCustomer implements Principal {
+    private String userID;
     private String starus;
     @Override
     public String getName() {
-        return name;
+        return userID;
     }
-    public PricipalCustome(String name, String starus) {
+    public PricipalCustomer(String userID, String starus) {
         this.starus = starus;
-        this.name = name;
+        this.userID = userID;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
     public String getStatus() {
         return starus;

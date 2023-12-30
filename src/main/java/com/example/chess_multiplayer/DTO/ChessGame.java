@@ -3,7 +3,6 @@ package com.example.chess_multiplayer.DTO;
 public class ChessGame {
     private String iDUserSend;
     private String userName;
-//    private String userSendName;
     private int userSendAva;
     private String iDRoom;
     private String idRoomUser;
@@ -69,14 +68,6 @@ public class ChessGame {
     public void setIdRoomUser(String idRoomUser) {
         this.idRoomUser = idRoomUser;
     }
-
-//    public String getUserSendName() {
-//        return userSendName;
-//    }
-//
-//    public void setUserSendName(String userSendName) {
-//        this.userSendName = userSendName;
-//    }
 
     public int getUserSendAva() {
         return userSendAva;

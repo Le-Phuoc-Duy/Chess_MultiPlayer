@@ -14,9 +14,7 @@ document.getElementById('drawRequest')!.addEventListener('click',function(){
 export function gameStatusAlert(content: string) {
     Swal.fire(content);
 }
-export function removeBoard() {
-    // removeAllSeleted()
-    //i row, j col
+export function removeBoard() { 
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
             let coordinate: string = i.toString() + j.toString()
@@ -45,8 +43,8 @@ export function removeGame() {
     localStorage.removeItem("chessMove")
     localStorage.removeItem("board")
     localStorage.removeItem("color")
-    localStorage.removeItem("userSendTempPort")
-    localStorage.removeItem("userReceiveTempPort")
+    // localStorage.removeItem("userSendTempPort")
+    // localStorage.removeItem("userReceiveTempPort")
     removeBoard()
     PromotionOverlay(Color.NOT);
     throw new Error('Function not implemented.');

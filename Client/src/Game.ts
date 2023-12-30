@@ -72,33 +72,23 @@ export class Game {
 		let sourcePiece: Piece | null			//Quân cờ di chuyển
 		let chkPromotion: boolean = false
 		sourcePiece = startPoint.piece
-		// console.log("img " + sourcePiece?.image + startPoint.row + startPoint.col) 
 		//Không chọn quân cờ, chọn ô cờ
 		if (sourcePiece === null) {
-			console.log("sourcePiece")
 			return false;
 		}
 		//Chưa tới lượt
 		if (!this._currentTurn) {
-			console.log("chua toi luot")
 			return false;
 		}
 		//Chơi quân đối thủ
 		if (sourcePiece.color !== this._playerSide) {
-			console.log("khong the choi quan cua doi thu")
 			return false;
 		}
 		//Nước cờ có đúng logic không?
 		if (!sourcePiece.canMove(this._board, startPoint, endPoint)) {
-			// console.log("invalid move " + startPoint.row + startPoint.col)
-			// console.log("invalid move " + endPoint.row + endPoint.col)
 			return false
 		}
-		//Catsling?
-		// if (this._board.catsling === Catsling.DONE) console.log("catsle done ")
-		// if (this._board.catsling === Catsling.FAR) console.log("catsle.FAR ")
-		// if (this._board.catsling === Catsling.NEAR) console.log("catsle NEAR ")
-		// if (this._board.catsling === Catsling.NOT) console.log("catslNOT   ")
+		//Nhập thành
 		let startBoxRook; let endBoxRook;let tmpRookEnd
 		if (this.board.catsling === Catsling.NEAR && sourcePiece.color === Color.WHITE) {
 			if (this._board.getBox(7, 7).piece?.name !== 'R') {
@@ -193,7 +183,6 @@ export class Game {
 		}
 		//Promotion?
 		if (endPoint.row === 0 && (this._board.getBox(startPoint.row, startPoint.col).piece?.name === 'p' || this._board.getBox(startPoint.row, startPoint.col).piece?.name === 'P')) {
-			// console.log("piece promote" + piecePromoted)
 			if (this._playerSide === Color.WHITE) {
 				if (piecePromoted === "Queen") {
 					this._board.getBox(startPoint.row, startPoint.col).piece = new Queen(Color.WHITE, "./assets/White-Queen.png", "Q")
@@ -262,7 +251,6 @@ export class Game {
 				this._board.kingMoved = true
 				this.board.catsling = Catsling.NOT
 			}
-			// console.log("dang chieu")
 			return false
 		} else {
 			if (this._board.catsling === Catsling.EXCUTE) this._board.catsling = Catsling.DONE
@@ -282,14 +270,12 @@ export class Game {
 			&& this._board.getBox(rowOfKing - 1, colOfKing + 1).piece?.color === opponentColor
 			&& (this._board.getBox(rowOfKing - 1, colOfKing + 1).piece?.name === 'p'
 				|| this._board.getBox(rowOfKing - 1, colOfKing + 1).piece?.name === 'P')) {
-			// console.log("tot chieu +1")
 			return true
 		}
 		if (rowOfKing - 1 >= 0 && colOfKing - 1 >= 0
 			&& this._board.getBox(rowOfKing - 1, colOfKing - 1).piece?.color === opponentColor
 			&& (this._board.getBox(rowOfKing - 1, colOfKing - 1).piece?.name === 'p'
 				|| this._board.getBox(rowOfKing - 1, colOfKing - 1).piece?.name === 'P')) {
-			// console.log("tot chieu -1")
 			return true
 		}
 		//Mã chiếu
@@ -311,7 +297,6 @@ export class Game {
 				if (this._board.getBox(targetRow, targetCol).piece?.color === opponentColor
 					&& (this._board.getBox(targetRow, targetCol).piece?.name === 'n'
 						|| this._board.getBox(targetRow, targetCol).piece?.name === 'N')) {
-					// console.log("ma chieu" + knightMove.row + knightMove.col)
 					return true
 				}
 			}
@@ -336,9 +321,6 @@ export class Game {
 						|| this._board.getBox(r, c).piece?.name === 'R'
 						|| this._board.getBox(r, c).piece?.name === 'q'
 						|| this._board.getBox(r, c).piece?.name === 'Q') {
-						// console.log("chiếu theo dọc hoặc ngang" + direction.row + direction.col)
-						// console.log("quân chiếu" + this._board.getBox(r, c).piece?.name + r + c)
-						// console.log("quân vua" + rowOfKing + colOfKing)
 						return true;
 					} else if (this._board.getBox(r, c).piece !== null) {
 						break
@@ -365,7 +347,6 @@ export class Game {
 						|| this._board.getBox(diagRow, diagCol).piece?.name === 'B'
 						|| this._board.getBox(diagRow, diagCol).piece?.name === 'q'
 						|| this._board.getBox(diagRow, diagCol).piece?.name === 'Q') {
-						// console.log("chiếu theo đường chéo" + digDirection.row + digDirection.col)
 						return true
 					} else if (this._board.getBox(diagRow, diagCol).piece !== null) {
 						break
@@ -383,14 +364,13 @@ export class Game {
 		let FARROOK: boolean = this._board.rookFarKing
 		let NEARROOK: boolean = this._board.rookNearKing
 		let KINGMOVE: boolean = this._board.kingMoved
-		let BOARD: string = this.getFullCoordinates()
-		const directions = [
-			{ row: -1, col: -2 }, { row: -1, col: -1 }, { row: -1, col: 0 }, { row: -1, col: 1 }, { row: -1, col: 2 },
-			{ row: -2, col: -2 }, { row: -2, col: -1 }, { row: -2, col: 0 }, { row: -2, col: 1 }, { row: -2, col: 2 },
-			{ row: 1, col: -2 }, { row: 1, col: -1 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 },
-			{ row: 2, col: -2 }, { row: 2, col: -1 }, { row: 2, col: 0 }, { row: 2, col: 1 }, { row: 2, col: 2 },
-			{ row: 0, col: -2 }, { row: 0, col: -1 }, { row: 0, col: 1 }, { row: 0, col: 2 },
-		];
+		let BOARD: string = this.getFullCoordinates() 
+		let directions = []; 
+		for (let row = -7; row <= 7; row++) {
+			for (let col = -7; col <= 7; col++) { 
+				directions.push({row,col})
+			}
+		}  
 		// Lặp qua tất cả các ô trên bàn cờ
 		for (let r = 0; r < 8; r++) {
 			for (let c = 0; c < 8; c++) {
@@ -406,7 +386,6 @@ export class Game {
 								this._board.rookFarKing = FARROOK
 								this._board.rookNearKing = NEARROOK
 								this._board.kingMoved = KINGMOVE
-								console.log("isAllValidMove" + this._board.getBox(startPoint.row, startPoint.col).piece?.name + startPoint.row + startPoint.col + endPoint.row + endPoint.col)
 								this.setFullCoordinates(BOARD)
 								return true
 							}
@@ -427,11 +406,9 @@ export class Game {
 		let b = this.isAllValidMove()
 		if (a && !b) { 
 			setEndGame(GameStatus.LOSE)
-			console.log("bạn đã thua") 
 		}
 		else if (!a && !b) { 
 			setEndGame(GameStatus.DRAW)
-			console.log("bạn hòa") 
 		}
 	}
 	constructor(playerSide: Color, board: Board, currentTurn: boolean, status: GameStatus) {

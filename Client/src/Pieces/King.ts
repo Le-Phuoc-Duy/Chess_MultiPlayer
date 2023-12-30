@@ -9,7 +9,6 @@ export class King extends Piece{
     }
     canMove(board: Board, startPoint: Point, endPoint: Point): boolean { 
         if(endPoint.piece && endPoint.piece.color === this.color){ 
-            console.log("king spy")
             return false
         } 
         let row = Math.abs(startPoint.row - endPoint.row)
@@ -65,9 +64,8 @@ export class King extends Piece{
         }
         return false
     }
-    isPathClear(board: Board, startPoint: Point, endPoint: Point): boolean {
-        // const direction = startPoint.col < endPoint.col ? 1 : -1;  
-        //Vì King chỉ bắt nhảy cóc khi nhập thành nên chỉ lấy tọa độ col
+    isPathClear(board: Board, startPoint: Point, endPoint: Point): boolean { 
+        // Vì King chỉ bắt nhảy cóc khi nhập thành nên chỉ lấy tọa độ col
         let direction
         if(startPoint.col < endPoint.col) direction = 1
         else if(startPoint.col > endPoint.col) direction = -1

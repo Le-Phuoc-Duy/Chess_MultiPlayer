@@ -18,7 +18,7 @@ const socket = new SockJS('http://' + window.location.hostname + ':8888/ws');
 export const stompClient = new Client({
     webSocketFactory: () => socket,
     connectHeaders: {
-        tempPort: localStorage.getItem('userID')!
+        userID: localStorage.getItem('userID')!
     },
     debug: (msg) => console.log(msg),
     reconnectDelay: 1000,
@@ -36,10 +36,8 @@ stompClient.onWebSocketError = (error) => {
 
 // Bắt sự kiện khi kết nối thành công
 stompClient.onConnect = (frame) => {
-    console.log("onconnect")
     stompClient.subscribe('/user/queue/chessMove', (message) => {
         const body = JSON.parse(message.body);
-        // console.log('iDUserSend: ' + body.iDUserSend + '\niDUserReceive: ' + body.iDUserReceive + '\niDRoom: ' + body.iDRoom + '\nidRoomUser: ' + body.idRoomUser + '\nchessMove: ' + body.chessMove + '\nboard: ' + body.board + '\ncolor: ' + body.color)
         localStorage.setItem('iDUserSend', body.iDUserSend);
         localStorage.setItem('iDRoom', body.iDRoom);
         localStorage.setItem('idRoomUser', body.idRoomUser);
@@ -48,7 +46,6 @@ stompClient.onConnect = (frame) => {
         localStorage.setItem('color', body.color.toString()); 
         localStorage.setItem('userCountdownValue', body.userCountdownValue);
         localStorage.setItem('oppCountdownValue', body.oppCountdownValue);
-        // localStorage.setItem('userSendName', body.userSendName);
         localStorage.setItem('userSendAva', body.userSendAva);
         localStorage.setItem('userReceiveName', body.userReceiveName);
         //Trường hợp đăng nhập 1 acc trên 2 máy
@@ -57,7 +54,6 @@ stompClient.onConnect = (frame) => {
             tmpColor = localStorage.getItem('color') === "true" ? Color.WHITE : Color.BLACK;
             var tmpGame: Game = new Game(tmpColor,new Board,true,GameStatus.WIN) 
             setCurrentGame(tmpGame)
-            console.log("provl: "+ currentGame.playerSide )
             PromotionOverlay(currentGame.playerSide)
         }
         currentGame.setFullCoordinates(body.board)
@@ -69,7 +65,6 @@ stompClient.onConnect = (frame) => {
         }
         drawBoard(currentGame.board);
         currentGame.checkGameStatus()
-        // setTimer(body.userCountdownValue,body.oppCountdownValue,false,true)
         initializeClockSelf(body.userCountdownValue);
         initializeClockOpp(body.oppCountdownValue);
     });
@@ -83,7 +78,6 @@ stompClient.onConnect = (frame) => {
         localStorage.setItem('color', body.color.toString()); 
         localStorage.setItem('userCountdownValue', body.userCountdownValue);
         localStorage.setItem('oppCountdownValue', body.oppCountdownValue);
-        // localStorage.setItem('userSendName', body.userSendName);
         localStorage.setItem('userSendAva', body.userSendAva);
         localStorage.setItem('userReceiveName', body.userReceiveName);
         //Trường hợp đăng nhập 1 acc trên 2 máy
@@ -92,7 +86,6 @@ stompClient.onConnect = (frame) => {
             tmpColor = localStorage.getItem('color') === "true" ? Color.WHITE : Color.BLACK;
             var tmpGame: Game = new Game(tmpColor,new Board,true,GameStatus.WIN) 
             setCurrentGame(tmpGame)
-            console.log("provl: "+ currentGame.playerSide )
             PromotionOverlay(currentGame.playerSide)
         }
 
@@ -104,8 +97,6 @@ stompClient.onConnect = (frame) => {
             localStorage.setItem('currentTurn', 'false');
         }
         drawBoard(currentGame.board);
-        // currentGame.checkGameStatus()
-        // setTimer(body.userCountdownValue,body.oppCountdownValue,true,false)
         initializeClockSelf(body.userCountdownValue);
         initializeClockOpp(body.oppCountdownValue);
     });
@@ -114,7 +105,6 @@ stompClient.onConnect = (frame) => {
         if(body.side === true){
             initializeClockSelf(body.countdownValue);
         }else if(body.side === false){
-            // localStorage.setItem('oppcountdownValue', body.countdownValue);
             initializeClockOpp(body.countdownValue);
         }
     });
@@ -167,23 +157,18 @@ stompClient.onConnect = (frame) => {
                                 title: "Đã có người chơi khác tham gia, Bắt đầu trận đấu"
                             });
                             if (result.color) {
-                                console.log("self la white, opp la black")
                                 var gameByCreate: Game = new Game(Color.WHITE, new Board, true, 0);
                             } else {
-                                console.log("self la black, opp la white")
                                 var gameByCreate: Game = new Game(Color.BLACK, new Board, false, 0);
                             }
                             gameByCreate.setFullCoordinates(result.board);
                             setCurrentGame(gameByCreate)
                             drawBoard(gameByCreate.board);
                             PromotionOverlay(currentGame.playerSide);
-                            console.log("result.userCountdownValue: " + result.userCountdownValue);
-                            // setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
                             initializeClockSelf(result.userCountdownValue);
                             initializeClockOpp(result.userCountdownValue);
                         }
                     })
-                    //idDUserSend: body.iDUserSend, userName: body.userName, mode: body.mode, userReceiveName: body.userReceiveName, message: Invite.Accept
                 } else {
                     stompClient.publish({
                         destination: '/app/replyInvite',
@@ -223,9 +208,6 @@ stompClient.onConnect = (frame) => {
         ChatContentFrom(body.userReceiveName, body.userSendAva, body.chat, false);
     });
     stompClient.subscribe('/user/queue/addFriend', (message) => {
-        // const body = JSON.parse(message.body);
-        // console.log(body.result)
-        console.log("add fe" + message.body)
         switch(message.body){
             case "FRIEND_REQUEST":
                 Swal.fire({
@@ -289,8 +271,6 @@ stompClient.onConnect = (frame) => {
     });
     stompClient.subscribe('/user/queue/endGame', (message) => {
         const body = JSON.parse(message.body);
-        console.log("recevie endGame" )
-        console.log("body result: "+body.result )
         switch(body.result){
             case "DRAW":
                 Swal.fire("Cờ hòa! Trận đấu kết thúc")
@@ -352,7 +332,6 @@ stompClient.onConnect = (frame) => {
     });
     stompClient.subscribe('/user/queue/profile', (message) => {
         const body = JSON.parse(message.body);
-        console.log("profile " + body.rank)
         profileRender(body.rank,body.elo, body.numberOfWon,body.numberOfDrawn,body.numberOfLost, body.numberOfStanding)
     });
     stompClient.subscribe('/user/queue/standing', (message) => {
@@ -367,13 +346,9 @@ stompClient.onConnect = (frame) => {
 // Kết nối tới server
 stompClient.activate();
 // Bắt sự kiện khi mất kết nối
-stompClient.onDisconnect = (frame) => {
-    // console.log('Disconnected from WebSocket server');
-};
+stompClient.onDisconnect = (frame) => {};
 // Handle lỗi
 stompClient.onStompError = (frame) => {
-    console.error('WebSocket error:', frame);
-
     // Hiển thị chi tiết lỗi
     if (frame.headers) {
         console.error('Error message:', frame.headers.message);
@@ -393,8 +368,6 @@ export function setCurrentGame(game: Game) {
     currentGame = game
 }
 export function drawBoard(board: Board) {
-    // removeAllSeleted()
-    //i row, j col
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
             let coordinate: string = i.toString() + j.toString()
@@ -418,9 +391,7 @@ function ClickPiece(r: number, c: number, game: Game) {
     removeAllSeleted()
     document.getElementById(`${r}${c}`)?.classList.add("selected-square");
     if (selected) {
-        console.log("secleted")
         if (game.playerMove(startX, startY, r, c)) {
-            console.log("canmove" + startX + startY + r + c)
             drawBoard(game.board)
             localStorage.setItem('board', game.getFullCoordinates());
             let iDUserSend: string | null = localStorage.getItem('iDUserSend');
@@ -429,10 +400,7 @@ function ClickPiece(r: number, c: number, game: Game) {
             let idRoomUser: string | null = localStorage.getItem('idRoomUser');
             let chessMove: string | null = localStorage.getItem('chessMove');
             let board: string | null = game.getFullCoordinates();
-            let userSendTempPort: string | null = localStorage.getItem('userSendTempPort');
-            let userReceiveTempPort: string | null = localStorage.getItem('userReceiveTempPort');
             let color: boolean;
-
             if (localStorage.getItem('color') == "true") {
                 color = true;
             } else {
@@ -446,8 +414,6 @@ function ClickPiece(r: number, c: number, game: Game) {
               chessMove ?? '',
               board ?? '',
               color ?? false, // Gán giá trị mặc định nếu không tồn tại hoặc không hợp lệ
-              userSendTempPort ?? '',
-              userReceiveTempPort ?? '',
               1,
               1
             );
@@ -461,10 +427,9 @@ function ClickPiece(r: number, c: number, game: Game) {
         endX = -1
         endY = -1
     } else {
-        console.log("!secleted")
         selected = true
-        startX = r //parseInt(coordinates.charAt(0))
-        startY = c //parseInt(coordinates.charAt(1))
+        startX = r 
+        startY = c
     }
 }
 //Remove màu selected
@@ -604,7 +569,6 @@ document.querySelectorAll('.imgPromotion').forEach((element) => {
         const value = element.getAttribute('value');
         if (value) {
             piecePromoted = value;
-            console.log("piece value: " + piecePromoted);
             // Xóa bỏ viền màu đỏ ở tất cả các phần tử
             document.querySelectorAll('.imgPromotion').forEach((img) => {
                 img.classList.remove("selected-promotion")

@@ -41,9 +41,7 @@ public class FriendController {
         String UserInvitedId = userService.getIdUserByIdAcc(AccInvitedId);
         User userInvite = userService.getUserById(friendRequest.getUserInviteID());
         User userInvited = userService.getUserById(UserInvitedId);
-        System.out.println("addFriend" + userInvite.getIDUser() + ":" + userInvited.getIDUser());
         if(friendService.isExistFriend(userInvite, userInvited)){
-            System.out.println("FRIEND_ALREADY");
             friendRequest.setResult("FRIEND_ALREADY");
         }
         switch (friendRequest.getResult()){
@@ -70,8 +68,6 @@ public class FriendController {
     @MessageMapping("/myFriend")
     @SendToUser("/queue/myFriend")
     public ArrayList<FriendReponse> getListFriend(@Payload String userID){
-//        String userID = principal.getName();
-        System.out.println("my friend");
         ArrayList<FriendReponse> friendResponses = new ArrayList<>();
         ArrayList<String> listFriendID = new ArrayList<>();
         listFriendID = friendService.getListFriend(userService.getUserById(userID));
@@ -89,7 +85,6 @@ public class FriendController {
     }
     @MessageMapping("/inviteFriend")
     public void inviteFriend(InviteFriend invite){
-        System.out.println("message: " + invite.getMessage());
         InviteFriend inviteFriend = new InviteFriend();
         String OppAccId = accountService.getAccID(invite.getUserReceiveName());
         String OppUserId = userService.getIdUserByIdAcc(OppAccId);
@@ -107,11 +102,8 @@ public class FriendController {
             ChessGame chessGameUser2 = new ChessGame();
             //khoi tao room
             String idRoomCreated = roomService.createRoom(reply.getMode());
-            System.out.println("idRoomCreated: " + idRoomCreated);
-            System.out.println("iduser1" + reply.getiDUserSend());
             String AccOppId = accountService.getAccID(reply.getUserReceiveName());
             String UserOppId = userService.getIdUserByIdAcc(AccOppId);
-            System.out.println("iduser2" + UserOppId);
 
             //khoi tao roomuser
             boolean color = generateRandomBoolean();
@@ -119,14 +111,10 @@ public class FriendController {
             String idRoomUser2Created;
             if(color){
                 idRoomUser1Created = roomuserController.creatRoomuser(reply.getiDUserSend(),idRoomCreated,reply.getMode(), true);
-                System.out.println("createRoomUser1" + idRoomUser1Created);
                 idRoomUser2Created = roomuserController.creatRoomuser(UserOppId,idRoomCreated,reply.getMode(),false);
-                System.out.println("createRoomUser2" + idRoomUser2Created);
             }else{
                 idRoomUser1Created = roomuserController.creatRoomuser(reply.getiDUserSend(),idRoomCreated,reply.getMode(), false);
-                System.out.println("createRoomUser1" + idRoomUser1Created);
                 idRoomUser2Created = roomuserController.creatRoomuser(UserOppId,idRoomCreated,reply.getMode(),true);
-                System.out.println("createRoomUser2" + idRoomUser2Created);
             }
             //set Chess Game
             switch (reply.getMode()){
@@ -156,7 +144,6 @@ public class FriendController {
             chessGameUser1.setiDRoom(idRoomCreated);
             chessGameUser1.setIdRoomUser(idRoomUser1Created);
             chessGameUser1.setChessMove(null);
-//        chessGameUser1.setUserSendName(userService.getUsernameByUserID(user.getIdUserCreate()));
             chessGameUser1.setUserName(userService.getUsernameByUserID(reply.getiDUserSend()));
             chessGameUser1.setUserSendAva(userService.getUserById(UserOppId).getAva());
             chessGameUser1.setUserReceiveName(userService.getUsernameByUserID(UserOppId));
@@ -165,7 +152,6 @@ public class FriendController {
             chessGameUser2.setiDRoom(idRoomCreated);
             chessGameUser2.setIdRoomUser(idRoomUser2Created);
             chessGameUser2.setChessMove(null);
-//        chessGameUser2.setUserSendName(userService.getUsernameByUserID(message.getIdUserCreate()));
             chessGameUser2.setUserName(userService.getUsernameByUserID(UserOppId));
             chessGameUser2.setUserSendAva(userService.getUserById(reply.getiDUserSend()).getAva());
             chessGameUser2.setUserReceiveName(userService.getUsernameByUserID(reply.getiDUserSend()));
@@ -184,8 +170,6 @@ public class FriendController {
                 UserInterceptor.changeRoom("INCREASE",idRoomCreated,chessGameUser2.getiDUserSend(),chessGameUser1.getiDUserSend(),"Đang chơi");
 
             }
-            System.out.println(chessGameUser1.toString());
-            System.out.println(chessGameUser2.toString());
             UserInterceptor.updateStatusPrincipal(UserOppId,"INGAME");
             UserInterceptor.updateStatusPrincipal(reply.getiDUserSend(),"INGAME");
             //send result to user2-user1

@@ -1,4 +1,4 @@
-import { currentGame, drawBoard, setCurrentGame, stompClient } from "../Connect";
+import {stompClient } from "../Connect";
 import Swal from "sweetalert2";
 
 const chatModeAll: HTMLInputElement = document.getElementById('chatModeAll') as HTMLInputElement;
@@ -23,7 +23,6 @@ chatModePrivate.addEventListener('change', function (this: HTMLInputElement) {
     }
 });
 document.getElementById("btnSendMessage")?.addEventListener('click', () => {
-    console.log("btnSendMessage")
     if(localStorage.getItem('userID') == null){
         const Toast = Swal.mixin({
             toast: true,
@@ -147,10 +146,7 @@ export function ChatContentFrom(senderName: string, senderAvatar: number, messag
         // Gắn các phần tử con vào newMessageDiv và messageContentDiv
         newMessageDiv.appendChild(senderNameP);
         messageContentDiv.appendChild(avatarImg);
-        messageContentDiv.appendChild(messageP);
-
-        // Lấy đối tượng có id là "chatPrivateContent"
-        // const chatPrivateContent = document.getElementById('chatPrivateContent');
+        messageContentDiv.appendChild(messageP); 
 
         // Kiểm tra xem đối tượng có tồn tại không trước khi thêm vào
         if(chatMode){

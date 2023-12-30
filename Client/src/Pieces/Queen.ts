@@ -10,11 +10,9 @@ export class Queen extends Piece{
     }
     canMove(board: Board, startPoint: Point, endPoint: Point): boolean { 
         if(endPoint.piece && endPoint.piece.color === this.color){ 
-            console.log("Queen spy")
             return false
         } 
         if(!this.isPathClear(board,startPoint,endPoint)){
-            console.log("nhay coc")
             return false
         } 
         if(startPoint.row === endPoint.row || startPoint.col === endPoint.col)
@@ -48,9 +46,7 @@ export class Queen extends Piece{
                 row += direction
             }
             return true; // Đường đi không bị cản trở
-        }else{                                              // Đi chéo
-            // let rowDirection = startPoint.row < endPoint.row ? 1 : -1;
-            // let colDirection = startPoint.col < endPoint.col ? 1 : -1;
+        }else{                                              // Đi chéo 
             let rowDirection
             let colDirection
             if(startPoint.row < endPoint.row) rowDirection = 1

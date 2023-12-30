@@ -17,19 +17,12 @@ import java.util.List;
 @Controller
 public class ProfileController {
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-    @Autowired
-    private UserController userController;
-    @Autowired
     private UserService userService;
-    @Autowired
-    private AccountService accountService;
 
     @MessageMapping("/profile")
     @SendToUser("/queue/profile")
     public ProfileReponse profile(@Payload String profileRequest) {
         ProfileReponse profile = new ProfileReponse();
-//        String UserId = profileRequest.getUserID();
         String UserId = profileRequest;
         profile.setUserID(UserId);
         profile.setElo(userService.getUserById(UserId).getElo());
@@ -37,9 +30,8 @@ public class ProfileController {
         profile.setNumberOfLost(userService.getUserById(UserId).getLose());
         profile.setNumberOfDrawn(userService.getUserById(UserId).getDraw());
         profile.setNumberOfStanding(userService.getNumberOfStanding());
-        profile.setRank(userService.getRank(UserId));           //?? viết ở đây đúng k
+        profile.setRank(userService.getRank(UserId));
         return profile;
-//        messagingTemplate.convertAndSendToUser(profileRequest.getTempPort(), "/queue/profile", profile);
     }
     @MessageMapping("/standing")
     @SendToUser("/queue/standing")
@@ -66,6 +58,5 @@ public class ProfileController {
             listStanding.add(standing);
         }
         return listStanding;
-//        messagingTemplate.convertAndSendToUser(profileRequest.getTempPort(), "/queue/standing", userService.getTopUsers(1,13));
     }
 }

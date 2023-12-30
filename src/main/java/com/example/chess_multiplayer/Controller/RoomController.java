@@ -26,8 +26,6 @@ public class RoomController {
     @Autowired
     private UserService userService;
     @Autowired
-    private AccountService accountService;
-    @Autowired
     private RoomuserController roomuserController;
     private Set<WaitingRoom> waitingRooms = new HashSet<>();
     private Set<String> RandomWaitingRoomIds = new HashSet<>();
@@ -38,7 +36,6 @@ public class RoomController {
     public WaitingRoom createRoom(WaitingRoom message) {
         // Sinh ngẫu nhiên ID phòng
         String waitingRoomId = generateRandomWaitingRoomId();
-//        String infor = userId + "/" + principal.getName() + "/" + mode;
         WaitingRoom waitingRoom = new WaitingRoom();
         waitingRoom.setWaitingRoomId(waitingRoomId);
         waitingRoom.setUserCreateId(message.getUserCreateId());
@@ -71,9 +68,6 @@ public class RoomController {
 
             //khoi tao room
             String idRoomCreated = roomService.createRoom(waitingRoom.getMode());
-            System.out.println("iduser1" + waitingRoom.getUserCreateId());
-            System.out.println("iduser2" + message.getIdUserJoin());
-            System.out.println("idRoomCreated: " + idRoomCreated);
 
             //khoi tao roomuser
             boolean color = generateRandomBoolean();
@@ -81,14 +75,10 @@ public class RoomController {
             String idRoomUser2Created;
             if(color == true){
                 idRoomUser1Created = roomuserController.creatRoomuser(waitingRoom.getUserCreateId(),idRoomCreated,waitingRoom.getMode(), true);
-                System.out.println("createRoomUser1" + idRoomUser1Created);
                 idRoomUser2Created = roomuserController.creatRoomuser(message.getIdUserJoin(),idRoomCreated,waitingRoom.getMode(),false);
-                System.out.println("createRoomUser2" + idRoomUser2Created);
             }else{
                 idRoomUser1Created = roomuserController.creatRoomuser(waitingRoom.getUserCreateId(),idRoomCreated,waitingRoom.getMode(), false);
-                System.out.println("createRoomUser1" + idRoomUser1Created);
                 idRoomUser2Created = roomuserController.creatRoomuser(message.getIdUserJoin(),idRoomCreated,waitingRoom.getMode(),true);
-                System.out.println("createRoomUser2" + idRoomUser2Created);
             }
             //remove hang doi
             removeWaitingRoomById(waitingRoom.getWaitingRoomId());
@@ -120,7 +110,6 @@ public class RoomController {
             chessGameUser1.setiDRoom(idRoomCreated);
             chessGameUser1.setIdRoomUser(idRoomUser1Created);
             chessGameUser1.setChessMove(null);
-//            chessGameUser1.setUserSendName(userService.getUsernameByUserID(message.getIdUserJoin()));
             chessGameUser1.setUserSendAva(userService.getUserById(message.getIdUserJoin()).getAva());
             chessGameUser1.setUserReceiveName(userService.getUsernameByUserID(message.getIdUserJoin()));
 
@@ -128,7 +117,6 @@ public class RoomController {
             chessGameUser2.setiDRoom(idRoomCreated);
             chessGameUser2.setIdRoomUser(idRoomUser2Created);
             chessGameUser2.setChessMove(null);
-//            chessGameUser2.setUserSendName(userService.getUsernameByUserID(waitingRoom.getUserCreateId()));
             chessGameUser2.setUserSendAva(userService.getUserById(waitingRoom.getUserCreateId()).getAva());
             chessGameUser2.setUserReceiveName(userService.getUsernameByUserID(waitingRoom.getUserCreateId()));
 

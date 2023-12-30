@@ -32,7 +32,6 @@ public class RoomService {
             room.setTimeStart(Instant.now());
             room.setTimeEnd(null);
             room.setMode(mode);
-//            Roomuser roomuser = new Roomuser();
             room.setRoomusers(new HashSet<>());
             roomRepository.save(room);
             return room.getIDRoom();

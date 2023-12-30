@@ -1,4 +1,3 @@
-// Import Swal library (assuming you have it installed)
 import { Color } from "../Enum";
 import { PromotionOverlay, currentGame, drawBoard, setCurrentGame, stompClient, initializeClockSelf, initializeClockOpp } from "../Connect";
 import { RoomJoinedResponse } from "../RoomJoinedResponse";
@@ -37,7 +36,6 @@ document.getElementById("buttonPlay")?.addEventListener("click", async () => {
         if (cancelButton) {
           cancelButton.addEventListener('click', () => {
             cancelJoinGame().then(() => {
-              console.log("cancel");
             });
 
           });
@@ -49,7 +47,6 @@ document.getElementById("buttonPlay")?.addEventListener("click", async () => {
     loadingSwal.then((result) => {
       if (result.dismiss === Swal.DismissReason.timer) {
         cancelJoinGame().then(() => {
-          console.log("cancel");
         });
       }
     }); // 20 giây
@@ -57,24 +54,19 @@ document.getElementById("buttonPlay")?.addEventListener("click", async () => {
     joinGame().then((result) => {
       if (result) {
         loadingSwal.close();
-        console.log("done Task");
         Swal.fire({
           icon: 'success',
           title: 'Vào phòng thành công!',
         })
         if (result.color) {
-          console.log("self la white, opp la black")
           var gameByCreate: Game = new Game(Color.WHITE, new Board, true, 0);
         } else {
-          console.log("self la black, opp la white")
           var gameByCreate: Game = new Game(Color.BLACK, new Board, false, 0);
         }
         gameByCreate.setFullCoordinates(result.board);
         setCurrentGame(gameByCreate)
         drawBoard(gameByCreate.board);
         PromotionOverlay(currentGame.playerSide);
-        console.log("result.userCountdownValue: " + result.userCountdownValue);
-        // setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
         initializeClockSelf(result.userCountdownValue);
         initializeClockOpp(result.userCountdownValue);
       }
@@ -120,17 +112,14 @@ function joinGame(): Promise<RoomJoinedResponse> {
       headers: {},
       body: JSON.stringify({ idUserCreate: localStorage.getItem('userID'), mode: gameMode}),
     });
-    console.log("subscibe");
     stompClient.subscribe('/user/queue/createGameRoom', (message) => {
       const body = JSON.parse(message.body);
-      // console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
       localStorage.setItem('iDUserSend', body.iDUserSend);
       localStorage.setItem('iDRoom', body.iDRoom);
       localStorage.setItem('idRoomUser', body.idRoomUser);
       localStorage.setItem('chessMove', body.chessMove);
       localStorage.setItem('board', body.board);
       localStorage.setItem('color', body.color.toString()); 
-      // localStorage.setItem('userSendName', body.userSendName);
       localStorage.setItem('userSendAva', body.userSendAva);
       localStorage.setItem('userCountdownValue', body.userCountdownValue);
       localStorage.setItem('userReceiveName', body.userReceiveName);
@@ -181,7 +170,6 @@ function cancelJoinGame(): Promise<String> {
 
     stompClient.subscribe('/user/queue/cancelJoinGame', (message) => {
       const body = JSON.parse(message.body);
-      console.log(body.toString());
       resolve(body);
     });
   });

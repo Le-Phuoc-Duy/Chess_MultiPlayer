@@ -26,8 +26,6 @@ public class UserController {
     @Autowired
     private RoomService roomService;
     @Autowired
-    private AccountService accountService;
-    @Autowired
     private RoomuserController roomuserController;
     private Set<queueUser> queueUsers = new HashSet<>();
     public String getIdUserByIDAcc(String idAcc){
@@ -68,9 +66,6 @@ public class UserController {
         ChessGame chessGameUser2 = new ChessGame();
         //khoi tao room
         String idRoomCreated = roomService.createRoom(user.getMode());
-        System.out.println("iduser1" + user.getIdUserCreate());
-        System.out.println("iduser2" + message.getIdUserCreate());
-        System.out.println("idRoomCreated: " + idRoomCreated);
 
         //khoi tao roomuser
         boolean color = generateRandomBoolean();
@@ -78,14 +73,10 @@ public class UserController {
         String idRoomUser2Created;
         if(color){
             idRoomUser1Created = roomuserController.creatRoomuser(user.getIdUserCreate(),idRoomCreated,user.getMode(), true);
-            System.out.println("createRoomUser1" + idRoomUser1Created);
             idRoomUser2Created = roomuserController.creatRoomuser(message.getIdUserCreate(),idRoomCreated,message.getMode(),false);
-            System.out.println("createRoomUser2" + idRoomUser2Created);
         }else{
             idRoomUser1Created = roomuserController.creatRoomuser(user.getIdUserCreate(),idRoomCreated,user.getMode(), false);
-            System.out.println("createRoomUser1" + idRoomUser1Created);
             idRoomUser2Created = roomuserController.creatRoomuser(message.getIdUserCreate(),idRoomCreated,message.getMode(),true);
-            System.out.println("createRoomUser2" + idRoomUser2Created);
         }
         //set Chess Game
         switch (user.getMode()){
@@ -143,8 +134,6 @@ public class UserController {
             UserInterceptor.changeRoom("INCREASE",idRoomCreated,chessGameUser2.getiDUserSend(),chessGameUser1.getiDUserSend(),"Đang chơi");
 
         }
-        System.out.println(chessGameUser1.toString());
-        System.out.println(chessGameUser2.toString());
         UserInterceptor.updateStatusPrincipal(message.getIdUserCreate(),"INGAME");
         UserInterceptor.updateStatusPrincipal(user.getIdUserCreate(),"INGAME");
         //send result to user2-user1
@@ -154,23 +143,17 @@ public class UserController {
 
     @MessageMapping("/cancelJoinGame")
     public void cancelJoinGame(queueUser message) {
-        System.out.println("before Cancel: ");
         for (queueUser user: queueUsers){
-            System.out.println(user.getIdUserCreate());
         }
-        System.out.println("call Cancel: " + message.getIdUserCreate());
         Iterator<queueUser> iterator = queueUsers.iterator();
         while (iterator.hasNext()) {
             queueUser user = iterator.next();
             if (user.getIdUserCreate().equals(message.getIdUserCreate())) {
-                System.out.println("remove: " + user.getIdUserCreate());
                 queueUsers.remove(user); // Loại bỏ người chơi khớp từ danh sách chờ
                 break;
             }
         }
-        System.out.println("after Cancel: ");
         for (queueUser user: queueUsers){
-           System.out.println(user.getIdUserCreate());
         }
     }
     public boolean generateRandomBoolean() {

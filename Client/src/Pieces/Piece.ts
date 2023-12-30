@@ -1,8 +1,7 @@
 import { Board } from "../Board";
 import { Point } from "../Point";
 import { Color } from "../Enum";
-export abstract class Piece { 
-    private _killed : boolean = false
+export abstract class Piece {
     private _color: Color 
     private _name: string = "/";
     private _image: string = ""
@@ -26,12 +25,6 @@ export abstract class Piece {
     public set color(value: Color) {
         this._color = value
     }
-    public get killed(): boolean { 
-		return this._killed
-	}  
-    public set killed(killed: boolean){
-        this._killed = killed
-    } 
     public get image(): string {
         return this._image
     }

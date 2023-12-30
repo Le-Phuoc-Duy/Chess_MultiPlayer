@@ -10,14 +10,12 @@ export class Rook extends Piece{
     }
     canMove(board: Board, startPoint: Point, endPoint: Point): boolean {  
         if(endPoint.piece && endPoint.piece.color === this.color){ 
-            console.log("rook spy")
             return false
         }
         if(!this.isPathClear(board,startPoint,endPoint)){
-            console.log("nhay coc")
             return false
         } 
-        //Nuoc di binh thuong
+        // Nước đi bình thường
         if(startPoint.row === endPoint.row || startPoint.col === endPoint.col){
             if (startPoint.col === 0 && startPoint.piece?.color === Color.WHITE)
                 board.rookFarKing = false

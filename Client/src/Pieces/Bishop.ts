@@ -10,11 +10,9 @@ export class Bishop extends Piece{
     }
     canMove(board: Board, startPoint: Point, endPoint: Point): boolean { 
         if(endPoint.piece && endPoint.piece.color === this.color){ 
-            console.log("Bishop spy")
             return false
         }
         if(!this.isPathClear(board,startPoint,endPoint)){
-            console.log("nhay coc")
             return false
         } 
         let row = Math.abs(startPoint.row - endPoint.row)

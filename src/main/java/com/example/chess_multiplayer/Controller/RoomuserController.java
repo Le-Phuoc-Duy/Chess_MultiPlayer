@@ -8,7 +8,6 @@ import com.example.chess_multiplayer.Interface.CountdownTimerListener;
 import com.example.chess_multiplayer.Service.RoomService;
 import com.example.chess_multiplayer.Service.RoomuserService;
 import com.example.chess_multiplayer.Service.UserService;
-import com.example.chess_multiplayer.config.PricipalCustome;
 import com.example.chess_multiplayer.config.UserInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -55,7 +54,6 @@ public class RoomuserController implements CountdownTimerListener {
         // Update room user values
         roomuserService.updateRoomUserResult(idRoomUser, Result.LOSE.toString());
         roomuserService.updateRoomUserResult(idRoomUserReceive, Result.WIN.toString());
-        System.out.println("Time out for user: " + idUserSend);
     }
 
     @Override
@@ -149,7 +147,6 @@ public class RoomuserController implements CountdownTimerListener {
         String AccOppId = accountService.getAccID(message.getUserReceiveName());
         String UserOppId = userService.getIdUserByIdAcc(AccOppId);
         int mode = roomService.getRoomById(message.getiDRoom()).getMode();
-        System.out.println("mode: "+ mode);
         ChessGame chessGameUserReceive = new ChessGame();
         chessGameUserReceive.setiDUserSend(UserOppId);
         chessGameUserReceive.setiDRoom(message.getiDRoom());
@@ -200,7 +197,6 @@ public class RoomuserController implements CountdownTimerListener {
             }
             message.setUserCountdownValue(getCountdownTimerWithIdRoomUser(message.getIdRoomUser()));
             message.setOppCountdownValue(getCountdownTimerWithIdRoomUser(chessGameUserReceive.getIdRoomUser()));
-            System.out.println("countDown: " + getCountdownTimerWithIdRoomUser(chessGameUserReceive.getIdRoomUser()));
             chessGameUserReceive.setUserCountdownValue(getCountdownTimerWithIdRoomUser(chessGameUserReceive.getIdRoomUser()));
             chessGameUserReceive.setOppCountdownValue(getCountdownTimerWithIdRoomUser(message.getIdRoomUser()));
 
@@ -212,7 +208,6 @@ public class RoomuserController implements CountdownTimerListener {
     }
     @MessageMapping("/endGame")
     public void endGame(GameStatus message) {
-        System.out.println("endGame");
         String AccOppId = accountService.getAccID(message.getUserReceiveName());
         String UserOppId = userService.getIdUserByIdAcc(AccOppId);
         GameStatus gameStatusUserReceive = new GameStatus();

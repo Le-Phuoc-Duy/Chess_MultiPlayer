@@ -25,7 +25,6 @@ public class ProfileReponse {
     public void setNumberOfStanding(long numberOfStanding) {
         this.numberOfStanding = numberOfStanding;
     }
-//    private Set<Friend> friends = new HashSet<>();
     public int getNumberOfWon() {
         return numberOfWon;
     }
@@ -64,12 +63,4 @@ public class ProfileReponse {
     public void setElo(int elo) {
         this.elo = elo;
     }
-
-//    public Set<Friend> getFriends() {
-//        return friends;
-//    }
-//
-//    public void setFriends(Set<Friend> friends) {
-//        this.friends = friends;
-//    }
 }

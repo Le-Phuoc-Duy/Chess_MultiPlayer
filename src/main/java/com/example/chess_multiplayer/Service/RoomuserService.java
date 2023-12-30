@@ -47,7 +47,6 @@ public class RoomuserService {
             }
             roomUser.setRoom(room);
             roomuserRepository.save(roomUser);
-//            room.getRoomusers().add(roomUser);
             return roomUser.getIDRoomUser();
         }catch (Exception e){
             e.printStackTrace();

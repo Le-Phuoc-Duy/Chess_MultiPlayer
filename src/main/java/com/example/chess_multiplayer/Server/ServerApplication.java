@@ -13,23 +13,17 @@ public class ServerApplication {
     private static JLabel lbNumberOfRoom;
     private static int numberOfOnline;
     private static int numberOfRoom;
-    public static void setTxtLoginLog(String content) {
-        txtLoginLog.setText(txtLoginLog.getText() + content);
-    }
     public static void changeOnline(String opt, String newUserID) {
         if(opt.equals("INCREASE")){
             numberOfOnline++;
-            txtLoginLog.setText(txtLoginLog.getText() + newUserID + " đã truy cập" + "\n");
+            txtLoginLog.setText(txtLoginLog.getText() + "   " + newUserID + " đã truy cập" + "\n");
         }
         if(opt.equals("DECREASE")){
             numberOfOnline--;
-            txtLoginLog.setText(txtLoginLog.getText() + newUserID + " đã thoát" + "\n");
+            if(numberOfOnline < 0) numberOfOnline = 0;
+            txtLoginLog.setText(txtLoginLog.getText() + "   " + newUserID + " đã thoát" + "\n");
         }
         lbNumberOfOnline.setText(String.valueOf(numberOfOnline));
-    }
-    public void addRowToRoomLogTable(String description, String blackPiece, String whitePiece, String result) {
-        roomLogTableModel.addRow(new Object[]{description, blackPiece, whitePiece, result});
-
     }
     public static void changeRoom(String opt,String RoomId, String whiteID, String blackID, String result){
         if(opt.equals("INCREASE")){
@@ -39,6 +33,7 @@ public class ServerApplication {
         }
         if(opt.equals("DECREASE")){
             numberOfRoom--;
+            if(numberOfRoom < 0) numberOfRoom = 0;
             Object[] rowData = {"Phòng " +RoomId + " đã kết thúc", whiteID, blackID, result};
             roomLogTableModel.addRow(rowData);
         }
@@ -68,11 +63,11 @@ public class ServerApplication {
         JScrollPane loginScrollPane = new JScrollPane(txtLoginLog);
 
         JPanel pn3 = new JPanel();
-        JLabel lbRoom = new JLabel("Số lượng phòng: ");
+        JLabel lbRoom = new JLabel("Số lượng phòng đang chơi: ");
         lbNumberOfRoom = new JLabel("0");
         pn3.add(lbRoom);
         pn3.add(lbNumberOfRoom);
-        pn3.add(Box.createHorizontalStrut(350));
+        pn3.add(Box.createHorizontalStrut(320));
 
         JPanel pn4 = new JPanel();
         JLabel lbLogRoom = new JLabel("Lịch sử phòng: ");

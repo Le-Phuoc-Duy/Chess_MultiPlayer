@@ -128,7 +128,7 @@ public class UserService {
         pageIndex--;    // pageIndex đếm từ 0 nên phải giảm
         Page<User> userPage = userRepository.findAllByOrderByEloDesc(PageRequest.of(pageIndex, pageSize));
 
-        // Chuyển đổi Page<User> thành List<String> hoặc thực hiện xử lý khác tùy thuộc vào yêu cầu của bạn
+        // Chuyển đổi Page<User> thành List<String>
         List<String> userIds = userPage.getContent().stream()
                 .map(User::getIDUser)
                 .collect(Collectors.toList());

@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 import { Game } from "../Game";
 import { Board } from '../Board';
 function createRoom(mode: number): Promise<string> {
-    console.log("mode" + mode)
     return new Promise((resolve, reject) => {
         stompClient.publish({
             destination: '/app/createRoom',
@@ -24,15 +23,12 @@ export function joinRoom(): Promise<RoomJoinedResponse> {
     return new Promise((resolve, reject) => {
         stompClient.subscribe('/user/queue/roomJoined', (message) => {
             const body = JSON.parse(message.body);
-            // console.log('UserID: ' + body.userID + '\nMessage: ' + body.message);
-            // console.log('iDUserSend: ' + body.iDUserSend + '\niDUserReceive: ' + body.iDUserReceive + '\niDRoom: ' + body.iDRoom + '\nidRoomUser: ' + body.idRoomUser + '\nchessMove: ' + body.chessMove + '\nboard: ' + body.board + '\ncolor: ' + body.color + '\nuserSendTempPort: ' + body.userSendTempPort + +'\nuserReceiveTempPort: ' + body.userReceiveTempPort);
             localStorage.setItem('iDUserSend', body.iDUserSend);
             localStorage.setItem('iDRoom', body.iDRoom);
             localStorage.setItem('idRoomUser', body.idRoomUser);
             localStorage.setItem('chessMove', body.chessMove);
             localStorage.setItem('board', body.board);
             localStorage.setItem('color', body.color.toString()); 
-            // localStorage.setItem('userSendName', body.userSendName);
             localStorage.setItem('userSendAva', body.userSendAva);
             localStorage.setItem('userCountdownValue', body.userCountdownValue);
             localStorage.setItem('userReceiveName', body.userReceiveName);
@@ -48,8 +44,8 @@ export function sendChessMove(CreateChessMove: RoomJoinedResponse): Promise<stri
             body: JSON.stringify({iDUserSend: CreateChessMove.iDUserSend, userName: localStorage.getItem('userName'),
                                     iDRoom: CreateChessMove.iDRoom, userSendAva: localStorage.getItem('ava'),
                                     idRoomUser: CreateChessMove.idRoomUser,  chessMove: CreateChessMove.chessMove, 
-                                    board: CreateChessMove.board, 
-                                    color: CreateChessMove.color, userReceiveName: localStorage.getItem('userReceiveName') }),
+                                    board: CreateChessMove.board, color: CreateChessMove.color, 
+                                    userReceiveName: localStorage.getItem('userReceiveName') }),
         });
         resolve("Success");
     });
@@ -97,20 +93,15 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                 joinRoom()
                   .then((result) => {
                       if (result) {
-                          console.log('iDUserSend: ' + result.iDUserSend + '\niDUserReceive: ' + result.iDUserReceive + '\niDRoom: ' + result.iDRoom + '\nidRoomUser: ' + result.idRoomUser + '\nchessMove: ' + result.chessMove + '\nboard: ' + result.board + '\ncolor: ' + result.color);
                           if (result.color) {
-                              console.log("self la white, opp la black")
                               var gameByJoin: Game = new Game(Color.WHITE, new Board, true, 0);
                           } else {
-                              console.log("self la black, opp la white")
                               var gameByJoin: Game = new Game(Color.BLACK, new Board, false, 0);
                           }
                           gameByJoin.setFullCoordinates(result.board);
                           setCurrentGame(gameByJoin)
                           drawBoard(gameByJoin.board);
                           PromotionOverlay(currentGame.playerSide);
-                          console.log("result.userCountdownValue: " + result.userCountdownValue);
-                          // setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
                           initializeClockSelf(result.userCountdownValue);
                           initializeClockOpp(result.userCountdownValue);
                           const Toast = Swal.mixin({
@@ -208,18 +199,14 @@ document.getElementById("playWithFriend")?.addEventListener("click", async () =>
                                   title: "Đã có người chơi khác tham gia, Bắt đầu trận đấu"
                               });
                               if (result.color) {
-                                  console.log("self la white, opp la black")
                                   var gameByCreate: Game = new Game(Color.WHITE, new Board, true, 0);
                               } else {
-                                  console.log("self la black, opp la white")
                                   var gameByCreate: Game = new Game(Color.BLACK, new Board, false, 0);
                               }
                               gameByCreate.setFullCoordinates(result.board);
                               setCurrentGame(gameByCreate)
                               drawBoard(gameByCreate.board);
                               PromotionOverlay(currentGame.playerSide);
-                              console.log("result.userCountdownValue: " + result.userCountdownValue);
-                              // setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
                               initializeClockSelf(result.userCountdownValue);
                               initializeClockOpp(result.userCountdownValue);
                           }

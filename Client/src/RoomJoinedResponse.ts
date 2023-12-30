@@ -6,11 +6,9 @@ export class RoomJoinedResponse {
     chessMove: string;
     board: string;
     color: boolean;
-    userSendTempPort: string;
-    userReceiveTempPort: string;
     userCountdownValue: number;
     oppCountdownValue: number;
-    constructor(iDUserSend: string, iDUserReceive: string, iDRoom: string, idRoomUser: string, chessMove: string, board: string, color: boolean,userSendTempPort: string,userReceiveTempPort: string,userCountdownValue: number,oppCountdownValue: number) {
+    constructor(iDUserSend: string, iDUserReceive: string, iDRoom: string, idRoomUser: string, chessMove: string, board: string, color: boolean,userCountdownValue: number,oppCountdownValue: number) {
         this.iDUserSend = iDUserSend;
         this.iDUserReceive = iDUserReceive;
         this.iDRoom = iDRoom;
@@ -18,8 +16,6 @@ export class RoomJoinedResponse {
         this.chessMove = chessMove;
         this.board = board;
         this.color = color;
-        this.userSendTempPort = userSendTempPort;
-        this.userReceiveTempPort =userReceiveTempPort;
         this.userCountdownValue = userCountdownValue;
         this.oppCountdownValue = oppCountdownValue;
     }

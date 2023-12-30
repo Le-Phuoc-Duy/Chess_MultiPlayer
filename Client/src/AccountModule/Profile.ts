@@ -3,9 +3,7 @@ import { PromotionOverlay, currentGame, drawBoard, initializeClockOpp, initializ
 import { Color, Invite } from "../Enum";
 import { joinRoom } from "../PlayModule/PlayWithFriend";
 import { Game } from "../Game";
-import { Board } from "../Board";
-
-// import { Chart } from "chart.js";  
+import { Board } from "../Board"; 
 document.getElementById('profileButton')?.addEventListener('click', function(){
     document.getElementById('profileSection')!.style.display = 'block'  
     document.getElementById('tableBXH')!.style.display = 'block'  
@@ -32,7 +30,6 @@ export function profileRender(rank: string,elo: string, numberOfWon: string, num
         body: '1'
     });
     createPagination(Math.ceil(numberOfStanding/4)) 
-    console.log("nnn" + numberOfDrawn+ numberOfLost + numberOfWon) 
     if(numberOfDrawn == "0" && numberOfLost == "0" && numberOfWon == "0"){
         document.getElementById('divAchieve')!.classList.add('d-none')
     }else{
@@ -138,9 +135,7 @@ function createPagination(totalIndices: number) {
         pageItems.forEach((item, index) => {
             item.addEventListener('click', () => {
                 activeIndex = start + index;
-                renderIndices();
-                console.log("page " + activeIndex)
-                
+                renderIndices();                
             });
         });
     }
@@ -270,11 +265,6 @@ function showModal(oopName: String) {
             headers: {},
             body: JSON.stringify({ idDUserSend: localStorage.getItem('userID'), userName: localStorage.getItem('userName'), mode: parseInt(selectedOption), userReceiveName: oopName, message: Invite.Request}),
         });
-        console.log("idDUserSend: ", localStorage.getItem('userID'))
-        console.log("userName: ", localStorage.getItem('userName'))
-        console.log("mode: ", parseInt(selectedOption))
-        console.log("userReceiveName: ", oopName)
-        console.log("message: ", Invite.Request)
         joinRoom().then((result) => {
             if (result) {
                 const Toast = Swal.mixin({
@@ -293,18 +283,14 @@ function showModal(oopName: String) {
                     title: "Đã có người chơi khác tham gia, Bắt đầu trận đấu"
                 });
                 if (result.color) {
-                    console.log("self la white, opp la black")
                     var gameByCreate: Game = new Game(Color.WHITE, new Board, true, 0);
                 } else {
-                    console.log("self la black, opp la white")
                     var gameByCreate: Game = new Game(Color.BLACK, new Board, false, 0);
                 }
                 gameByCreate.setFullCoordinates(result.board);
                 setCurrentGame(gameByCreate)
                 drawBoard(gameByCreate.board);
                 PromotionOverlay(currentGame.playerSide);
-                console.log("result.userCountdownValue: " + result.userCountdownValue);
-                // setTimer(result.userCountdownValue, result.userCountdownValue, true, true)
                 initializeClockSelf(result.userCountdownValue);
                 initializeClockOpp(result.userCountdownValue);
             }
