@@ -6,7 +6,10 @@ import { Game } from "../Game";
 import { Board } from "../Board"; 
 document.getElementById('profileButton')?.addEventListener('click', function(){
     document.getElementById('profileSection')!.style.display = 'block'  
-    document.getElementById('tableBXH')!.style.display = 'block'  
+    document.getElementById('tableBXH')!.style.display = 'block';  
+    document.getElementById('paginationBXH')!.style.display = 'flex';
+    document.getElementById('tableFriend')!.style.display = 'none';  
+    (document.getElementById("inpBXH") as HTMLInputElement).checked = true
     document.getElementById('mainGame')!.style.display = 'none'
     stompClient.publish({
         destination: '/app/profile', 
@@ -76,7 +79,6 @@ document.getElementById('inpFriend')!.addEventListener('change', function (this:
             destination: '/app/myFriend', 
             headers: {},  
             body: localStorage.getItem('userID')!.toString()
-            // body: '1'
         });
     }
 });
@@ -135,6 +137,11 @@ function createPagination(totalIndices: number) {
         pageItems.forEach((item, index) => {
             item.addEventListener('click', () => {
                 activeIndex = start + index;
+                stompClient.publish({
+                    destination: '/app/standing', 
+                    headers: {},  
+                    body: activeIndex.toString()
+                });
                 renderIndices();                
             });
         });
@@ -186,7 +193,11 @@ export function listFriendRender(content: any){
 
         let tdPlay = document.createElement('td');
         let buttonPlay = document.createElement('button');
-        buttonPlay.className = "btn btn-sm btn-success btnInvite";
+        if(friend.status === "ONLINE"){ 
+            buttonPlay.className = "btn btn-sm btn-success btnInvite";
+        }else{
+            buttonPlay.className = "btn btn-sm btn-secondary btnInvite";
+        }
         buttonPlay.value = friend.name;
         buttonPlay.textContent = "Mời";
         buttonPlay.addEventListener('click', function(){

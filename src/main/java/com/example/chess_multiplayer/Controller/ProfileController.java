@@ -39,17 +39,10 @@ public class ProfileController {
         List<Standing> listStanding = new ArrayList<>();
         //Tạm thời mỗi page 3 user
         List<String> listUserStanding = userService.getTopUsers(pageIndex,4);
-        long rankCnt = userService.getRank(listUserStanding.get(0));
         for (int i = 0; i < listUserStanding.size(); i++) {
             String currentIdUser = listUserStanding.get(i);
             Standing standing = new Standing();
-            if(i>0){
-                String previousIdUser = listUserStanding.get(i - 1);
-                if(userService.getUserById(currentIdUser).getElo() < userService.getUserById(previousIdUser).getElo()){
-                    rankCnt++;
-                }
-            }
-            standing.setRank(rankCnt);
+            standing.setRank(userService.getRank(currentIdUser));
             standing.setUsername(userService.getUsernameByUserID(currentIdUser));
             standing.setNumberOfWin(userService.getUserById(currentIdUser).getWin());
             standing.setNumberOfLose(userService.getUserById(currentIdUser).getLose());

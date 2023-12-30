@@ -18,8 +18,8 @@ body{
     margin-right: 5%;
 }
 .imgPromotion{
-    width: 20%;
-    margin: 2%;
+    width: 18%;
+    margin: 3%;
 
 }
 .clockdiv {
@@ -30,8 +30,11 @@ body{
     text-align: center;
     font-size: 25px;
   }
+.w-110{
+    width: 110px;
+}
 .time {
-    padding: 6px;
+    padding: 0.2vw;
     border-radius: 3px;
     background: #00816a;
     display: inline-block;

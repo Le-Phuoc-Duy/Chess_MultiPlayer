@@ -28,7 +28,6 @@ public class UserInterceptor implements ChannelInterceptor {
                     PricipalCustomer pricipalCustomer = userMap.get(name);
                     //userID null, trước khi vào chức năng login
                     if ("null".equals(name)){
-                        System.out.println("null");
                         final String randomId = UUID.randomUUID().toString();
                         pricipalCustomer = new PricipalCustomer(randomId,"ONLINE");
                         changeOnline("INCREASE",randomId);

@@ -114,8 +114,8 @@ stompClient.onConnect = (frame) => {
         if(body.message == "Request"){
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
-                  confirmButton: "btn btn-success",
-                  cancelButton: "btn btn-danger"
+                  confirmButton: "btn btn-success m-1 w-110",
+                  cancelButton: "btn btn-danger m-1 w-110"
                 },
                 buttonsStyling: false
               });
@@ -125,7 +125,7 @@ stompClient.onConnect = (frame) => {
               else mode = "10 phút";
               swalWithBootstrapButtons.fire({
                 title: "Lời mời",
-                text: "Tài khoản "+body.userReceiveName +" mời đánh cờ ở chế độ " + mode +"!",
+                html: `Tài khoản <strong>${body.userReceiveName}</strong> mời đánh cờ ở chế độ <strong>${mode}</strong>`,
                 icon: "question",
                 showCancelButton: true,
                 confirmButtonText: "Chấp nhận",
@@ -174,13 +174,23 @@ stompClient.onConnect = (frame) => {
                         destination: '/app/replyInvite',
                         headers: {},
                         body: JSON.stringify({iDUserSend: body.iDUserSend, userName: body.userName, mode: body.mode, userReceiveName: body.userReceiveName, message: Invite.Deny}),
+                    }); 
+                    const ToastDenyInvite = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                        }
                     });
-                  swalWithBootstrapButtons.fire({
-                    title: "Từ chối",
-                    text: "Bạn đã từ chối lời mời",
-                    icon: "error"
-                  });
-                }
+                    ToastDenyInvite.fire({
+                        icon: "error",
+                        title: "Bạn đã từ chối lời mời"
+                    });  
+                    }
               });
         }
     });

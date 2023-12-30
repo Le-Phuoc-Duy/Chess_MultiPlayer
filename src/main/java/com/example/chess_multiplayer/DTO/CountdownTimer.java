@@ -44,7 +44,7 @@ public class CountdownTimer {
                 listener.countdown(idUserSend,idUserReceive,countdownValue);
                 countdownValue--;
             } else if(countdownValue >= 0){
-                System.out.println("Stop countdown for " + idRoomUser + ": " + countdownValue);
+
             }else{
                 stopCountdown();
                 if (listener != null) {
