@@ -104,7 +104,9 @@ stompClient.onConnect = (frame) => {
         const body = JSON.parse(message.body);
         if(body.side === true){
             initializeClockSelf(body.countdownValue);
+            initializeClockOpp(body.countdownValueUserReceive);
         }else if(body.side === false){
+            initializeClockSelf(body.countdownValueUserReceive);
             initializeClockOpp(body.countdownValue);
         }
     });

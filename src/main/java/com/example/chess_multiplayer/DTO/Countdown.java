@@ -4,11 +4,15 @@ public class Countdown {
     private int countdownValue;
     private String idUser;
     private Boolean side;
+    private int countdownValueUserReceive;
+    private String idUserReceive;
 
-    public Countdown(int countdownValue, String idUser, Boolean side) {
+    public Countdown(int countdownValue, String idUser, Boolean side, int countdownValueUserReceive, String idUserReceive) {
         this.countdownValue = countdownValue;
         this.idUser = idUser;
         this.side = side;
+        this.countdownValueUserReceive = countdownValueUserReceive;
+        this.idUserReceive = idUserReceive;
     }
 
     public int getCountdownValue() {
@@ -33,5 +37,21 @@ public class Countdown {
 
     public void setSide(Boolean side) {
         this.side = side;
+    }
+
+    public int getCountdownValueUserReceive() {
+        return countdownValueUserReceive;
+    }
+
+    public void setCountdownValueUserReceive(int countdownValueUserReceive) {
+        this.countdownValueUserReceive = countdownValueUserReceive;
+    }
+
+    public String getIdUserReceive() {
+        return idUserReceive;
+    }
+
+    public void setIdUserReceive(String idUserReceive) {
+        this.idUserReceive = idUserReceive;
     }
 }

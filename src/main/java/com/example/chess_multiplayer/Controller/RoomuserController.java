@@ -57,11 +57,12 @@ public class RoomuserController implements CountdownTimerListener {
     }
 
     @Override
-    public void countdown(String idUserSend, String idUserReceive, int countdownValue) {
-        Countdown countdownUserSend = new Countdown(countdownValue,idUserSend,true);
-        Countdown countdownUserReceive = new Countdown(countdownValue, idUserReceive, false);
+    public void countdown(String idUserSend, String idUserReceive, int countdownValue, String idRoomUserReceive) {
+        Countdown countdownUserSend = new Countdown(countdownValue,idUserSend,true, getCountdownTimerWithIdRoomUser(idRoomUserReceive), idUserReceive);
+//        Countdown countdownUserReceive = new Countdown(countdownValue, idUserReceive, false);
         messagingTemplate.convertAndSendToUser(countdownUserSend.getIdUser(), "/queue/countdown", countdownUserSend);
-        messagingTemplate.convertAndSendToUser(countdownUserReceive.getIdUser(), "/queue/countdown", countdownUserReceive);
+        countdownUserSend.setSide(false);//countdown for user receive
+        messagingTemplate.convertAndSendToUser(idUserReceive, "/queue/countdown", countdownUserSend);
     }
 
     public void checkAndRemoveFinishedTimersUserSendId(String idUser) {
