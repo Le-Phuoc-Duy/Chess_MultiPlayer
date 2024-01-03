@@ -13,17 +13,30 @@ public class ServerApplication {
     private static JLabel lbNumberOfRoom;
     private static int numberOfOnline;
     private static int numberOfRoom;
+    public static int countOccurrences(String text, String searchTerm) {
+        int count = 0;
+        int index = 0;
+
+        while ((index = text.indexOf(searchTerm, index)) != -1) {
+            count++;
+            index += searchTerm.length();
+        }
+
+        return count;
+    }
     public static void changeOnline(String opt, String newUserID) {
         if(opt.equals("INCREASE")){
-            numberOfOnline++;
+//            numberOfOnline++;
             txtLoginLog.setText(txtLoginLog.getText() + "   " + newUserID + " đã truy cập" + "\n");
         }
         if(opt.equals("DECREASE")){
-            numberOfOnline--;
-            if(numberOfOnline < 0) numberOfOnline = 0;
+//            numberOfOnline--;
+//            if(numberOfOnline < 0) numberOfOnline = 0;
             txtLoginLog.setText(txtLoginLog.getText() + "   " + newUserID + " đã thoát" + "\n");
         }
-        lbNumberOfOnline.setText(String.valueOf(numberOfOnline));
+        int in = countOccurrences(txtLoginLog.getText(), "đã truy cập");
+        int out = countOccurrences(txtLoginLog.getText(), "đã thoát");
+        lbNumberOfOnline.setText(String.valueOf(in - out));
     }
     public static void changeRoom(String opt,String RoomId, String whiteID, String blackID, String result){
         if(opt.equals("INCREASE")){
