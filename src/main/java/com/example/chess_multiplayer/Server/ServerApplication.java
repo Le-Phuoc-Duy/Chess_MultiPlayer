@@ -11,7 +11,6 @@ public class ServerApplication {
     private static DefaultTableModel roomLogTableModel;
     private static JLabel lbNumberOfOnline;
     private static JLabel lbNumberOfRoom;
-    private static int numberOfOnline;
     private static int numberOfRoom;
     public static int countOccurrences(String text, String searchTerm) {
         int count = 0;
@@ -26,12 +25,9 @@ public class ServerApplication {
     }
     public static void changeOnline(String opt, String newUserID) {
         if(opt.equals("INCREASE")){
-//            numberOfOnline++;
             txtLoginLog.setText(txtLoginLog.getText() + "   " + newUserID + " đã truy cập" + "\n");
         }
         if(opt.equals("DECREASE")){
-//            numberOfOnline--;
-//            if(numberOfOnline < 0) numberOfOnline = 0;
             txtLoginLog.setText(txtLoginLog.getText() + "   " + newUserID + " đã thoát" + "\n");
         }
         int in = countOccurrences(txtLoginLog.getText(), "đã truy cập");
@@ -81,7 +77,7 @@ public class ServerApplication {
         lbNumberOfRoom = new JLabel("0");
         pn3.add(lbRoom);
         pn3.add(lbNumberOfRoom);
-        pn3.add(Box.createHorizontalStrut(320));
+        pn3.add(Box.createHorizontalStrut(294));
 
         JPanel pn4 = new JPanel();
         JLabel lbLogRoom = new JLabel("Lịch sử phòng: ");

@@ -40,8 +40,8 @@ document.getElementById("loginButton")?.addEventListener("click",async () => {
                 Swal.showValidationMessage('Vui lòng không để trống mật khẩu');
             } else if (!username){
                 Swal.showValidationMessage('Vui lòng không để trống tên người dùng');
-            // } else if (password.length < 5) {
-            //     Swal.showValidationMessage('Mật khẩu phải có ít nhất 5 ký tự.');
+            } else if (password.length < 5) {
+                Swal.showValidationMessage('Mật khẩu phải có ít nhất 5 ký tự.');
             } else { 
                 sendLogin(username, password)
                     .then((result) => { 
