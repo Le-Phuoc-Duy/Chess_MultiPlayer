@@ -4,6 +4,7 @@ import { Color, Invite } from "../Enum";
 import { joinRoom } from "../PlayModule/PlayWithFriend";
 import { Game } from "../Game";
 import { Board } from "../Board"; 
+var chart = null
 document.getElementById('profileButton')?.addEventListener('click', function(){
     document.getElementById('profileSection')!.style.display = 'block'  
     document.getElementById('tableBXH')!.style.display = 'block';  
@@ -23,6 +24,7 @@ document.getElementById('backProfile')?.addEventListener('click', function(){
 })
 
 export function profileRender(rank: string,elo: string, numberOfWon: string, numberOfDrawn: string, numberOfLost: string, numberOfStanding: number){
+    console.log("D" + numberOfDrawn +"W" + numberOfWon + "L" + numberOfLost)
     document.getElementById('h4ProfileName')!.innerHTML = localStorage.getItem('userName')!;
     document.getElementById('h4ProfileElo')!.innerHTML = "Elo: " + elo;
     document.getElementById('h4ProfileRank')!.innerHTML = "#RANK: " + rank;
@@ -54,6 +56,9 @@ export function profileRender(rank: string,elo: string, numberOfWon: string, num
             },
         
         } 
+        if (chart) {
+            chart.destroy(); // Nếu tồn tại, hủy biểu đồ cũ
+        }
         var ctx = document.getElementById('achieve')!.getContext('2d')  
         chart = new Chart(ctx, {
             type: "pie",
@@ -234,6 +239,7 @@ function showModal(oopName: String) {
         -moz-appearance: none;
         background-color: #fff;
         cursor: pointer;
+        text-align: center;
       }
     
       .custom-arrow {

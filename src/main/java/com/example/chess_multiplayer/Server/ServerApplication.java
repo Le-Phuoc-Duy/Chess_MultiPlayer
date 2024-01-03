@@ -60,6 +60,7 @@ public class ServerApplication {
         pn2.add(Box.createHorizontalStrut(370));
 
         txtLoginLog = new JTextArea(10,50);
+        txtLoginLog.setEditable(false);
         JScrollPane loginScrollPane = new JScrollPane(txtLoginLog);
 
         JPanel pn3 = new JPanel();
