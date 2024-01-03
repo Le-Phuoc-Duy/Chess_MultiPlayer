@@ -84,28 +84,37 @@ document.getElementById("buttonPlay")?.addEventListener("click", async () => {
 
 function joinGame(): Promise<RoomJoinedResponse> {
   return new Promise((resolve) => {
-    let gameMode: number
+    let gameMode: number = -1
     switch (document.getElementById('gameMode')!.innerHTML) {
-      case "2 | 1 phút":
-        gameMode = -1
-        break;
-      case "3 | 2 phút":
-        gameMode = -2
-        break;
-      case "5 phút":
-        gameMode = -3
-        break;
-      case "10 phút":
-        gameMode = -4
-        break;
-      default:
-        let minute = (document.getElementById('minute') as HTMLInputElement).value;
-        let second = (document.getElementById('second') as HTMLInputElement).value;
-        let m: number = parseInt(minute);
-        let s: number = parseInt(second);
-        let x: number = m * 60 + s
-        gameMode = x;
-        break;
+        case "2 | 1 phút":
+            gameMode = -1
+            break;
+        case "3 | 2 phút":
+            gameMode = -2
+            break;
+        case "5 phút":
+            gameMode = -3
+            break;
+        case "10 phút":
+            gameMode = -4
+            break;
+        default:
+            let m: number;
+            let s: number;
+            let minute = (document.getElementById('minute') as HTMLInputElement).value;
+            let second = (document.getElementById('second') as HTMLInputElement).value;
+            if (isNaN(parseInt(minute))) {
+                m = 0;
+            }else{
+                m = parseInt(minute);
+            }
+            if (isNaN(parseInt(second))) {
+                s = 0;
+            }else{
+                s = parseInt(second);
+            }
+            gameMode = m*60 + s;
+            break;
     }
     stompClient.publish({
       destination: '/app/joinGame',

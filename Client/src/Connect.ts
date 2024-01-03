@@ -458,6 +458,7 @@ buttons.forEach((button) => {
         if (button.id === 'mode5') {
             let minute = (document.getElementById('minute') as HTMLInputElement).value;
             let second = (document.getElementById('second') as HTMLInputElement).value;
+            if (!second) second = "00"
             let x = minute + ":" + second;
             document.getElementById('gameMode')!.innerHTML = x;
         } else {
