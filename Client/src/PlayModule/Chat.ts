@@ -63,7 +63,7 @@ function sendChatToServer(): Promise<string> {
                     body: JSON.stringify({ idDUserSend: localStorage.getItem('userID'), chat: inputValue, ava: null }),
                 });
                 resolve("chatAll Success");
-                MyChatContent(inputValue,avaNumber,true);
+                // MyChatContent(inputValue,avaNumber,true);
                 if (messageInput) {
                     messageInput.value = ''; 
                 }
@@ -100,7 +100,7 @@ function sendChatToServer(): Promise<string> {
                         body: JSON.stringify({ idUserSend: idUserSend, idRoom: idRoom, idRoomUser: idRoomUser, chat: chat, userSendName: userSendName, userReceiveName: userReceiveName }),
                     });
                     resolve("chatAll Success");
-                    MyChatContent(inputValue,avaNumber,false);
+                    // MyChatContent(inputValue,avaNumber,false);
                     if (messageInput) {
                         messageInput.value = ''; 
                     }
@@ -112,8 +112,11 @@ function sendChatToServer(): Promise<string> {
     }
     
 }
-export function ChatContentFrom(senderName: string, senderAvatar: number, messageContent: string, chatMode: boolean) {   
-    if(senderName != localStorage.getItem('userName') || localStorage.getItem('userID') == null){
+export function ChatContentFrom(senderName: string, senderAvatar: number, messageContent: string, chatMode: boolean) {  
+    if(senderName == localStorage.getItem('userName')) {
+        MyChatContent(messageContent,senderAvatar,chatMode);
+    }
+    else if(senderName != localStorage.getItem('userName') || localStorage.getItem('userID') == null){
         const newMessageDiv = document.createElement('div');
         newMessageDiv.classList.add('d-flex', 'justify-content-between');
 

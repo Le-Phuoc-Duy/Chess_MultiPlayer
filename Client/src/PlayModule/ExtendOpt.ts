@@ -43,6 +43,8 @@ export function removeGame() {
     localStorage.removeItem("chessMove")
     localStorage.removeItem("board")
     localStorage.removeItem("color")
+    let chatPrivateContent: HTMLElement = document.getElementById('chatPrivateContent') as HTMLElement;
+    chatPrivateContent.innerHTML = "";
     // localStorage.removeItem("userSendTempPort")
     // localStorage.removeItem("userReceiveTempPort")
     removeBoard()

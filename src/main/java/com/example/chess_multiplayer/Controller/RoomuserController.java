@@ -404,6 +404,8 @@ public class RoomuserController implements CountdownTimerListener {
             chatRoomUserReceive.setIdRoomUser(getRoomuserIdByRoomIdAndUserId(message.getIdRoom(), UserOppId));
             chatRoomUserReceive.setChat(message.getChat());
             messagingTemplate.convertAndSendToUser(UserOppId, "/queue/chatRoom",chatRoomUserReceive );
+            chatRoomUserReceive.setIdUserSend(message.getIdUserSend());
+            messagingTemplate.convertAndSendToUser(message.getIdUserSend(), "/queue/chatRoom",chatRoomUserReceive );
         }else{
             messagingTemplate.convertAndSendToUser(UserOppId, "/queue/chatRoom", null);
         }
